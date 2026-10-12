@@ -33,6 +33,3 @@
 - Existing Python agent runtime: `ai/eden/source/agents/`, `source/orchestrator/`, `source/resolvers/`, `source/utils/`, `source/api/`
 - Relevant ETL retrieval documents: `data/etl-pipeline/source/pipeline/gold/`
 
-## Excluded by design
-- CRM, Gantt, calendar, marketing, subscriptions, tenant administration, full domain models unrelated to these features, auxiliary AI products, unrelated service gateways, historical deployment scripts and original production environment files.
-- The React routing shell and full Java platform were excluded to honor the request for **only** the named features. Importing these slices into a working product requires adding compatible shared platform services.

@@ -1,0 +1,1200 @@
+
+.listAssetRoot {
+  background:
+    radial-gradient(1100px 420px at 10% -10%, rgba(37, 99, 235, 0.18), transparent 60%),
+    radial-gradient(900px 360px at 95% 0%, rgba(124, 58, 237, 0.14), transparent 55%),
+    linear-gradient(180deg, rgba(248, 250, 252, 1) 0%, rgba(241, 245, 249, 1) 100%);
+}
+
+.headerOuter {
+  padding: 16px 16px 16px 16px;
+}
+
+.contentOuter {
+
+  padding: 0 16px 24px 16px;
+}
+
+@media (min-width: 900px) {
+  .headerOuter {
+    padding: 24px 24px 16px 24px;
+  }
+
+  .contentOuter {
+    padding: 0 24px 24px 24px;
+  }
+}
+
+.headerCard {
+  border-radius: 16px;
+  padding: 18px;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  box-shadow: 0 18px 50px rgba(2, 6, 23, 0.10);
+  position: relative;
+  overflow: hidden;
+  background-color: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(10px);
+}
+
+.headerGlow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(700px 220px at 0% 0%, rgba(37, 99, 235, 0.14), transparent 60%),
+    radial-gradient(700px 220px at 100% 0%, rgba(124, 58, 237, 0.12), transparent 60%);
+}
+
+.headerRow {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.headerLeft {
+  min-width: 240px;
+}
+
+.headerTitle {
+  font-weight: 950 !important;
+  font-size: 28px !important;
+  line-height: 1.1 !important;
+  color: #0f172a !important;
+}
+
+.headerSubtitle {
+  margin-top: 6px !important;
+  color: rgba(15, 23, 42, 0.65) !important;
+  font-weight: 600 !important;
+}
+
+.headerChipsRow {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.headerChip {
+  padding: 6px 10px !important;
+  border-radius: 999px !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+}
+
+.headerChipNeutral {
+  color: rgba(15, 23, 42, 0.70);
+  background: rgba(2, 6, 23, 0.04);
+}
+
+.headerChipBlue {
+  color: rgba(37, 99, 235, 0.90);
+  background: rgba(37, 99, 235, 0.08);
+  border-color: rgba(37, 99, 235, 0.14);
+}
+
+/* CTA */
+.ctaRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.versionWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.addBtn {
+  border-radius: 999px !important;
+  padding: 10px 20px !important;
+  font-weight: 900 !important;
+  text-transform: none !important;
+  box-shadow: 0 14px 28px rgba(60, 91, 250, 0.22) !important;
+  transition: transform 200ms ease, box-shadow 200ms ease, filter 200ms ease !important;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 18px 34px rgba(60, 91, 250, 0.28) !important;
+    filter: brightness(1.02);
+  }
+}
+
+.versionBadge {
+  position: absolute !important;
+  top: -8px !important;
+  right: -8px !important;
+  background: linear-gradient(90deg, #3F72AF 0%, #112D4E 100%) !important;
+  color: #fff !important;
+  border-radius: 999px !important;
+  padding: 2px 8px !important;
+  font-size: 0.7rem !important;
+  font-weight: 900 !important;
+  cursor: pointer !important;
+  border: 2px solid rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 10px 22px rgba(2, 6, 23, 0.2) !important;
+  transition: transform 150ms ease !important;
+
+  &:hover {
+    transform: scale(1.06);
+  }
+}
+
+.versionMenuPaper {
+  border-radius: 16px !important;
+  border: 1px solid rgba(15, 23, 42, 0.10) !important;
+  box-shadow: 0 18px 50px rgba(2, 6, 23, 0.16) !important;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: blur(12px);
+}
+
+/* Toast */
+.toastRoot {
+  padding-top: 56px;
+}
+
+.toastAlert {
+  width: 100%;
+  border-radius: 12px !important;
+  box-shadow: 0 12px 30px rgba(2, 6, 23, 0.12);
+}
+
+/* Loading */
+.loadingBox {
+  display: grid;
+  place-items: center;
+  padding: 80px 0;
+}
+
+.loadingTile {
+  width: 56px !important;
+  height: 56px !important;
+  border-radius: 16px !important;
+  display: grid !important;
+  place-items: center !important;
+  background: rgba(255, 255, 255, 0.8) !important;
+  border: 1px solid rgba(15, 23, 42, 0.10) !important;
+  box-shadow: 0 16px 40px rgba(2, 6, 23, 0.10) !important;
+}
+
+.loadingText {
+  margin-top: 16px !important;
+  color: rgba(15, 23, 42, 0.65) !important;
+  font-weight: 700 !important;
+}
+
+/* Empty state */
+.emptyState {
+  text-align: center;
+  padding: 32px;
+  border-radius: 16px;
+  border: 1px dashed rgba(15, 23, 42, 0.18);
+  background:
+    radial-gradient(900px 240px at 0% 0%, rgba(37, 99, 235, 0.08), transparent 60%),
+    rgba(255, 255, 255, 0.75);
+}
+
+.emptyTitle {
+  font-size: 20px !important;
+  font-weight: 950 !important;
+  color: #0f172a !important;
+}
+
+.emptySubtitle {
+  margin-top: 6px !important;
+  color: rgba(15, 23, 42, 0.65) !important;
+  font-weight: 600 !important;
+}
+
+/* Asset card */
+.assetCard {
+  border-radius: 16px !important;
+  overflow: hidden;
+  border: 1px solid rgba(15, 23, 42, 0.10) !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.74) 100%) !important;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 18px 52px rgba(2, 6, 23, 0.10);
+  transition: transform 180ms ease, box-shadow 180ms ease !important;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 22px 60px rgba(2, 6, 23, 0.14) !important;
+  }
+}
+
+.assetCardInner {
+  padding: 18px;
+}
+
+.assetTopRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.assetTopLeft {
+  min-width: 0;
+}
+
+.assetName {
+  font-weight: 950 !important;
+  font-size: 18px !important;
+  color: #1d4ed8 !important;
+  line-height: 1.2 !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.assetAddress {
+  margin-top: 6px !important;
+  color: rgba(15, 23, 42, 0.65) !important;
+  font-weight: 650 !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.assetMetaLine {
+  margin-top: 4px !important;
+  color: rgba(15, 23, 42, 0.60) !important;
+  font-weight: 600 !important;
+}
+
+.assetTopRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.actionIconBtn {
+  border-radius: 10px !important;
+  border: 1px solid rgba(15, 23, 42, 0.10) !important;
+  background: rgba(255, 255, 255, 0.75) !important;
+
+  &:hover {
+    background: rgba(60, 91, 250, 0.10) !important;
+    border-color: rgba(60, 91, 250, 0.30) !important;
+  }
+}
+
+.cardDivider {
+  margin: 14px 0 !important;
+  border-color: rgba(15, 23, 42, 0.10) !important;
+}
+
+/* Menu */
+.assetMenuList {
+  padding: 0 !important;
+}
+
+.assetMenuPaper {
+  width: 360px;
+  border-radius: 16px !important;
+  border: 1px solid rgba(15, 23, 42, 0.10) !important;
+  box-shadow: 0 22px 60px rgba(2, 6, 23, 0.18) !important;
+  overflow: hidden !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: blur(12px);
+}
+
+.menuHeader {
+  padding: 14px 16px 10px 16px;
+}
+
+.menuHeaderTitle {
+  font-weight: 950 !important;
+  font-size: 16px !important;
+}
+
+.menuHeaderSub {
+  margin-top: 6px !important;
+  font-size: 12.5px !important;
+  color: rgba(15, 23, 42, 0.60) !important;
+  font-weight: 650 !important;
+}
+
+.thinDivider {
+  border-color: rgba(15, 23, 42, 0.08) !important;
+}
+
+.menuItemsWrap {
+  padding: 8px !important;
+}
+
+.menuItemRow {
+  border-radius: 12px !important;
+  padding: 10px !important;
+  margin-bottom: 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+
+  &:hover {
+    background: rgba(2, 6, 23, 0.04) !important;
+  }
+}
+
+.menuItemLeft {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  min-width: 0 !important;
+}
+
+.menuIconBox {
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 12px !important;
+  display: grid !important;
+  place-items: center !important;
+  flex: 0 0 auto !important;
+}
+
+.menuIconBlue {
+  background: rgba(37, 99, 235, 0.10) !important;
+  color: rgba(37, 99, 235, 0.95) !important;
+}
+
+.menuIconRed {
+  background: rgba(239, 68, 68, 0.10) !important;
+  color: rgba(239, 68, 68, 0.95) !important;
+}
+
+.menuIconGreen {
+  background: rgba(16, 185, 129, 0.10) !important;
+  color: rgba(16, 185, 129, 0.95) !important;
+}
+
+.menuIconIndigo {
+  background: rgba(99, 102, 241, 0.10) !important;
+  color: rgba(99, 102, 241, 0.95) !important;
+}
+
+.menuItemTitle {
+  font-weight: 900 !important;
+  font-size: 14.5px !important;
+  white-space: nowrap;
+}
+
+.menuItemHint {
+  font-size: 12.5px !important;
+  color: rgba(15, 23, 42, 0.55) !important;
+  font-weight: 650 !important;
+}
+
+/* Map */
+.mapBox {
+  //   border-radius: 16px;
+  overflow: hidden !important;
+  border: 1px solid rgba(15, 23, 42, 0.10) !important;
+  //   box-shadow: 0 14px 34px rgba(2, 6, 23, 0.10);
+  position: relative !important;
+}
+
+.mapOverlay {
+  position: absolute !important;
+  inset: 0 !important;
+  pointer-events: none !important;
+  background: linear-gradient(180deg, rgba(2, 6, 23, 0.10) 0%, transparent 38%) !important;
+  z-index: 1 !important;
+}
+
+.mapLoading {
+  height: 180px !important;
+  display: grid !important;
+  place-items: center !important;
+}
+
+/* Meta tiles */
+.metaGrid {
+  display: grid !important;
+  gap: 10px !important;
+}
+
+.metaTile {
+  border-radius: 12px !important;
+  padding: 8px !important;
+  border: 1px solid rgba(15, 23, 42, 0.10) !important;
+  background: rgba(255, 255, 255, 0.65) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+.metaLabel {
+  font-size: 12px !important;
+  color: rgba(15, 23, 42, 0.60) !important;
+  font-weight: 900 !important;
+}
+
+.metaValue {
+  font-size: 16px !important;
+  font-weight: 950 !important;
+  color: #0f172a !important;
+}
+
+.metaRow {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+}
+
+.metaValueRight {
+  text-align: right !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  max-width: 160px !important;
+}
+
+/* Status strip */
+.statusStrip {
+  margin-top: 16px !important;
+  border-radius: 16px !important;
+  padding: 12px 14px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  border: 1px solid rgba(15, 23, 42, 0.10) !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.55) 100%) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+
+.statusTextWrap {
+  flex: 1 !important;
+  min-width: 0 !important;
+  /* needed for ellipsis */
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  gap: 2px !important;
+}
+
+.statusMain {
+  font-weight: 950 !important;
+  line-height: 1.2 !important;
+
+  /* ✅ stop height growth */
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+
+.statusSubtext {
+  font-size: 12.5px !important;
+  font-weight: 650 !important;
+  color: rgba(15, 23, 42, 0.60) !important;
+
+  /* ✅ clamp to one line so strip height never grows */
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.statusRefreshBtn {
+  border-radius: 12px !important;
+  background: rgba(2, 6, 23, 0.04) !important;
+  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+
+  &:hover {
+    background: rgba(2, 6, 23, 0.06) !important;
+  }
+}
+
+/* Confirm dialogs */
+.confirmDialogPad {
+  padding: 16px 32px 0 32px !important;
+}
+
+.confirmDialogBox {
+  margin: 16px !important;
+}
+
+.warnIcon {
+  font-size: 80px !important;
+  color: #ffc107 !important;
+  stroke: #ffffff !important;
+  stroke-width: 1px !important;
+}
+
+.confirmTitle {
+  font-size: 22px !important;
+  font-weight: 500 !important;
+  margin-bottom: 12px !important;
+}
+
+.confirmActions {
+  display: flex !important;
+  justify-content: center !important;
+}
+
+/* Trade dialog */
+.tradeDialogPad {
+  padding: 24px !important;
+}
+
+.tradeDialogContent {
+  display: flex !important;
+  gap: 16px !important;
+}
+
+.tradeCard {
+  width: 120px !important;
+  border: 1px solid gray !important;
+}
+
+.tradeCardSelected {
+  border: 2px solid blue !important;
+}
+
+/* Request info dialog */
+.requestInfoActions {
+  display: flex !important;
+  justify-content: flex-end !important;
+}
+
+/* Request flow dialog */
+.requestFlowPaper {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.22) !important;
+}
+
+.requestFlowHeader {
+  padding: 14px 18px !important;
+  color: #fff !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.2px !important;
+  background: #1e3a8a !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.requestFlowHeaderLeft {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.requestFlowIconBox {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 10px !important;
+  background: rgba(255, 255, 255, 0.14) !important;
+  display: grid !important;
+  place-items: center !important;
+}
+
+.requestFlowIcon {
+  font-size: 20px !important;
+  color: #fff !important;
+}
+
+.stepBadge {
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  padding: 6px 10px !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.18) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+}
+
+.requestFlowContent {
+  padding: 18px !important;
+  background: #f6f8fb !important;
+}
+
+.requestFlowFooter {
+  padding: 14px 18px !important;
+  background: #fff !important;
+  border-top: 1px solid rgba(15, 23, 42, 0.08) !important;
+  display: flex !important;
+  justify-content: space-between !important;
+}
+
+.footerRightBtns {
+  display: flex !important;
+  gap: 8px !important;
+}
+
+.requestFooterBtn {
+  border-radius: 10px !important;
+  padding-left: 18px !important;
+  padding-right: 18px !important;
+  font-weight: 900 !important;
+  text-transform: none !important;
+}
+
+/* Request flow inner cards */
+.propertyInfoCard {
+  margin: 16px 0 !important;
+  border-radius: 12px !important;
+  border-color: rgba(15, 23, 42, 0.10) !important;
+  background:
+    radial-gradient(900px 240px at 0% 0%, rgba(37, 99, 235, 0.10), transparent 60%),
+    #fff !important;
+}
+
+.propertyInfoContent {
+  padding: 16px !important;
+}
+
+.propertyInfoTitle {
+  font-weight: 900 !important;
+  color: #1e3a8a !important;
+  margin-bottom: 8px !important;
+}
+
+.propertyInfoGrid {
+  display: grid !important;
+  gap: 6px;
+}
+
+.boldLabel {
+  font-weight: 800 !important;
+  margin-right: 6px !important;
+}
+
+.addressLine {
+  display: flex !important;
+  gap: 6px !important;
+  flex-wrap: wrap !important;
+}
+
+.stepCard {
+  border-radius: 12px !important;
+  border-color: rgba(15, 23, 42, 0.10) !important;
+  background: #fff !important;
+}
+
+.stepCardContent {
+  padding: 16px !important;
+}
+
+.stepTitle {
+  font-weight: 900 !important;
+  margin-bottom: 8px !important;
+  color: #0f172a !important;
+}
+
+.formLabel {
+  margin-bottom: 10px !important;
+  font-weight: 700 !important;
+  color: #334155 !important;
+}
+
+.selectRounded {
+  border-radius: 10px !important;
+}
+
+.selectMenuPaper {
+  margin-top: 8px !important;
+  border-radius: 10px !important;
+  max-height: 260px !important;
+  overflow-y: auto !important;
+  width: 250px !important;
+}
+
+.existingRequestWarn {
+  margin-top: 14px !important;
+  padding: 12px !important;
+  border-radius: 10px !important;
+  background: rgba(245, 158, 11, 0.12) !important;
+  border: 1px solid rgba(245, 158, 11, 0.25) !important;
+}
+
+.existingRequestWarnText {
+  font-weight: 800 !important;
+  color: #92400e !important;
+}
+
+/* Measurement dialog (glass) */
+.dialogRoot {
+  .MuiDialog-paper {
+    border-radius: 16px !important;
+    overflow: hidden !important;
+    border: 1px solid rgba(15, 23, 42, 0.10) !important;
+    box-shadow: 0 26px 70px rgba(2, 6, 23, 0.22) !important;
+    background:
+      radial-gradient(900px 280px at 0% 0%, rgba(37, 99, 235, 0.16), transparent 60%),
+      radial-gradient(900px 280px at 100% 0%, rgba(124, 58, 237, 0.12), transparent 55%),
+      rgba(255, 255, 255, 0.92) !important;
+    backdrop-filter: blur(12px) !important;
+  }
+}
+
+.dialogHeader {
+  padding: 16px 18px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.10) !important;
+}
+
+.dialogTitleText {
+  font-weight: 950 !important;
+  font-size: 20px !important;
+}
+
+.dialogSubText {
+  font-size: 12.5px !important;
+  color: rgba(15, 23, 42, 0.60) !important;
+}
+
+.dialogContentPad {
+  padding: 16px !important;
+  margin-top: 16px;
+}
+
+.roundBtn {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(15, 23, 42, 0.10) !important;
+  background: rgba(255, 255, 255, 0.8) !important;
+
+  &:hover {
+    background: rgba(2, 6, 23, 0.04) !important;
+  }
+}
+
+.dialogCard {
+  border-radius: 16px !important;
+  border: 1px solid rgba(15, 23, 42, 0.10) !important;
+  box-shadow: 0 16px 40px rgba(2, 6, 23, 0.10) !important;
+  overflow: hidden !important;
+  background: rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(10px) !important;
+  margin-top: 16px !important;
+}
+
+.dialogCardContent {
+  padding: 16px !important;
+}
+
+.tableWrap {
+  border-radius: 12px !important;
+  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+  overflow: hidden !important;
+  background: rgba(255, 255, 255, 0.65) !important;
+}
+
+.tableHeadCell {
+  font-weight: 900 !important;
+  color: rgba(15, 23, 42, 0.78) !important;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08) !important;
+  background: rgba(255, 255, 255, 0.65) !important;
+}
+
+.tableRowHover {
+  td {
+    border-bottom: 1px solid rgba(15, 23, 42, 0.06) !important;
+  }
+
+  &:hover {
+    background: rgba(2, 6, 23, 0.03) !important;
+  }
+}
+
+.tableCellStrong {
+  font-weight: 650 !important;
+}
+
+.emptyTableCell {
+  padding: 48px 0 !important;
+}
+
+.emptyTableBox {
+  text-align: center;
+}
+
+.emptyTableTitle {
+  font-weight: 900 !important;
+  margin-bottom: 6px !important;
+}
+
+.emptyTableSub {
+  color: rgba(15, 23, 42, 0.60) !important;
+}
+
+.dialogDivider {
+  margin: 16px 0 !important;
+}
+
+.tipText {
+  font-size: 12.5px !important;
+  color: rgba(15, 23, 42, 0.60) !important;
+}
+
+.dialogFooter {
+  padding: 12px 16px !important;
+  border-top: 1px solid rgba(15, 23, 42, 0.10) !important;
+  background: rgba(255, 255, 255, 0.70) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+.dialogCloseBtn {
+  border-radius: 999px !important;
+  padding: 8px 18px !important;
+  font-weight: 900 !important;
+  text-transform: none !important;
+}
+
+/* DeleteAssetDialog.scss */
+
+.delDialogPaper {
+  border-radius: 20px !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(148, 163, 184, 0.22) !important;
+  background:
+    radial-gradient(900px 380px at 0% 0%, rgba(59, 130, 246, 0.18), transparent 55%),
+    radial-gradient(900px 380px at 100% 0%, rgba(168, 85, 247, 0.14), transparent 55%),
+    rgba(255, 255, 255, 0.90) !important;
+  backdrop-filter: blur(14px) !important;
+  box-shadow: 0 28px 80px rgba(2, 6, 23, 0.35) !important;
+
+  animation: popIn 220ms ease-out !important;
+}
+
+@keyframes popIn {
+  from {
+    transform: translateY(8px) scale(0.98);
+    opacity: 0.5;
+  }
+
+  to {
+    transform: translateY(0px) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Header */
+.delDialogHeader {
+  position: relative !important;
+  padding: 18px 18px 0 18px !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+}
+
+.delDialogBadge {
+  width: 54px !important;
+  height: 54px !important;
+  border-radius: 18px !important;
+  display: grid !important;
+  place-items: center !important;
+  border: 1px solid rgba(239, 68, 68, 0.22) !important;
+  background: linear-gradient(180deg, rgba(239, 68, 68, 0.14), rgba(239, 68, 68, 0.06)) !important;
+  box-shadow: 0 16px 42px rgba(239, 68, 68, 0.16) !important;
+
+  animation: pulseSoft 1200ms ease-in-out infinite !important;
+}
+
+@keyframes pulseSoft {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.04);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.delDialogWarnIcon {
+  font-size: 30px !important;
+  color: rgba(239, 68, 68, 0.95) !important;
+}
+
+/* Close button */
+.delDialogCloseBtn {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(148, 163, 184, 0.22) !important;
+  background: rgba(255, 255, 255, 0.75) !important;
+  transition: transform 160ms ease, background 160ms ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    background: rgba(2, 6, 23, 0.04) !important;
+  }
+}
+
+/* Body */
+.delDialogBody {
+  padding: 14px 18px 10px 18px !important;
+}
+
+.delDialogTitle {
+  font-size: 20px !important;
+  font-weight: 950 !important;
+  color: rgba(15, 23, 42, 0.92) !important;
+  letter-spacing: 0.2px !important;
+}
+
+.delDialogSubtitle {
+  margin-top: 8px !important;
+  font-size: 13.5px !important;
+  line-height: 1.5 !important;
+  color: rgba(15, 23, 42, 0.62) !important;
+  font-weight: 650 !important;
+}
+
+/* Info card */
+
+
+
+
+/* Footer actions */
+.delDialogActions {
+  padding: 14px 18px 18px 18px !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+}
+
+/* Buttons */
+.delBtnCancel {
+  flex: 1;
+  border-radius: 14px !important;
+  padding: 10px 14px !important;
+  font-weight: 900 !important;
+  text-transform: none !important;
+  border: 1px solid rgba(148, 163, 184, 0.28) !important;
+  background: rgba(255, 255, 255, 0.75) !important;
+  color: rgba(15, 23, 42, 0.78) !important;
+
+  transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease !important;
+
+  &:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 18px 40px rgba(2, 6, 23, 0.10) !important;
+    background: rgba(2, 6, 23, 0.03) !important;
+  }
+}
+
+.delBtnDanger {
+  flex: 1;
+  border-radius: 14px !important;
+  padding: 10px 14px !important;
+  font-weight: 950 !important;
+  text-transform: none !important;
+  color: #fff !important;
+
+  background: linear-gradient(90deg, rgba(239, 68, 68, 1), rgba(220, 38, 38, 1)) !important;
+  box-shadow: 0 18px 46px rgba(239, 68, 68, 0.28) !important;
+
+  transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease !important;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 22px 54px rgba(239, 68, 68, 0.34) !important;
+    filter: brightness(1.03) !important;
+  }
+
+  &:active {
+    transform: translateY(0px) scale(0.99) !important;
+  }
+}
+
+.statusIconWrap {
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 12px !important;
+  display: grid !important;
+  place-items: center !important;
+  flex: 0 0 auto !important;
+}
+
+.statusActionBtn {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 12px !important;
+  background: rgba(2, 6, 23, 0.04) !important;
+  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+
+  &:hover {
+    background: rgba(2, 6, 23, 0.06) !important;
+  }
+}
+
+.statusCtaBtn {
+  height: 40px !important;
+  /* ✅ match IconButton height */
+  border-radius: 999px !important;
+  font-weight: 800 !important;
+  text-transform: none !important;
+  padding: 0 10px !important;
+  white-space: nowrap !important;
+
+  background: rgba(37, 99, 235, 0.10) !important;
+  border: 1px solid rgba(37, 99, 235, 0.18) !important;
+
+  &:hover {
+    background: rgba(37, 99, 235, 0.16) !important;
+  }
+}
+
+/* Tip styling only (doesn’t change height) */
+.tipStrip {
+  background: linear-gradient(180deg, rgba(37, 99, 235, 0.08) 0%, rgba(255, 255, 255, 0.55) 100%) !important;
+  border: 1px dashed rgba(37, 99, 235, 0.22) !important;
+}
+
+.tipStrip .statusIconWrap {
+  background: rgba(37, 99, 235, 0.12) !important;
+  border: 1px solid rgba(37, 99, 235, 0.18) !important;
+}
+
+.tipIcon {
+  font-size: 20px !important;
+  color: rgba(37, 99, 235, 0.95) !important;
+}
+
+.tipTitle {
+  color: #1d4ed8 !important;
+}
+
+/* RequestSuccessDialog.scss */
+
+.requestSuccessPaper {
+  border-radius: 16px !important; /* MUI borderRadius: 4 => 16px */
+  overflow: hidden !important;
+  box-shadow: 0 26px 80px rgba(2, 6, 23, 0.35) !important;
+  background: #fff !important;
+}
+
+/* HEADER */
+.requestSuccessHeader {
+  padding: 14px 18px !important; /* px: 2.2 (~17.6px), py: 1.8 (~14.4px) */
+  color: #fff !important;
+  background-color: #00a240 !important;
+  position: relative !important;
+}
+
+.requestSuccessHeaderGlow {
+  position: absolute !important;
+  inset: 0 !important;
+  pointer-events: none !important;
+  background:
+    radial-gradient(900px 240px at 0% 0%, rgba(255, 255, 255, 0.18), transparent 60%),
+    radial-gradient(900px 240px at 100% 0%, rgba(255, 255, 255, 0.14), transparent 60%) !important;
+}
+
+.requestSuccessHeaderRow {
+  position: relative !important;
+}
+
+/* icon bubble */
+.requestSuccessIconBubble {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 12px !important;
+  display: grid !important;
+  place-items: center !important;
+  background: rgba(255, 255, 255, 0.18) !important;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.18) !important;
+  flex-shrink: 0 !important;
+}
+
+.requestSuccessTitle {
+  font-weight: 950 !important;
+  font-size: 18px !important;
+  line-height: 1.1 !important;
+}
+
+.requestSuccessSubtitle {
+  opacity: 0.95 !important;
+  font-size: 13px !important;
+  margin-top: 4px !important;
+}
+
+/* close button */
+.requestSuccessCloseBtn {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.16) !important;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.24) !important;
+  }
+}
+
+/* CONTENT */
+.requestSuccessContent {
+  padding: 20px !important; /* p: 2.5 => 20px */
+}
+
+/* Next steps card */
+.requestSuccessNextCard {
+  border-radius: 12px !important; /* 3 => 12px */
+  padding: 16px !important;
+  border-color: rgba(15, 23, 42, 0.1) !important;
+  background:
+    radial-gradient(700px 240px at 0% 0%, rgba(16, 185, 129, 0.08), transparent 55%),
+    rgba(248, 250, 252, 0.95) !important;
+}
+
+.requestSuccessNextTitle {
+  font-weight: 950 !important;
+  color: #0f172a !important;
+  margin-bottom: 8px !important;
+}
+
+/* rows */
+.requestSuccessInfoIcon {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 8px !important; /* 2 => 8px */
+  display: grid !important;
+  place-items: center !important;
+  background: rgba(15, 23, 42, 0.06) !important;
+  color: rgba(15, 23, 42, 0.75) !important;
+  flex-shrink: 0 !important;
+}
+
+.requestSuccessInfoTitle {
+  font-weight: 900 !important;
+  color: #0f172a !important;
+}
+
+.requestSuccessInfoText {
+  font-size: 13px !important;
+  margin-top: 2px !important;
+}
+
+/* OK button */
+.requestSuccessOkWrap {
+  display: flex !important;
+  justify-content: center !important;
+  margin-top: 16px !important;
+}
+
+.requestSuccessOkBtn {
+  padding-left: 32px !important;
+  padding-right: 32px !important;
+  border-radius: 8px !important;
+  font-weight: 950 !important;
+  text-transform: none !important;
+  background: linear-gradient(135deg, #10b981, #22c55e) !important;
+  box-shadow: 0 14px 30px rgba(16, 185, 129, 0.25) !important;
+
+  &:hover {
+    background: linear-gradient(135deg, #0ea5a4, #16a34a) !important;
+  }
+}

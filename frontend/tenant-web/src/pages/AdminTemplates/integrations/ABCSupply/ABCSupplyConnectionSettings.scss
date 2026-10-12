@@ -1,0 +1,663 @@
+/*
+ * ABCSupplyConnectionSettings.scss
+ *
+ * Palette — unified with ABCSupplyTable design tokens
+ *   #0E1318  — ground dark  (hero, banner, form brand — matches table hero)
+ *   #F47C20  — ABC orange   (accent, CTA — matches table orange)
+ *   #FAFAF8  — surface      (light bg — matches table surface)
+ *   #F7F2EC  — surface warm (step cards — matches table surface-warm)
+ *   #EAE5DC  — border       (matches table border)
+ *   #1A1410  — text dark    (matches table text)
+ *   #7A7268  — text muted   (matches table muted)
+ */
+
+// ── Root ──────────────────────────────────────────────────────────────────────
+
+.abc-cs-root {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+// ── Logo mark ─────────────────────────────────────────────────────────────────
+
+.abc-logo-mark {
+  background: #fff;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 5px;
+  overflow: hidden;
+}
+
+.abc-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+// ── Setup error ───────────────────────────────────────────────────────────────
+
+.abc-cs-setup-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 16px;
+  text-align: center;
+  gap: 6px;
+}
+
+.abc-cs-setup-error-icon {
+  font-size: 2.2rem !important;
+  color: #d32f2f;
+  margin-bottom: 4px;
+}
+
+.abc-cs-setup-error-title {
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+  color: #1A1410 !important;
+}
+
+.abc-cs-setup-error-sub {
+  font-size: 0.83rem !important;
+  color: #7A7268 !important;
+  max-width: 360px;
+  line-height: 1.55 !important;
+}
+
+// ── Landing ───────────────────────────────────────────────────────────────────
+
+.abc-cs-landing {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.abc-cs-hero {
+  background: linear-gradient(158deg, #0E1318 0%, #140E06 52%, #1C0D04 100%);
+  border-radius: 14px;
+  padding: 26px 30px;
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 3px;
+    background: #F47C20;
+  }
+
+  &::after {
+    content: "ABC";
+    position: absolute;
+    right: 18px;
+    bottom: -14px;
+    font-size: 5.5rem;
+    font-weight: 900;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: rgba(255, 255, 255, 0.04);
+    letter-spacing: -0.04em;
+    pointer-events: none;
+    user-select: none;
+    line-height: 1;
+  }
+}
+
+.abc-cs-hero-body {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.abc-cs-hero-headline {
+  font-size: 1.3rem !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  margin-bottom: 7px !important;
+  line-height: 1.25 !important;
+  text-wrap: balance;
+  letter-spacing: -0.01em !important;
+}
+
+.abc-cs-hero-sub {
+  font-size: 0.845rem !important;
+  color: rgba(255, 255, 255, 0.50) !important;
+  line-height: 1.6 !important;
+  margin-bottom: 18px !important;
+  max-width: 480px;
+}
+
+.abc-cs-hero-cta {
+  background-color: #F47C20 !important;
+  color: #fff !important;
+  border-radius: 8px !important;
+  text-transform: none !important;
+  font-size: 0.845rem !important;
+  font-weight: 600 !important;
+  padding: 7px 18px !important;
+  box-shadow: 0 4px 16px rgba(244, 124, 32, 0.38) !important;
+  letter-spacing: 0 !important;
+
+  &:hover {
+    background-color: #E06A10 !important;
+    box-shadow: 0 6px 20px rgba(244, 124, 32, 0.48) !important;
+  }
+}
+
+// ── Sections ──────────────────────────────────────────────────────────────────
+
+.abc-cs-section {
+  margin-bottom: 14px;
+}
+
+.abc-cs-section-label {
+  font-size: 0.66rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.09em !important;
+  color: #9A9088 !important;
+  margin-bottom: 9px !important;
+}
+
+// ── Steps ─────────────────────────────────────────────────────────────────────
+
+.abc-cs-step {
+  background: #F7F2EC;
+  border-radius: 10px;
+  padding: 15px;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.abc-cs-step-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #F47C20;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.76rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 9px;
+  flex-shrink: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.abc-cs-step-title {
+  font-size: 0.835rem !important;
+  font-weight: 700 !important;
+  color: #1A1410 !important;
+  margin-bottom: 4px !important;
+}
+
+.abc-cs-step-body {
+  font-size: 0.79rem !important;
+  color: #7A7268 !important;
+  line-height: 1.52 !important;
+}
+
+// ── Feature cards ─────────────────────────────────────────────────────────────
+
+.abc-cs-feature {
+  background: #ffffff;
+  border: 1px solid #EAE5DC;
+  border-radius: 10px;
+  padding: 15px;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.abc-cs-feature-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 7px;
+  background: rgba(244, 124, 32, 0.10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 9px;
+
+  svg {
+    color: #F47C20;
+    font-size: 1rem;
+  }
+}
+
+.abc-cs-feature-label {
+  font-size: 0.835rem !important;
+  font-weight: 700 !important;
+  color: #1A1410 !important;
+  margin-bottom: 3px !important;
+}
+
+.abc-cs-feature-body {
+  font-size: 0.79rem !important;
+  color: #7A7268 !important;
+  line-height: 1.52 !important;
+}
+
+// ── Form ──────────────────────────────────────────────────────────────────────
+
+.abc-cs-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #7A7268;
+  font-size: 0.79rem;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  padding: 0;
+  margin-bottom: 10px;
+  transition: color 0.14s;
+
+  &:hover { color: #1A1410; }
+  svg { font-size: 0.86rem; }
+}
+
+.abc-cs-form-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 0;
+  border: 1px solid #EAE5DC;
+  border-radius: 14px;
+  overflow: hidden;
+
+  @media (max-width: 800px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.abc-cs-form-brand {
+  background: linear-gradient(158deg, #0E1318 0%, #140E06 52%, #1C0D04 100%);
+  padding: 30px 26px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 3px;
+    background: #F47C20;
+  }
+
+  &::after {
+    content: "ABC";
+    position: absolute;
+    right: -6px;
+    bottom: -16px;
+    font-size: 6.5rem;
+    font-weight: 900;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: rgba(255, 255, 255, 0.04);
+    letter-spacing: -0.04em;
+    pointer-events: none;
+    user-select: none;
+    line-height: 1;
+  }
+}
+
+.abc-cs-form-brand-title {
+  font-size: 1.15rem !important;
+  font-weight: 800 !important;
+  color: #ffffff !important;
+  margin-top: 13px !important;
+  margin-bottom: 7px !important;
+  letter-spacing: -0.02em !important;
+}
+
+.abc-cs-form-brand-body {
+  font-size: 0.815rem !important;
+  color: rgba(255, 255, 255, 0.46) !important;
+  line-height: 1.58 !important;
+  margin-bottom: 18px !important;
+}
+
+.abc-cs-form-brand-trust {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-top: auto;
+
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    color: rgba(255, 255, 255, 0.52);
+    font-size: 0.785rem;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    line-height: 1.4;
+
+    svg {
+      font-size: 0.85rem !important;
+      color: #F47C20;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+  }
+}
+
+.abc-cs-form-card {
+  background: #ffffff;
+  padding: 26px 22px;
+}
+
+.abc-cs-form-title {
+  font-size: 0.97rem !important;
+  font-weight: 700 !important;
+  color: #1A1410 !important;
+  margin-bottom: 4px !important;
+  letter-spacing: -0.01em !important;
+}
+
+.abc-cs-form-sub {
+  font-size: 0.805rem !important;
+  color: #7A7268 !important;
+  line-height: 1.52 !important;
+}
+
+.abc-cs-field-label {
+  font-size: 0.77rem !important;
+  font-weight: 600 !important;
+  color: #2D2820 !important;
+  margin-bottom: 5px !important;
+  display: block;
+}
+
+.abc-cs-field-optional {
+  font-weight: 400;
+  color: #9A9088;
+  font-size: 0.73rem;
+}
+
+.abc-cs-field-hint {
+  font-size: 0.72rem !important;
+  color: #9A9088 !important;
+  margin-top: 5px !important;
+  line-height: 1.4 !important;
+}
+
+.abc-cs-field {
+  .MuiInputBase-root {
+    border-radius: 7px;
+    font-size: 0.845rem;
+    background: #FAFAF8;
+  }
+
+  .MuiOutlinedInput-notchedOutline {
+    border-color: #E0D8CC;
+    transition: border-color 0.14s;
+  }
+
+  &:hover .MuiOutlinedInput-notchedOutline {
+    border-color: #C4BBB0;
+  }
+
+  .Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-color: #F47C20 !important;
+    border-width: 1.5px !important;
+  }
+}
+
+.abc-cs-field-account {
+  flex: 1;
+  min-width: 120px;
+}
+
+.abc-cs-btn-cancel {
+  color: #7A7268 !important;
+  text-transform: none !important;
+  font-size: 0.82rem !important;
+  letter-spacing: 0 !important;
+
+  &:hover { background-color: #F7F2EC !important; }
+}
+
+.abc-cs-btn-save {
+  background-color: #F47C20 !important;
+  color: #fff !important;
+  border-radius: 8px !important;
+  text-transform: none !important;
+  font-size: 0.82rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  box-shadow: 0 2px 10px rgba(244, 124, 32, 0.28) !important;
+
+  &:hover {
+    background-color: #E06A10 !important;
+    box-shadow: 0 4px 14px rgba(244, 124, 32, 0.38) !important;
+  }
+
+  &:disabled {
+    background-color: #D0C9C2 !important;
+    color: rgba(255, 255, 255, 0.58) !important;
+    box-shadow: none !important;
+  }
+}
+
+// ── Loading panel skeleton ────────────────────────────────────────────────────
+
+.abc-cs-load-panel {
+  border: 1px solid #EAE5DC;
+  border-radius: 14px;
+  overflow: hidden;
+  animation: abc-cs-fade-up 0.30s ease both;
+}
+
+.abc-cs-load-banner {
+  background: linear-gradient(158deg, #0E1318 0%, #140E06 52%, #1C0D04 100%);
+  padding: 16px 22px;
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 3px;
+    background: rgba(34, 197, 94, 0.28);
+  }
+}
+
+.abc-cs-load-banner-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.abc-cs-load-rows {
+  background: #FAFAF8;
+
+  .MuiSkeleton-root {
+    display: block;
+    width: 100%;
+  }
+}
+
+// ── Unified panel (banner + table as one frame) ───────────────────────────────
+
+.abc-unified-panel {
+  border: 1px solid #EAE5DC;
+  border-radius: 14px;
+  overflow: clip;
+  animation: abc-cs-fade-up 0.35s ease both;
+
+  // flush table hero with banner: no gap, no rounding, aligned horizontal edge
+  // no top padding — banner sits directly above, tab rail provides its own spacing
+  // z-index keeps hero above sticky table headers that can drift up during scroll
+  .abc-hero {
+    margin: 0;
+    border-radius: 0;
+    padding: 0 22px 20px;
+    z-index: 8;
+  }
+
+  // re-align tab rail bleed to match the 22px hero horizontal padding
+  // reduce top margin — no eyebrow above it in this context
+  .abc-tab-rail {
+    margin-top: 8px;
+    margin-left: -22px;
+    margin-right: -22px;
+    padding-left: 22px;
+    padding-right: 22px;
+  }
+
+  .abc-shell {
+    background: transparent;
+    min-height: unset;
+  }
+}
+
+// ── Connected banner ──────────────────────────────────────────────────────────
+
+.abc-cs-banner {
+  background: linear-gradient(158deg, #0E1318 0%, #140E06 52%, #1C0D04 100%);
+  padding: 17px 22px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 10;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 3px;
+    background: #22c55e;
+  }
+}
+
+.abc-cs-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+}
+
+.abc-cs-banner-title {
+  font-size: 0.875rem !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  margin-bottom: 2px !important;
+  letter-spacing: -0.01em !important;
+}
+
+.abc-cs-banner-meta {
+  font-size: 0.755rem !important;
+  color: rgba(255, 255, 255, 0.45) !important;
+}
+
+.abc-cs-pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #22c55e;
+  flex-shrink: 0;
+  animation: abc-cs-pulse-anim 2.4s ease-in-out infinite;
+}
+
+@keyframes abc-cs-pulse-anim {
+  0%   { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
+  65%  { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+.abc-cs-btn-disconnect {
+  border-radius: 7px !important;
+  text-transform: none !important;
+  font-size: 0.755rem !important;
+  font-weight: 500 !important;
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: 0 !important;
+  color: rgba(255, 255, 255, 0.58) !important;
+  border-color: rgba(255, 255, 255, 0.17) !important;
+  transition: color 0.14s, border-color 0.14s, background-color 0.14s !important;
+
+  &:hover {
+    color: #fca5a5 !important;
+    border-color: rgba(239, 68, 68, 0.42) !important;
+    background-color: rgba(239, 68, 68, 0.07) !important;
+  }
+
+  &:disabled { opacity: 0.35 !important; }
+}
+
+// ── Animations ────────────────────────────────────────────────────────────────
+
+@keyframes abc-cs-fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.abc-cs-anim-fade-up {
+  animation: abc-cs-fade-up 0.33s ease both;
+}
+
+.abc-cs-anim-field {
+  animation: abc-cs-fade-up 0.28s ease calc(var(--field-i, 0) * 58ms) both;
+}
+
+.abc-cs-landing {
+  > .abc-cs-hero {
+    animation: abc-cs-fade-up 0.36s ease both;
+  }
+
+  > .abc-cs-section:nth-child(2) {
+    .MuiGrid-item:nth-child(1) .abc-cs-step { animation: abc-cs-fade-up 0.28s ease 0.07s both; }
+    .MuiGrid-item:nth-child(2) .abc-cs-step { animation: abc-cs-fade-up 0.28s ease 0.13s both; }
+    .MuiGrid-item:nth-child(3) .abc-cs-step { animation: abc-cs-fade-up 0.28s ease 0.19s both; }
+  }
+
+  > .abc-cs-section:nth-child(3) {
+    .MuiGrid-item:nth-child(1) .abc-cs-feature { animation: abc-cs-fade-up 0.28s ease 0.13s both; }
+    .MuiGrid-item:nth-child(2) .abc-cs-feature { animation: abc-cs-fade-up 0.28s ease 0.19s both; }
+    .MuiGrid-item:nth-child(3) .abc-cs-feature { animation: abc-cs-fade-up 0.28s ease 0.25s both; }
+  }
+}
+
+.abc-cs-step,
+.abc-cs-feature {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 16px rgba(0, 0, 0, 0.07);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .abc-unified-panel,
+  .abc-cs-load-panel,
+  .abc-cs-hero,
+  .abc-cs-banner,
+  .abc-cs-anim-fade-up,
+  .abc-cs-anim-field,
+  .abc-cs-step,
+  .abc-cs-feature,
+  .abc-cs-pulse {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}

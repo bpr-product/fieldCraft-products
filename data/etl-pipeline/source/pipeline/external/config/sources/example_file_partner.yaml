@@ -1,0 +1,21 @@
+# Example file-drop connector config.
+# Files must be placed at: external-landing/{source_name}/{tenant_id}/{YYYY-MM-DD}/{filename}
+# Supported formats: csv, tsv, xlsx, xls, json, jsonl, parquet
+# If tenant_id is absent from the path, tenantid is synthesised as ext:{source_name}.
+source_name: partner_acme
+source_entity: work_order
+connector_type: file
+
+file:
+  landing_container: external-landing
+  landing_prefix: partner_acme/
+  formats: [csv, xlsx]
+  delimiter: ","
+  has_header: true
+  sheet_name: null
+
+routing:
+  strategy: kafka
+
+id_field: work_order_id
+ts_field: updated_at

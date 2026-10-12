@@ -1,0 +1,89 @@
+# config/environments.yaml.example
+#
+# Copy to environments.yaml and fill in ${VAR} values in .env.local
+# or Azure Key Vault. Never hardcode credentials in this file.
+#
+# Full reference: docs/multi-env/configuration_reference.md
+
+tier: nonprod          # local | nonprod | prod  — must equal ETL_ENV
+
+hash_salt: ${CDC_HASH_SALT}   # required only if any `hash:` rule is used
+
+environments:
+
+  dev:
+    cdc_enabled: true
+    snapshot_mode: initial           # full historical backfill
+    source:
+      host:         ${DEV_PG_HOST}
+      port:         5432
+      user:         ${DEV_PG_USER}
+      password:     ${DEV_PG_PASSWORD}
+      provider_db:  fieldcraft_provider
+      ssl_mode:     require
+    tables:
+      exclude: []                    # no extra exclusions beyond system baseline
+      columns:
+        worker:
+          drop: [ssn, date_of_birth] # never captured — compliance
+
+  qa:
+    cdc_enabled: true
+    snapshot_mode: initial
+    source:
+      host:         ${QA_PG_HOST}
+      port:         5432
+      user:         ${QA_PG_USER}
+      password:     ${QA_PG_PASSWORD}
+      provider_db:  fieldcraft_provider
+      ssl_mode:     require
+    operations:
+      skip: [delete]                 # ignore deletes in QA
+    tables:
+      exclude: [audit_log]
+      columns:
+        worker:
+          drop: [ssn]
+
+  staging:
+    cdc_enabled: true
+    # "when_needed" is documented for some Debezium connectors but is NOT a
+    # valid enum value for io.debezium.connector.postgresql.PostgresConnector
+    # in the debezium/connect:2.5 image actually deployed here -- Kafka
+    # Connect's own config validation rejects it. Use "initial".
+    snapshot_mode: initial           # first-run snapshot
+    source:
+      host:         ${STAGING_PG_HOST}
+      port:         5432
+      user:         ${STAGING_PG_USER}
+      password:     ${STAGING_PG_PASSWORD}
+      provider_db:  fieldcraft_provider
+      ssl_mode:     require
+    tables:
+      columns:
+        worker:
+          drop:     [ssn]
+          hash:     [email]          # joinable but unreadable
+
+  sandbox:
+    cdc_enabled: true
+    snapshot_mode: never             # live changes only — no historical backfill
+    source:
+      host:         ${SANDBOX_PG_HOST}
+      port:         5432
+      user:         ${SANDBOX_PG_USER}
+      password:     ${SANDBOX_PG_PASSWORD}
+      provider_db:  fieldcraft_provider
+      ssl_mode:     require
+    tables: {}
+
+  datamart:
+    cdc_enabled: false               # off by default — enable when ready
+    source:
+      host:         ${DATAMART_PG_HOST}
+      port:         5432
+      user:         ${DATAMART_PG_USER}
+      password:     ${DATAMART_PG_PASSWORD}
+      provider_db:  fieldcraft_provider
+      ssl_mode:     require
+    tables: {}

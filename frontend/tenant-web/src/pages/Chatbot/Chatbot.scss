@@ -1,0 +1,86 @@
+@mixin form-component-style {
+    border-radius: 10px;
+    padding: 0.5em;
+    font-size: 1.1em;
+}
+
+.chat-header {
+    text-align: center;
+    width: 34.9vw;
+    height: 9vh;
+    background-color: #2679ff;
+    // background-color: #ebeef5;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    margin: 0px;
+}
+
+.chat-container {
+    width: 35vw;
+    height: 85vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border: 1.9px solid #dee0e3;
+    // padding: 1em;
+    border-radius: 17px !important;
+    background-color: #ffffff;
+
+    .form-container {
+        display: flex;
+        justify-content: space-between;
+
+
+
+        // input {
+        //     width: 92%;
+
+        //     border-style: none;
+        //     border-color: rgb(237, 78, 50);
+        //     background-color: rgb(232, 232, 232);
+        //     border-radius: 0% !important;
+
+        //     @include form-component-style;
+
+        //     &:focus {
+        //         outline: none;
+        //     }
+        // }
+
+        button {
+            background-color: #2679ff;
+            color: #f8fcfe;
+            border-style: none;
+            // height:50px !important;
+            border-radius: 50% !important;
+            padding: 5px !important;
+            // @include form-component-style;
+
+            &:hover {
+                opacity: 0.8;
+                cursor: pointer;
+            }
+        }
+    }
+
+    .custom-textfield {
+        //  width: 100% ;
+        margin: 0.8em;
+        margin-left: 25px;
+
+        // height: 50%;
+    }
+
+    // .fab {
+    //     height: 5px !important;
+    // }
+
+    .custom-button {
+        margin: 0.6em;
+        margin-right: 10px;
+
+
+    }
+
+
+}

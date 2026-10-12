@@ -1,0 +1,66 @@
+{
+  "name": "fieldcraft-silver-cdc-connector",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "plugin.name": "pgoutput",
+    "tasks.max": "1",
+
+    "database.hostname": "${SILVER_PG_HOST}",
+    "database.port": "${SILVER_PG_PORT}",
+    "database.user": "${SILVER_PG_USER}",
+    "database.password": "${file:/opt/kafka/connect-secrets.properties:fieldcraft-silver-cdc-connector_db_password}",
+    "database.dbname": "${SILVER_PG_DB}",
+    "database.server.name": "silver",
+    "database.sslmode": "${SILVER_PG_SSL_MODE}",
+
+    "slot.name": "debezium_slot_fieldcraft_silver2",
+    "publication.name": "debezium_publication_fieldcraft_silver2",
+    "publication.autocreate.mode": "disabled",
+
+    "snapshot.mode": "initial",
+
+    "poll.interval.ms": "100",
+    "max.batch.size": "2048",
+    "max.queue.size": "8192",
+
+    "table.include.list": "silver.project,silver.project_estimate,silver.bom,silver.payment_expense,silver.answers,silver.resource_estimate,silver.task,silver.resource_schedule,silver.purchase_order,silver.purchase_order_items,silver.invoice,silver.payment_receives,silver.project_schedule,silver.vendor,silver.question_template,silver.resource,silver.material_cost,silver.vendor_material_map,silver.audit_log,silver.user_account,silver.user_role_map,silver.roles,silver.role_permission,silver.project_member,silver.communication_log,silver.fieldcraft_customer_customer,silver.fieldcraft_customer_lead,silver.external_service_service_master",
+
+    "decimal.handling.mode": "string",
+    "binary.handling.mode": "base64",
+    "time.precision.mode": "connect",
+    "tombstones.on.delete": "false",
+    "heartbeat.interval.ms": "${SILVER_CDC_HEARTBEAT_MS}",
+
+    "topic.prefix": "silver",
+    "topic.creation.default.replication.factor": "1",
+    "topic.creation.default.partitions": "1",
+
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter.schemas.enable": "false",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable": "false",
+
+    "transforms": "unwrap,route,hbroute",
+    "transforms.unwrap.type": "io.debezium.transforms.ExtractNewRecordState",
+    "transforms.unwrap.drop.tombstones": "true",
+    "transforms.unwrap.delete.handling.mode": "rewrite",
+    "transforms.unwrap.add.fields": "op,source.table",
+    "transforms.unwrap.add.fields.prefix": "",
+    "transforms.route.type": "org.apache.kafka.connect.transforms.RegexRouter",
+    "transforms.route.regex": "^silver\\.silver\\..*$",
+    "transforms.route.replacement": "${ETL_ENV}.silver.cdc.events",
+    "transforms.hbroute.type": "org.apache.kafka.connect.transforms.RegexRouter",
+    "transforms.hbroute.regex": "__debezium-heartbeat\\.(.*)",
+    "transforms.hbroute.replacement": "${ETL_ENV}.pipeline.heartbeat",
+
+    "producer.override.max.request.size": "1000000",
+    "producer.override.batch.size": "131072",
+    "producer.override.linger.ms": "10",
+
+    "errors.tolerance": "all",
+    "errors.log.enable": "true",
+    "errors.log.include.messages": "true",
+    "errors.deadletterqueue.topic.name": "${ETL_ENV}.silver.dlq",
+    "errors.deadletterqueue.topic.replication.factor": "1"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "ABC_SUPPLY": {
+    "uomMap": {
+      "EA": "EA",
+      "EACH": "EA",
+      "PC": "PCS",
+      "PCS": "PCS",
+      "PIECE": "PCS",
+      "BD": "BD",
+      "BNDL": "BD",
+      "BUNDLE": "BD",
+      "SQ": "SQ",
+      "SQR": "SQ",
+      "SQUARE": "SQ",
+      "SF": "SF",
+      "LF": "LF",
+      "GAL": "GAL",
+      "GL": "GAL",
+      "BX": "BX",
+      "BOX": "BX",
+      "RL": "ROLL",
+      "ROLL": "ROLL",
+      "TB": "TB",
+      "TUBE": "TB",
+      "PLT": "PLT",
+      "PALLET": "PLT",
+      "LB": "LB",
+      "DZ": "DZ",
+      "PR": "PR",
+      "SET": "SET"
+    }
+  }
+}

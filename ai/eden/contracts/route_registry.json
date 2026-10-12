@@ -1,0 +1,5006 @@
+{
+  "routes": [
+    {
+      "id": "dashboard",
+      "pattern": "/dashboard",
+      "icon": "📊",
+      "intent_keywords": [
+        "dashboard",
+        "home",
+        "overview",
+        "summary",
+        "main page",
+        "start",
+        "landing",
+        "home page",
+        "go home"
+      ],
+      "entity_required": null,
+      "permission_required": "DASH.REA",
+      "label_template": "Dashboard",
+      "description": "Company overview, KPIs, and activity summary",
+      "module": "dashboard",
+      "page_help": "Here you can review company KPIs like Bids Out and Sold Contracts, each with a year-view toggle.",
+      "page_features": [
+        {
+          "name": "Bids Out card",
+          "keywords": [
+            "bids out",
+            "bid card"
+          ],
+          "hint": "The Bids Out card, top of the dashboard — has its own Year View toggle.",
+          "locate": [
+            "Bids Out",
+            "Year View"
+          ]
+        },
+        {
+          "name": "Sold Contracts card",
+          "keywords": [
+            "sold contracts",
+            "contracts card"
+          ],
+          "hint": "The Sold Contracts card, next to Bids Out — also has a Year View toggle.",
+          "locate": [
+            "Sold Contracts",
+            "Year View"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gantt_charts",
+      "pattern": "/ganttCharts",
+      "icon": "📅",
+      "intent_keywords": [
+        "schedule",
+        "gantt",
+        "timeline",
+        "task list",
+        "planning",
+        "milestones",
+        "project dates",
+        "due dates",
+        "deadlines",
+        "project schedule",
+        "project plan",
+        "when is"
+      ],
+      "entity_required": "project",
+      "permission_required": "GAN.REA",
+      "label_template": "Gantt Charts",
+      "description": "Project schedules, task timelines, and milestones",
+      "module": "Scheduling",
+      "page_help": "Here you can view the project's task timeline with a status legend, create a change order, and toggle project notes.",
+      "page_features": [
+        {
+          "name": "Create Change Order button",
+          "keywords": [
+            "change order",
+            "create change order"
+          ],
+          "hint": "The Create Change Order button, above the Gantt chart (only shown for eligible project types/status).",
+          "locate": [
+            "Create Change Order"
+          ]
+        },
+        {
+          "name": "notes toggle",
+          "keywords": [
+            "notes",
+            "show notes",
+            "project notes",
+            "add a note",
+            "create a note",
+            "write a note",
+            "new note",
+            "add note"
+          ],
+          "hint": "The Show Notes / Hide Notes toggle icon at the top of the page.",
+          "locate": [
+            "Show Notes",
+            "Hide Notes",
+            "Notes"
+          ]
+        },
+        {
+          "name": "status legend",
+          "keywords": [
+            "legend",
+            "status colors",
+            "status dots"
+          ],
+          "hint": "The colored status legend above the chart — each dot color means a different task status.",
+          "locate": [
+            "Legend",
+            "Status"
+          ]
+        },
+        {
+          "name": "Show/Hide Notes toggle",
+          "keywords": [
+            "show notes",
+            "hide notes"
+          ],
+          "hint": "Expands/collapses the Project Hub notes panel.",
+          "locate": [
+            "Show/Hide Notes toggle"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "purchase_orders",
+      "pattern": "/purchaseOrder",
+      "icon": "📦",
+      "intent_keywords": [
+        "purchase order",
+        "po",
+        "purchase orders",
+        "procurement",
+        "vendor order",
+        "order materials",
+        "raise po",
+        "create po",
+        "buy materials",
+        "supplier order",
+        "material purchase"
+      ],
+      "entity_required": null,
+      "permission_required": "PO.REA",
+      "label_template": "Purchase Orders",
+      "description": "Vendor orders, material procurement, and PO tracking",
+      "module": "Procurement",
+      "page_help": "Here you can step through a purchase order, process it by status, and sign it with the signature pad.",
+      "page_features": [
+        {
+          "name": "signature pad",
+          "keywords": [
+            "signature",
+            "sign",
+            "signature pad",
+            "e-sign"
+          ],
+          "hint": "The signature pad panel — has Clear, Save, and Cancel buttons.",
+          "locate": [
+            "Clear",
+            "Signature"
+          ]
+        },
+        {
+          "name": "step navigation",
+          "keywords": [
+            "next step",
+            "back",
+            "stepper"
+          ],
+          "hint": "The Back/Next buttons at the bottom of the PO stepper.",
+          "locate": [
+            "Next",
+            "Back"
+          ]
+        },
+        {
+          "name": "Approve / Counter Offer / Reject buttons",
+          "keywords": [
+            "approve purchase order",
+            "reject purchase order",
+            "counter offer po"
+          ],
+          "hint": "Vendor/subcontractor response actions on the PO review stepper.",
+          "locate": [
+            "Approve / Counter Offer / Reject"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "job_ledger",
+      "pattern": "/jobLedger",
+      "icon": "📒",
+      "intent_keywords": [
+        "job ledger",
+        "ledger",
+        "job costs",
+        "cost ledger",
+        "job financials",
+        "cost tracking",
+        "job cost report",
+        "project costs",
+        "expenses by job"
+      ],
+      "entity_required": "project",
+      "permission_required": "JBL.REA",
+      "label_template": "Job Ledger",
+      "description": "This project's job ledger — actual vs. estimated cost by code, revenue, profit, profit margin, and budget utilization for this project (JobLedgerList.tsx computes and displays all of these)",
+      "module": "Finance",
+      "page_help": "Here you can expand cost codes to compare actual vs estimated cost with variance, and import or export the ledger.",
+      "page_features": [
+        {
+          "name": "Import Ledger button",
+          "keywords": [
+            "import ledger",
+            "import"
+          ],
+          "hint": "The Import Ledger button — opens the import dialog (requires permission).",
+          "locate": [
+            "Import Ledger",
+            "Import"
+          ]
+        },
+        {
+          "name": "Export Ledger button",
+          "keywords": [
+            "export ledger",
+            "export"
+          ],
+          "hint": "The Export Ledger button, next to Import.",
+          "locate": [
+            "Export Ledger",
+            "Export"
+          ]
+        },
+        {
+          "name": "variance column",
+          "keywords": [
+            "variance",
+            "over budget",
+            "cost variance"
+          ],
+          "hint": "The Variance column (shown in red) — actual cost minus estimated cost per cost code.",
+          "locate": [
+            "Variance"
+          ]
+        },
+        {
+          "name": "Cost-code row expand",
+          "keywords": [
+            "expand cost code",
+            "job ledger detail"
+          ],
+          "hint": "Clicking a labor/materials/service/indirect-labor cost code expands an inline sub-table of detailed expenses.",
+          "locate": [
+            "Cost-code row expand"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "timesheets",
+      "pattern": "/timesheets",
+      "icon": "⏱️",
+      "intent_keywords": [
+        "timesheet",
+        "timesheets",
+        "time logs",
+        "hours",
+        "time tracking",
+        "log time",
+        "employee hours",
+        "attendance",
+        "clock in",
+        "work hours",
+        "labor hours"
+      ],
+      "entity_required": null,
+      "permission_required": "TIM.REA",
+      "label_template": "Timesheets",
+      "description": "Employee time logs, hours worked, and attendance records",
+      "module": "HR",
+      "page_help": "Here you can switch between the employee timesheet view and leave information tabs.",
+      "page_features": [
+        {
+          "name": "Leave Information tab",
+          "keywords": [
+            "leave",
+            "leave information",
+            "time off",
+            "pto"
+          ],
+          "hint": "The \"Employers Leave Information\" tab at the top of the page.",
+          "locate": [
+            "Leave Information",
+            "Leave"
+          ]
+        },
+        {
+          "name": "Time Corrections tab",
+          "keywords": [
+            "time correction",
+            "correct time",
+            "fix timesheet"
+          ],
+          "hint": "The Time Corrections tab (only visible if that feature is enabled for your tenant).",
+          "locate": [
+            "Time Corrections"
+          ]
+        },
+        {
+          "name": "notes toggle",
+          "keywords": [
+            "notes",
+            "show notes",
+            "project notes"
+          ],
+          "hint": "The Show Notes / Hide Notes toggle icon at the top of the page.",
+          "locate": [
+            "Show Notes",
+            "Hide Notes",
+            "Notes"
+          ]
+        },
+        {
+          "name": "Export Timelog button",
+          "keywords": [
+            "export timesheet",
+            "download timelog"
+          ],
+          "hint": "Opens export configuration for timesheet data (requires resource.READ).",
+          "locate": [
+            "Export Timelog"
+          ]
+        },
+        {
+          "name": "Book Leave button",
+          "keywords": [
+            "book leave",
+            "request leave"
+          ],
+          "hint": "Opens a leave-request submission dialog.",
+          "locate": [
+            "Book Leave"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "material_management",
+      "pattern": "/materialmanagement",
+      "target_route": "/materialmart",
+      "target_route_state": {
+        "selectedTab": "materials"
+      },
+      "icon": "🧱",
+      "intent_keywords": [
+        "materials",
+        "material management",
+        "material list",
+        "supplies",
+        "material tracking",
+        "roofing materials",
+        "building materials",
+        "material catalog"
+      ],
+      "entity_required": null,
+      "permission_required": "CON.MAN",
+      "label_template": "Materials",
+      "description": "Material catalog, usage tracking, and supply management -- the Materials sub-tab of Material Mart",
+      "module": "Materials",
+      "page_help": "Here you can filter materials by trade and grade, search the catalog, add a new material, and choose which fields (including Selling Price) show in the table via the Material Fields dropdown.",
+      "page_features": []
+    },
+    {
+      "id": "inventory",
+      "pattern": "/materialmart",
+      "icon": "📦",
+      "intent_keywords": [
+        "material mart",
+        "materialmart",
+        "manage inventory",
+        "inventory",
+        "stock",
+        "stock summary",
+        "stock levels",
+        "warehouse",
+        "material stock",
+        "inventory summary",
+        "available stock",
+        "on hand"
+      ],
+      "entity_required": null,
+      "permission_required": "MAT.REA",
+      "label_template": "Material Mart",
+      "description": "Stock levels, inventory summary, on-hand quantities, and inventory-related purchase orders/bills/delivery slips",
+      "module": "Materials",
+      "page_help": "This is Material Mart. On Stock overview you can search materials, check available stock and selling prices, receive material, and view audit summaries; switch to the Stock POs/Stock Bills/Stock Delivery Slips tabs for inventory purchasing paperwork, or to Materials for the material catalogue.",
+      "page_features": [
+        {
+          "name": "Material Fields dropdown",
+          "keywords": [
+            "selling price",
+            "sell price",
+            "add sell price",
+            "show selling price",
+            "material fields",
+            "column picker",
+            "which columns",
+            "show fields",
+            "vendor name column"
+          ],
+          "hint": "The Material Fields dropdown, top of the materials table -- lets you choose which columns show, including Selling Price (not shown by default).",
+          "locate": [
+            "Material Fields"
+          ],
+          "post_click_locate": [
+            "Selling Price"
+          ],
+          "post_click_options": {
+            "selling price": ["Selling Price"],
+            "sell price": ["Selling Price"],
+            "vendor name": ["Vendor Name"],
+            "vendor": ["Vendor Name"],
+            "trade": ["Trade"],
+            "manufacturer": ["Manufacturer"],
+            "material name": ["Material Name"],
+            "item code": ["Item Code"],
+            "version history": ["Version History"],
+            "version start date": ["Version Start Date"],
+            "grade": ["Grade"],
+            "purchase unit cost": ["Purchase Unit Cost"],
+            "purchase unit": ["Purchase Unit"],
+            "base unit cost": ["Base Unit Cost"],
+            "unit cost": ["Base Unit Cost"],
+            "base unit": ["Base Unit"]
+          },
+          "route_state": {
+            "selectedTab": "materials"
+          }
+        },
+        {
+          "name": "Trade filter",
+          "keywords": [
+            "trade filter",
+            "filter by trade",
+            "filter materials by trade",
+            "material trade",
+            "materials trade",
+            "trade of the material",
+            "material by trade"
+          ],
+          "hint": "The Trade dropdown, top of the materials table -- filters the catalog to one trade.",
+          "locate": [
+            "Trade"
+          ],
+          "post_click_options": {
+            "roof enhancement": [
+              "Roof Enhancement"
+            ],
+            "roof replacement": [
+              "Roof Replacement"
+            ]
+          },
+          "route_state": {
+            "selectedTab": "materials"
+          }
+        },
+        {
+          "name": "Grade filter",
+          "keywords": [
+            "grade filter",
+            "filter by grade",
+            "filter materials by grade",
+            "material grade",
+            "materials grade",
+            "grade of the material",
+            "material by grade",
+            "grade a",
+            "grade b",
+            "grade c"
+          ],
+          "hint": "The Grade dropdown, next to the Trade filter -- filters the catalog to one material grade.",
+          "locate": [
+            "Grade"
+          ],
+          "post_click_options": {
+            "grade a": [
+              "a"
+            ],
+            "grade b": [
+              "b"
+            ],
+            "grade c": [
+              "c"
+            ]
+          },
+          "route_state": {
+            "selectedTab": "materials"
+          }
+        },
+        {
+          "name": "Add New Material button",
+          "keywords": [
+            "add material",
+            "new material",
+            "add new material"
+          ],
+          "hint": "The Add New Material button — lets you add a new material to the list.",
+          "locate": [
+            "Add New Material",
+            "Add Material"
+          ],
+          "route_state": {
+            "selectedTab": "materials"
+          }
+        },
+        {
+          "name": "Update (row)",
+          "keywords": [
+            "update material cost"
+          ],
+          "hint": "Saves inline edits to a material's cost, trade, or vendor.",
+          "locate": [
+            "Update"
+          ],
+          "route_state": {
+            "selectedTab": "materials"
+          }
+        },
+        {
+          "name": "Upload button",
+          "keywords": [
+            "import materials",
+            "bulk import materials"
+          ],
+          "hint": "Bulk-imports materials from a file.",
+          "locate": [
+            "Upload"
+          ],
+          "route_state": {
+            "selectedTab": "materials"
+          }
+        },
+        {
+          "name": "Stock Bills tab",
+          "keywords": [
+            "inventory bills",
+            "stock bills",
+            "bills in inventory",
+            "list bills",
+            "list all bills"
+          ],
+          "hint": "The Stock Bills tab, one of the sub-tabs (Materials / Stock overview / Stock POs / Stock Bills / Stock Delivery Slips) at the top of the Material Mart page -- lists bills for inventory purchases.",
+          "locate": [
+            "Stock Bills"
+          ]
+        },
+        {
+          "name": "Stock Delivery Slips tab",
+          "keywords": [
+            "stock delivery slips",
+            "inventory delivery slips",
+            "delivery slips for inventory",
+            "show delivery slips",
+            "show the delivery slips",
+            "view delivery slips"
+          ],
+          "hint": "The Stock Delivery Slips tab, one of the sub-tabs (Materials / Stock overview / Stock POs / Stock Bills / Stock Delivery Slips) at the top of the Material Mart page -- lists inventory delivery slips across all projects. Not the same as a single project's own Delivery Slip document (Sold/Production > Project Information), which needs a specific project named.",
+          "locate": [
+            "Stock Delivery Slips"
+          ]
+        },
+        {
+          "name": "Receive Material button",
+          "keywords": [
+            "receive material",
+            "receive stock",
+            "add stock"
+          ],
+          "hint": "The Receive Material button (plus icon), top of the inventory table.",
+          "locate": [
+            "Receive Material"
+          ]
+        },
+        {
+          "name": "search box",
+          "keywords": [
+            "search material",
+            "search inventory"
+          ],
+          "hint": "The Search Material box at the top of the page.",
+          "locate": [
+            "Search Material"
+          ]
+        },
+        {
+          "name": "audit summary",
+          "keywords": [
+            "audit",
+            "audit summary",
+            "stock audit"
+          ],
+          "hint": "The audit-summary button on each row — shows stock movement history.",
+          "locate": [
+            "Audit"
+          ]
+        },
+        {
+          "name": "Edit (row icon)",
+          "keywords": [
+            "edit material stock",
+            "change selling price",
+            "edit selling price",
+            "update selling price",
+            "selling price actions"
+          ],
+          "hint": "Open a material row's ⋮ menu in the Actions column and choose Edit -- opens a dialog to update that material's name, cost, or Selling Price.",
+          "locate": [
+            "Edit",
+            "Actions"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "inventory_audit",
+      "pattern": "/materialmart/audit/:sku/:materialUid",
+      "icon": "📋",
+      "intent_keywords": [
+        "stock audit",
+        "material history",
+        "audit trail",
+        "material audit summary",
+        "transaction history for material",
+        "who received this material",
+        "inventory audit log",
+        "batch history",
+        "material stock movement",
+        "check audit trail for sku",
+        "quantity changes for material",
+        "material transaction log"
+      ],
+      "entity_required": null,
+      "permission_required": "MAT.REA",
+      "label_template": "Material Audit Summary",
+      "description": "Displays the full transaction audit trail for a single material/SKU, including received/issued quantities, batch numbers, purchase references, project association, and pricing per transaction.",
+      "module": "Materials",
+      "page_help": "Use this page to review the complete stock movement history for a specific material. Search by reference, material name, SKU, or batch number, and filter by transaction type or SKU to narrow results. Sort columns and page through transactions, or use Go Back to return to Material Mart.",
+      "page_features": [
+        {
+          "name": "Search Transactions box",
+          "keywords": [
+            "search audit transactions",
+            "find by batch number",
+            "search by reference"
+          ],
+          "hint": "The text field labeled 'Search Transactions' in the filter bar, searches reference, material, SKU, and batch.",
+          "locate": [
+            "Search Transactions",
+            "Search by reference, material, SKU, Batch..."
+          ]
+        },
+        {
+          "name": "Transaction Type filter",
+          "keywords": [
+            "filter by transaction type",
+            "filter received or issued"
+          ],
+          "hint": "The Transaction Type dropdown in the filter bar, defaults to All Types.",
+          "locate": [
+            "Transaction Type",
+            "All Types"
+          ]
+        },
+        {
+          "name": "SKU filter",
+          "keywords": [
+            "filter by sku",
+            "select sku"
+          ],
+          "hint": "The SKU dropdown in the filter bar, defaults to All SKUs.",
+          "locate": [
+            "SKU",
+            "All SKUs"
+          ]
+        },
+        {
+          "name": "Go Back button",
+          "keywords": [
+            "go back",
+            "return to inventory",
+            "return to material mart",
+            "close audit view"
+          ],
+          "hint": "The Go Back button on the right side of the filter/control bar.",
+          "locate": [
+            "Go Back"
+          ]
+        },
+        {
+          "name": "Sortable audit table columns",
+          "keywords": [
+            "sort by date",
+            "sort audit table",
+            "column headers"
+          ],
+          "hint": "The Audit Summary table header row with columns Date of Transaction, Material Description, Batch No., SKU, Transaction Reference No., Transaction, Project ID, Buying Price, and Selling Price.",
+          "locate": [
+            "Date of Transaction",
+            "Material Description",
+            "Batch No.",
+            "SKU",
+            "Transaction Reference No.",
+            "Transaction",
+            "Project ID",
+            "Buying Price",
+            "Selling Price"
+          ]
+        },
+        {
+          "name": "Transaction count summary",
+          "keywords": [
+            "showing x of y transactions",
+            "audit result count"
+          ],
+          "hint": "The subtitle line above the table showing how many filtered transactions are displayed out of the total.",
+          "locate": [
+            "transactions"
+          ]
+        },
+        {
+          "name": "Audit table pagination",
+          "keywords": [
+            "audit rows per page",
+            "next page audit entries"
+          ],
+          "hint": "The pagination control below the audit table, with rows-per-page options of 15, 25, or 50.",
+          "locate": [
+            "Rows per page",
+            "Next page",
+            "Previous page"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "vendor_list",
+      "pattern": "/vendorlist",
+      "icon": "🤝",
+      "intent_keywords": [
+        "vendors",
+        "vendor list",
+        "supplier list",
+        "suppliers",
+        "vendor directory",
+        "approved vendors"
+      ],
+      "entity_required": null,
+      "permission_required": "VEN.REA",
+      "label_template": "Vendors",
+      "description": "Approved vendors and supplier directory",
+      "module": "Procurement",
+      "page_help": "Here you can search vendors, filter by status like Active or Inactive, and add a new vendor.",
+      "target_route": "/admin",
+      "target_route_state": {
+        "selectedTab": "2"
+      },
+      "page_features": [
+        {
+          "name": "status filter",
+          "keywords": [
+            "status filter",
+            "active vendors",
+            "inactive vendors"
+          ],
+          "hint": "The status filter pills above the table — All, Active, Inactive.",
+          "locate": [
+            "Active",
+            "Inactive",
+            "Status"
+          ]
+        },
+        {
+          "name": "search box",
+          "keywords": [
+            "search vendors",
+            "find vendor"
+          ],
+          "hint": "The \"Search vendors...\" box above the table.",
+          "locate": [
+            "Search vendors"
+          ]
+        },
+        {
+          "name": "Add New Vendor button",
+          "keywords": [
+            "add vendor",
+            "new vendor"
+          ],
+          "hint": "The Add New Vendor button, top right of the vendor table.",
+          "locate": [
+            "Add New Vendor"
+          ]
+        },
+        {
+          "name": "Delete (row icon)",
+          "keywords": [
+            "delete vendor"
+          ],
+          "hint": "Soft-deletes the vendor (marks Inactive).",
+          "locate": [
+            "Delete"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "resource_management",
+      "pattern": "/resourcemanagement",
+      "target_route": "/admin",
+      "target_route_state": {
+        "selectedTab": "6"
+      },
+      "icon": "👷",
+      "intent_keywords": [
+        "resource management",
+        "crew",
+        "workforce",
+        "labor",
+        "team",
+        "workers",
+        "field crew",
+        "manpower"
+      ],
+      "entity_required": null,
+      "permission_required": "RES.REA",
+      "label_template": "Resources",
+      "description": "Crew, workforce, and field resource management",
+      "module": "Resources",
+      "page_help": "Here you can search employees by name and update their details.",
+      "page_features": [
+        {
+          "name": "search box",
+          "keywords": [
+            "search by name",
+            "find employee"
+          ],
+          "hint": "The \"Search by name\" box at the top of the resource table.",
+          "locate": [
+            "Search by name"
+          ]
+        },
+        {
+          "name": "Update button",
+          "keywords": [
+            "update resource cost"
+          ],
+          "hint": "Saves bulk-edited resource cost values.",
+          "locate": [
+            "Update"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tenant_finance",
+      "pattern": "/tenantfinance",
+      "icon": "📈",
+      "intent_keywords": [
+        "finance",
+        "financial",
+        "financials",
+        "company finance",
+        "accounting",
+        "company costs",
+        "financial report",
+        "income",
+        "p and l",
+        "p&l"
+      ],
+      "entity_required": null,
+      "permission_required": "TAS.REA",
+      "label_template": "Finance",
+      "description": "Company-wide (not per-project) financial and accounting reports. A question naming or implying ONE specific project's revenue, profit, margin, or budget belongs to job_ledger instead -- that data is per-project, not this page's company-wide view.",
+      "module": "Finance",
+      "page_help": "Here you can review profit-and-loss and other financial charts, switching each card's time period.",
+      "page_features": [
+        {
+          "name": "Profit and Loss card",
+          "keywords": [
+            "profit and loss",
+            "p&l",
+            "p and l"
+          ],
+          "hint": "The Profit and Loss card — each card has its own period dropdown (Last 30 days, This Quarter, etc.).",
+          "locate": [
+            "Profit and Loss",
+            "Profit"
+          ]
+        },
+        {
+          "name": "period dropdown",
+          "keywords": [
+            "period",
+            "date range",
+            "time period",
+            "last quarter"
+          ],
+          "hint": "The period dropdown on each finance card — switch between Last day, This month, This Quarter, etc.",
+          "locate": [
+            "This month",
+            "Last 30 days"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "document_management",
+      "pattern": "/documents",
+      "icon": "📁",
+      "intent_keywords": [
+        "documents",
+        "document management",
+        "files",
+        "attachments",
+        "drawings",
+        "project documents",
+        "contracts",
+        "document library",
+        "file manager"
+      ],
+      "entity_required": null,
+      "permission_required": "CON.MAN",
+      "label_template": "Document Management",
+      "description": "Your company's document explorer — browse folders, upload, preview, download and share project files, drawings and contracts.",
+      "module": "Documents",
+      "page_help": "Here you can browse folders, upload files, search by name, preview a file with Quick Look, download a folder as ZIP, share files, and restore deleted items from the Recycle Bin.",
+      "page_features": [
+        {
+          "name": "Upload button",
+          "keywords": [
+            "upload file",
+            "upload document",
+            "add document"
+          ],
+          "hint": "The Upload button (cloud icon) in the explorer toolbar — uploads files into the folder you have open.",
+          "locate": [
+            "Upload"
+          ]
+        },
+        {
+          "name": "Search box",
+          "keywords": [
+            "search documents",
+            "search files",
+            "find a file",
+            "find document"
+          ],
+          "hint": "The Search box in the explorer toolbar — searches file names in the current project; press Enter to search now.",
+          "locate": [
+            "Search"
+          ]
+        },
+        {
+          "name": "Download as ZIP button",
+          "keywords": [
+            "download",
+            "download file"
+          ],
+          "hint": "The download button in the explorer toolbar — downloads the open folder, or your selected items, as a ZIP.",
+          "locate": [
+            "Download this folder as ZIP",
+            "Download"
+          ]
+        },
+        {
+          "name": "Quick Look Download button",
+          "keywords": [
+            "download document"
+          ],
+          "hint": "Select a file and press Space (Quick Look), then use its Download button to download that one file.",
+          "locate": [
+            "Download"
+          ]
+        },
+        {
+          "name": "Move to Recycle Bin",
+          "keywords": [
+            "delete document"
+          ],
+          "hint": "Select the file or folder and press Delete, or right-click it and choose Move to Recycle Bin.",
+          "locate": [
+            "Move to Recycle Bin"
+          ]
+        },
+        {
+          "name": "Recycle Bin",
+          "keywords": [
+            "recycle bin",
+            "deleted files",
+            "restore deleted file",
+            "restore file"
+          ],
+          "hint": "Recycle Bin in the left sidebar — deleted items land here; restore them or empty the bin.",
+          "locate": [
+            "Recycle Bin"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "asset_list",
+      "pattern": "/assetList",
+      "icon": "🔧",
+      "intent_keywords": [
+        "assets",
+        "asset list",
+        "equipment",
+        "machinery",
+        "company assets",
+        "asset register",
+        "fixed assets",
+        "asset tracking",
+        "asset inventory"
+      ],
+      "entity_required": null,
+      "permission_required": "AST.REA",
+      "label_template": "Assets",
+      "description": "Company equipment, machinery, and fixed asset register",
+      "module": "Assets",
+      "page_help": "Here you can edit or remove assets, request a measurement, and track measurement status per asset.",
+      "page_features": [
+        {
+          "name": "Request Measurement",
+          "keywords": [
+            "request measurement",
+            "measurement request"
+          ],
+          "hint": "The \"Request Measurement\" action in each asset card's menu (Send request).",
+          "locate": [
+            "Request Measurement"
+          ]
+        },
+        {
+          "name": "View Measurement",
+          "keywords": [
+            "view measurement",
+            "see measurement"
+          ],
+          "hint": "The \"View Measurement\" action in each asset card's menu (Open).",
+          "locate": [
+            "View Measurement"
+          ]
+        },
+        {
+          "name": "Add New Asset button",
+          "keywords": [
+            "add new asset"
+          ],
+          "hint": "Navigates to the asset creation form.",
+          "locate": [
+            "Add New Asset"
+          ]
+        },
+        {
+          "name": "Request Measurement button",
+          "keywords": [
+            "request measurement",
+            "order measurement"
+          ],
+          "hint": "Opens a 3-step dialog to place an EagleView-style measurement order.",
+          "locate": [
+            "Request Measurement"
+          ]
+        },
+        {
+          "name": "Delete (row icon)",
+          "keywords": [
+            "delete asset"
+          ],
+          "hint": "Deletes the asset after confirmation.",
+          "locate": [
+            "Delete"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tool_management",
+      "pattern": "/toolManagement",
+      "target_route": "/admin",
+      "target_route_state": {
+        "selectedTab": "4"
+      },
+      "icon": "🔨",
+      "intent_keywords": [
+        "tools",
+        "tool management",
+        "tool list",
+        "equipment tools",
+        "tool tracking",
+        "hand tools",
+        "power tools",
+        "tool inventory"
+      ],
+      "entity_required": null,
+      "permission_required": "TOO.REA",
+      "label_template": "Tools",
+      "description": "Tool inventory, tracking, and equipment management",
+      "module": "Admin",
+      "page_help": "Here you can filter tools by trade, search the list, add a tool, and edit vendor and trade tags inline.",
+      "page_features": [
+        {
+          "name": "Trade filter",
+          "keywords": [
+            "trade filter",
+            "filter by trade"
+          ],
+          "hint": "The Trade dropdown, top of the tools table.",
+          "locate": [
+            "Trade"
+          ]
+        },
+        {
+          "name": "Add New Tool button",
+          "keywords": [
+            "add tool",
+            "new tool"
+          ],
+          "hint": "Adds a new tool row to the table.",
+          "locate": [
+            "Add New Tool"
+          ]
+        },
+        {
+          "name": "Update (row)",
+          "keywords": [
+            "update tool cost"
+          ],
+          "hint": "Saves inline edits to a tool's cost.",
+          "locate": [
+            "Update"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "customer_invoices",
+      "pattern": "/customerInvoices",
+      "icon": "🧾",
+      "intent_keywords": [
+        "my invoices",
+        "my payments",
+        "my payment history",
+        "view my payments",
+        "recent payments i made",
+        "see my payment details",
+        "my payment page",
+        "what payments have i made",
+        "how much have i paid"
+      ],
+      "entity_required": null,
+      "permission_required": "INV.PAY",
+      "label_template": "Customer Invoices",
+      "description": "A single customer's own self-service billing portal — view and pay YOUR OWN invoices as a customer, not an internal staff view of other customers' records",
+      "module": "Finance",
+      "page_help": "Here you can search projects, review paid vs unpaid totals, view each project's invoices, and proceed to pay selected ones.",
+      "page_features": [
+        {
+          "name": "Payment summary tiles",
+          "keywords": [
+            "payment details",
+            "payment summary",
+            "how much have i paid",
+            "total paid",
+            "total unpaid",
+            "balance",
+            "what do i owe"
+          ],
+          "hint": "The three summary tiles at the top — Total Project Amount, Total Paid Amount, and Total Unpaid Amount across all your projects.",
+          "locate": [
+            "Total Project Amount",
+            "Total Paid Amount",
+            "Total Unpaid Amount"
+          ]
+        },
+        {
+          "name": "Proceed to Pay button",
+          "keywords": [
+            "proceed to pay",
+            "pay invoices",
+            "pay now"
+          ],
+          "hint": "The \"Proceed to Pay\" button — enabled once you select one or more invoices.",
+          "locate": [
+            "Proceed to Pay"
+          ]
+        },
+        {
+          "name": "View Invoices",
+          "keywords": [
+            "view invoices",
+            "see invoices"
+          ],
+          "hint": "The \"View Invoices\" link on each project row.",
+          "locate": [
+            "View Invoices"
+          ]
+        },
+        {
+          "name": "Proceed To Pay button",
+          "keywords": [
+            "pay invoices",
+            "bulk pay invoices"
+          ],
+          "hint": "Opens a payment dialog for the checkbox-selected invoices (disabled until at least one is selected).",
+          "locate": [
+            "Proceed To Pay"
+          ]
+        },
+        {
+          "name": "View Invoices (row expand)",
+          "keywords": [
+            "view project invoices"
+          ],
+          "hint": "Expands a project row to show its individual invoices.",
+          "locate": [
+            "View Invoices"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "project_information",
+      "pattern": "/soldproduction/projectinformation",
+      "icon": "📋",
+      "intent_keywords": [
+        "project information",
+        "project details",
+        "project overview",
+        "project info",
+        "about this project"
+      ],
+      "entity_required": "project",
+      "permission_required": "PRO.REA",
+      "label_template": "Project Information",
+      "description": "Full detail view for a single project — status, dates, and overview",
+      "page_help": "Here you can review this project's full details and overview, switch between tabs like Tasks, BOM, PO, Invoice, and Documents, toggle the Gantt/Task List view, create or view the estimate, and manage hold status.",
+      "module": "Production",
+      "page_features": [
+        {
+          "name": "Notes panel toggle",
+          "keywords": [
+            "show notes",
+            "hide notes",
+            "project hub notes",
+            "toggle notes panel",
+            "add a note",
+            "create a note",
+            "write a note",
+            "new note",
+            "add note"
+          ],
+          "hint": "A small arrow icon button fixed to the right edge of the page that expands or collapses the Project Hub notes sidebar.",
+          "locate": [
+            "Hide Notes",
+            "Show Notes"
+          ]
+        },
+        {
+          "name": "Project summary pills",
+          "keywords": [
+            "job info",
+            "sales person",
+            "scope",
+            "kickoff date",
+            "target date",
+            "budget"
+          ],
+          "hint": "The row of summary pill cards (Job, Sales Person, Scope, Kickoff, Target, Budget) at the top of the project view.",
+          "locate": [
+            "Job",
+            "Sales Person",
+            "Scope",
+            "Kickoff",
+            "Target",
+            "Budget"
+          ]
+        },
+        {
+          "name": "Project tabs",
+          "keywords": [
+            "tasks tab",
+            "gantt tasks tab",
+            "bom tab",
+            "po tab",
+            "delivery slips tab",
+            "bill tab",
+            "invoice tab",
+            "payments tab",
+            "job ledger tab",
+            "documents tab",
+            "wip report tab",
+            "vendor bill tab",
+            "payment settings tab",
+            "tax tab",
+            "qa tab"
+          ],
+          "hint": "The horizontal tab bar directly under the project summary pills.",
+          "locate": [
+            "Tasks",
+            "Gantt Tasks",
+            "BOM",
+            "PO",
+            "Delivery Slips",
+            "Bill",
+            "Invoice",
+            "Payments",
+            "Job Ledger",
+            "Documents",
+            "WIP Report",
+            "Tax",
+            "QA",
+            "Vendor / Subcontractor Bill",
+            "Payment Settings"
+          ]
+        },
+        {
+          "name": "Gantt / Task List view switcher",
+          "keywords": [
+            "gantt view",
+            "task list view",
+            "switch to gantt",
+            "switch to task list",
+            "bid task view"
+          ],
+          "hint": "A segmented toggle button group on the Tasks/Gantt Tasks tab that switches between the Gantt timeline view and a flat task/bid task list view.",
+          "locate": [
+            "Gantt",
+            "Task List",
+            "Bid Tasks"
+          ]
+        },
+        {
+          "name": "Create Estimate button",
+          "keywords": [
+            "create estimate",
+            "generate estimate",
+            "make estimate from bid"
+          ],
+          "hint": "The Create Estimate button on the Gantt Tasks tab, shown only when the Gantt view is active.",
+          "locate": [
+            "Create Estimate"
+          ]
+        },
+        {
+          "name": "View Estimate button",
+          "keywords": [
+            "view estimate",
+            "open estimate preview",
+            "see existing estimate"
+          ],
+          "hint": "The View Estimate button next to Create Estimate, shown once an estimate already exists for the project.",
+          "locate": [
+            "View Estimate"
+          ]
+        },
+        {
+          "name": "Hold / Resume project control",
+          "keywords": [
+            "hold project",
+            "resume project",
+            "pause project",
+            "on hold reason"
+          ],
+          "hint": "The Hold/Resume control on the Gantt view of the Tasks tab.",
+          "locate": [
+            "Hold",
+            "Resume",
+            "*Reason For Hold:"
+          ]
+        },
+        {
+          "name": "Submit / Update trade questions button",
+          "keywords": [
+            "submit questions",
+            "update questions",
+            "submit qa",
+            "save trade answers"
+          ],
+          "hint": "The Submit (or Update, if awaiting re-estimation) button under the QA tab's question renderer.",
+          "locate": [
+            "Submit",
+            "Update",
+            "Saving…"
+          ]
+        },
+        {
+          "name": "Vendor / Subcontractor Bill list",
+          "keywords": [
+            "uploaded bills",
+            "review bill",
+            "bill list",
+            "see uploaded bills",
+            "view uploaded bills",
+            "reviewed bills",
+            "bills received",
+            "vendor bill list",
+            "subcontractor bill list"
+          ],
+          "hint": "The Vendor / Subcontractor Bill tab lists bills uploaded for this project — click one to review the AI-extracted vendor, tax, and line-item data before approving.",
+          "locate": [
+            "Vendor / Subcontractor Bill"
+          ]
+        },
+        {
+          "name": "Hold button",
+          "keywords": [
+            "hold project"
+          ],
+          "hint": "Opens a reason dialog, then places the project on hold.",
+          "locate": [
+            "Hold"
+          ]
+        },
+        {
+          "name": "Force Complete button",
+          "keywords": [
+            "force complete project"
+          ],
+          "hint": "Force-completes an active project after a warning confirmation.",
+          "locate": [
+            "Force Complete"
+          ]
+        },
+        {
+          "name": "Resume / Reschedule button",
+          "keywords": [
+            "resume project",
+            "reschedule project"
+          ],
+          "hint": "Reactivates a held project on a chosen date.",
+          "locate": [
+            "Resume / Reschedule"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "estimate_project_information",
+      "pattern": "/salesestimate/projectinformation",
+      "icon": "📋",
+      "intent_keywords": [
+        "estimate project information",
+        "estimate project details",
+        "bid project overview"
+      ],
+      "entity_required": "project",
+      "permission_required": "PRO.REA",
+      "label_template": "Estimate Project Information",
+      "description": "Project detail view in the context of a sales estimate",
+      "page_help": "Here you can review this project's details from the estimating side, switch between tabs like Tasks, BOM, PO, and QA, create or view the estimate, and manage hold status.",
+      "module": "Sales",
+      "page_features": [
+        {
+          "name": "Notes panel toggle",
+          "keywords": [
+            "show notes",
+            "hide notes",
+            "project hub notes",
+            "toggle notes panel"
+          ],
+          "hint": "A small arrow icon button fixed to the right edge of the page that expands or collapses the Project Hub notes sidebar.",
+          "locate": [
+            "Hide Notes",
+            "Show Notes"
+          ]
+        },
+        {
+          "name": "Project summary pills",
+          "keywords": [
+            "job info",
+            "sales person",
+            "scope",
+            "kickoff date",
+            "target date",
+            "budget"
+          ],
+          "hint": "The row of summary pill cards (Job, Sales Person, Scope, Kickoff, Target, Budget) at the top of the project view.",
+          "locate": [
+            "Job",
+            "Sales Person",
+            "Scope",
+            "Kickoff",
+            "Target",
+            "Budget"
+          ]
+        },
+        {
+          "name": "Project tabs",
+          "keywords": [
+            "tasks tab",
+            "gantt tasks tab",
+            "bom tab",
+            "po tab",
+            "qa tab"
+          ],
+          "hint": "The horizontal tab bar under the project summary pills, showing the tabs available for a bid.",
+          "locate": [
+            "Tasks",
+            "Gantt Tasks",
+            "BOM",
+            "PO",
+            "QA"
+          ]
+        },
+        {
+          "name": "Gantt / Task List view switcher",
+          "keywords": [
+            "gantt view",
+            "task list view",
+            "switch to gantt",
+            "switch to task list",
+            "bid task view"
+          ],
+          "hint": "A segmented toggle button group on the Tasks/Gantt Tasks tab that switches between the Gantt timeline view and a flat bid task list view.",
+          "locate": [
+            "Gantt",
+            "Task List",
+            "Bid Tasks"
+          ]
+        },
+        {
+          "name": "Create Estimate button",
+          "keywords": [
+            "create estimate",
+            "generate estimate",
+            "make estimate from bid"
+          ],
+          "hint": "The Create Estimate button on the Gantt Tasks tab, shown only when the Gantt view is active.",
+          "locate": [
+            "Create Estimate"
+          ]
+        },
+        {
+          "name": "View Estimate button",
+          "keywords": [
+            "view estimate",
+            "open estimate preview",
+            "see existing estimate"
+          ],
+          "hint": "The View Estimate button next to Create Estimate, shown once an estimate already exists for the bid.",
+          "locate": [
+            "View Estimate"
+          ]
+        },
+        {
+          "name": "Submit / Update trade questions button",
+          "keywords": [
+            "submit questions",
+            "update questions",
+            "submit qa",
+            "save trade answers"
+          ],
+          "hint": "The Submit (or Update, if awaiting re-estimation) button under the QA tab's question renderer.",
+          "locate": [
+            "Submit",
+            "Update",
+            "Saving…"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "project_bom",
+      "pattern": "/soldproduction/projectinformation/bom",
+      "icon": "📦",
+      "intent_keywords": [
+        "bom",
+        "bill of materials",
+        "project materials",
+        "material takeoff",
+        "materials for this project",
+        "material list for this project"
+      ],
+      "entity_required": "project",
+      "permission_required": "BOM.REA",
+      "label_template": "Project Materials (BOM)",
+      "description": "This project's Bill of Materials — the BOM tab, listing every material for this project",
+      "page_help": "Here you can search materials by ID, name, or quantity, filter by unit or cost, and dispatch material stock for this project.",
+      "module": "Materials",
+      "page_features": [
+        {
+          "name": "Search materials field",
+          "keywords": [
+            "search materials",
+            "search bom",
+            "find material",
+            "search by material id"
+          ],
+          "hint": "The search field above the BOM table — searches by material ID, name, or quantity.",
+          "locate": [
+            "Search materials by ID, name, or quantity"
+          ]
+        },
+        {
+          "name": "Unit filter",
+          "keywords": [
+            "filter by unit",
+            "unit filter"
+          ],
+          "hint": "The Unit dropdown filter above the BOM table.",
+          "locate": [
+            "Unit"
+          ]
+        },
+        {
+          "name": "Cost sort filter",
+          "keywords": [
+            "sort by cost",
+            "cost filter",
+            "low to high",
+            "high to low"
+          ],
+          "hint": "The cost sort dropdown (low to high / high to low) above the BOM table.",
+          "locate": [
+            "Cost"
+          ]
+        },
+        {
+          "name": "Dispatch Material button",
+          "keywords": [
+            "dispatch material",
+            "dispatch stock",
+            "ship material"
+          ],
+          "hint": "The 'Dispatch Material' button, for dispatching stock for this project's BOM.",
+          "locate": [
+            "Dispatch Material"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "project_payments",
+      "pattern": "/soldproduction/projectinformation/payments",
+      "icon": "💳",
+      "intent_keywords": [
+        "project payments",
+        "payments for this project",
+        "this project's payment history",
+        "vendor payments made"
+      ],
+      "entity_required": "project",
+      "permission_required": "PAY.REA",
+      "label_template": "Project Payments",
+      "description": "This project's payments — the Payments tab, listing every payment made for this project",
+      "page_help": "Here you can review the payments made against this project's invoices.",
+      "module": "Finance"
+    },
+    {
+      "id": "project_documents",
+      "pattern": "/soldproduction/projectinformation/documents",
+      "icon": "📁",
+      "intent_keywords": [
+        "project documents",
+        "documents for this project",
+        "documents for this",
+        "project attachments"
+      ],
+      "entity_required": "project",
+      "permission_required": "DOC.REA",
+      "label_template": "Project Documents",
+      "description": "This project's documents — the Documents tab, listing every document attached to this project",
+      "page_help": "Here you can review and download documents attached to this project.",
+      "module": "Documents"
+    },
+    {
+      "id": "project_wip_report",
+      "pattern": "/soldproduction/projectinformation/wipreport",
+      "icon": "📊",
+      "intent_keywords": [
+        "wip report",
+        "work in progress report",
+        "project wip",
+        "wip for this project",
+        "wip report for this project"
+      ],
+      "entity_required": "project",
+      "permission_required": "WIPREP.REA",
+      "label_template": "Project WIP Report",
+      "description": "This project's Work-In-Progress report — the WIP Report tab for this project",
+      "page_help": "Here you can review the Work-In-Progress report for this project.",
+      "module": "Finance"
+    },
+    {
+      "id": "project_vendor_bill",
+      "pattern": "/soldproduction/projectinformation/vendorbill",
+      "icon": "🧾",
+      "intent_keywords": [
+        "vendor subcontractor bill",
+        "subcontractor bill list",
+        "project vendor bills",
+        "vendor bills for this project"
+      ],
+      "entity_required": "project",
+      "permission_required": "VENBIL.REA",
+      "label_template": "Project Vendor / Subcontractor Bill",
+      "description": "This project's vendor/subcontractor bills — the Vendor / Subcontractor Bill tab for this project",
+      "page_help": "Here you can review vendor and subcontractor bills uploaded for this project.",
+      "module": "Finance"
+    },
+    {
+      "id": "delivery_slip",
+      "pattern": "/soldproduction/projectinformation/deliveryslip",
+      "icon": "🚚",
+      "intent_keywords": [
+        "delivery slip",
+        "delivery note",
+        "material delivery",
+        "delivery receipt"
+      ],
+      "entity_required": "project",
+      "permission_required": "DELSLP.REA",
+      "label_template": "Delivery Slips",
+      "description": "This project's delivery slips — the Delivery Slips tab, listing every slip for this project",
+      "page_help": "Here you can review delivery slips for materials on this project, and compare delivered vs received quantities.",
+      "module": "Materials",
+      "page_features": [
+        {
+          "name": "Delivery Slip header",
+          "keywords": [
+            "delivery slip number",
+            "delivery slip details"
+          ],
+          "hint": "The page header showing 'Delivery Slip' title and the Delivery Slip Number at top of the card.",
+          "locate": [
+            "Delivery Slip",
+            "Delivery Slip Number #"
+          ]
+        },
+        {
+          "name": "Delivery Slip To section",
+          "keywords": [
+            "vendor delivery info",
+            "delivery slip vendor address"
+          ],
+          "hint": "The left-side block labeled 'Delivery Slip To:' showing vendor name and contact details.",
+          "locate": [
+            "Delivery Slip To:"
+          ]
+        },
+        {
+          "name": "Shipping Address section",
+          "keywords": [
+            "delivery shipping address",
+            "customer shipping info"
+          ],
+          "hint": "The right-side block labeled 'Shipping Address:' showing customer/vendor shipping details.",
+          "locate": [
+            "Shipping Address:"
+          ]
+        },
+        {
+          "name": "Delivered vs Received quantity table",
+          "keywords": [
+            "compare po and delivery quantities",
+            "received quantity",
+            "delivered quantity"
+          ],
+          "hint": "The comparison table with Code, Description, Delivered Quantity, Received Quantity, and Status columns.",
+          "locate": [
+            "Code",
+            "Description",
+            "Delivered Quantity",
+            "Received Quantity",
+            "Status"
+          ]
+        },
+        {
+          "name": "Note footer",
+          "keywords": [
+            "delivery slip note",
+            "thank you note"
+          ],
+          "hint": "The closing note at the bottom of the delivery slip card.",
+          "locate": [
+            "Note:"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "project_invoice_view",
+      "pattern": "/soldproduction/projectinformation/invoiceview",
+      "icon": "🧾",
+      "intent_keywords": [
+        "project invoice",
+        "invoice for this project",
+        "project billing",
+        "invoice",
+        "invoices",
+        "billing",
+        "accounts receivable",
+        "ar",
+        "unpaid",
+        "outstanding invoices",
+        "payment request",
+        "client invoice",
+        "raise invoice",
+        "send invoice"
+      ],
+      "entity_required": "project",
+      "permission_required": "INV.REA",
+      "label_template": "Project Invoices",
+      "description": "This project's invoices — the Invoice tab, listing every invoice for this project",
+      "page_help": "Here you can review or fill out the invoice for this project, add tax and discount lines, and send the invoice to the customer.",
+      "module": "Finance",
+      "page_features": [
+        {
+          "name": "Go Back button",
+          "keywords": [
+            "go back",
+            "back to project",
+            "return",
+            "cancel invoice edit"
+          ],
+          "hint": "The Go Back button at the top of the right-hand action panel.",
+          "locate": [
+            "Go Back"
+          ]
+        },
+        {
+          "name": "Send Invoice button",
+          "keywords": [
+            "send invoice",
+            "email invoice",
+            "issue invoice",
+            "send to customer"
+          ],
+          "hint": "The Send Invoice button in the right-hand action panel, enabled only when the invoice status is Generated.",
+          "locate": [
+            "Send Invoice"
+          ]
+        },
+        {
+          "name": "Skip Payment button",
+          "keywords": [
+            "skip payment",
+            "waive payment",
+            "skip customer payment"
+          ],
+          "hint": "The Skip Payment button below Send Invoice, enabled only for Un Paid invoices.",
+          "locate": [
+            "Skip Payment"
+          ]
+        },
+        {
+          "name": "Add Row button (tax)",
+          "keywords": [
+            "add tax row",
+            "add tax",
+            "new tax line"
+          ],
+          "hint": "The 'Add Row' text button below the tax info section, for adding a new tax line.",
+          "locate": [
+            "Add Row"
+          ]
+        },
+        {
+          "name": "Add Discount button",
+          "keywords": [
+            "add discount",
+            "new discount",
+            "discount line"
+          ],
+          "hint": "The 'Add Discount' text button below the discounts section.",
+          "locate": [
+            "Add Discount"
+          ]
+        },
+        {
+          "name": "Add Row button (line items)",
+          "keywords": [
+            "add item row",
+            "add line item",
+            "new invoice item"
+          ],
+          "hint": "The 'Add Row' text button below the itemized line-items table.",
+          "locate": [
+            "Add Row"
+          ]
+        },
+        {
+          "name": "Save button",
+          "keywords": [
+            "save invoice changes",
+            "save edits",
+            "update invoice"
+          ],
+          "hint": "The Save button at the bottom of the invoice card, visible when status is Generated.",
+          "locate": [
+            "Save"
+          ]
+        },
+        {
+          "name": "Share Invoice Link panel",
+          "keywords": [
+            "share invoice link",
+            "invoice qr code",
+            "copy invoice link",
+            "payment link"
+          ],
+          "hint": "The 'Share Invoice Link' card with a QR code and copyable link, shown in the right-hand panel after sending.",
+          "locate": [
+            "Share Invoice Link",
+            "Scan this QR Code"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "project_invoice_preview",
+      "pattern": "/soldproduction/projectinformation/invoicePreview",
+      "icon": "🧾",
+      "intent_keywords": [
+        "preview invoice",
+        "invoice preview",
+        "review invoice before sending"
+      ],
+      "entity_required": "project",
+      "permission_required": "INV.REA",
+      "label_template": "Project Invoices",
+      "description": "This project's invoices — the Invoice tab, where you can open one to preview it before sending",
+      "page_help": "Here you can preview the invoice before it goes out, share the payment link, and view or skip payment.",
+      "module": "Finance",
+      "page_features": [
+        {
+          "name": "Go Back button",
+          "keywords": [
+            "go back",
+            "back to project",
+            "return from preview"
+          ],
+          "hint": "The Go Back button at the top of the right-hand action panel.",
+          "locate": [
+            "Go Back"
+          ]
+        },
+        {
+          "name": "Send Invoice button",
+          "keywords": [
+            "send invoice",
+            "email invoice preview",
+            "issue invoice"
+          ],
+          "hint": "The Send Invoice button in the right-hand action panel of the invoice preview.",
+          "locate": [
+            "Send Invoice"
+          ]
+        },
+        {
+          "name": "Skip Payment button",
+          "keywords": [
+            "skip payment",
+            "waive customer payment"
+          ],
+          "hint": "The Skip Payment button below Send Invoice, enabled only for Un Paid invoices.",
+          "locate": [
+            "Skip Payment"
+          ]
+        },
+        {
+          "name": "Share Invoice Link panel",
+          "keywords": [
+            "share invoice link",
+            "invoice qr code",
+            "copy invoice link"
+          ],
+          "hint": "The 'Share Invoice Link' card with QR code and copy button in the right-hand panel.",
+          "locate": [
+            "Share Invoice Link",
+            "Scan this QR Code"
+          ]
+        },
+        {
+          "name": "Copy link button",
+          "keywords": [
+            "copy link",
+            "copy invoice url"
+          ],
+          "hint": "The copy icon button next to the read-only invoice link field.",
+          "locate": [
+            "Copy",
+            "Copied!"
+          ]
+        },
+        {
+          "name": "Payment Types panel",
+          "keywords": [
+            "payment types",
+            "record payment",
+            "pay invoice"
+          ],
+          "hint": "The Payment Types card at the bottom of the right-hand panel, hidden once the invoice is Paid.",
+          "locate": []
+        }
+      ]
+    },
+    {
+      "id": "po_details",
+      "pattern": "/podetails",
+      "icon": "📦",
+      "intent_keywords": [
+        "po details",
+        "purchase order details",
+        "view po",
+        "po summary",
+        "purchase orders for this project",
+        "project purchase orders",
+        "po",
+        "purchase order"
+      ],
+      "entity_required": "project",
+      "permission_required": "PO.REA",
+      "label_template": "Project Purchase Orders",
+      "description": "This project's purchase orders — the PO tab, listing every PO for this project",
+      "page_help": "Here you can review the full details of a purchase order, send it to the vendor, and manage tax lines.",
+      "module": "Procurement",
+      "page_features": [
+        {
+          "name": "Go Back button",
+          "keywords": [
+            "go back",
+            "back to project",
+            "return to po list",
+            "cancel po view"
+          ],
+          "hint": "The Go Back button in the right-hand action card, above Send PO.",
+          "locate": [
+            "Go Back"
+          ]
+        },
+        {
+          "name": "Send PO button",
+          "keywords": [
+            "send purchase order",
+            "send po to vendor",
+            "email po"
+          ],
+          "hint": "The Send PO button below Go Back, enabled only when the PO status is Generated.",
+          "locate": [
+            "Send PO",
+            "Sending..."
+          ]
+        },
+        {
+          "name": "Save button",
+          "keywords": [
+            "save purchase order",
+            "save tax changes",
+            "save po"
+          ],
+          "hint": "The Save button at the bottom of the PO card, shown when status is Generated and tax is not exempt.",
+          "locate": [
+            "Save"
+          ]
+        },
+        {
+          "name": "Add Row button (tax)",
+          "keywords": [
+            "add tax row",
+            "add tax component",
+            "new tax line"
+          ],
+          "hint": "The Add Row button above the totals section, used to add a new tax line item.",
+          "locate": [
+            "Add Row"
+          ]
+        },
+        {
+          "name": "Delete PO line item",
+          "keywords": [
+            "delete po item",
+            "remove line item",
+            "reject po item"
+          ],
+          "hint": "The trash-can icon in the Action column of each PO item row.",
+          "locate": [
+            "Delete"
+          ]
+        },
+        {
+          "name": "Notes panel",
+          "keywords": [
+            "po notes",
+            "add note to purchase order",
+            "notes list"
+          ],
+          "hint": "The Notes list panel on the right sidebar below the action buttons.",
+          "locate": []
+        },
+        {
+          "name": "Delete line item",
+          "keywords": [
+            "remove po item",
+            "reject po item"
+          ],
+          "hint": "Marks a line item as undelivered/rejected.",
+          "locate": [
+            "Delete line item"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "expense_list",
+      "pattern": "/expenselist",
+      "icon": "💵",
+      "intent_keywords": [
+        "expenses",
+        "expense list",
+        "expense report",
+        "spending list",
+        "track expenses"
+      ],
+      "entity_required": null,
+      "permission_required": "JBL.REA",
+      "label_template": "Expenses",
+      "description": "Tabbed Expenses/Bills/Vendors/Contractors table — currently running on placeholder sample data; most controls (Print, Share, Settings, Batch Actions, Courier) are not yet wired to real actions.",
+      "page_help": "Here you can review and track expenses, switch between Expenses/Bills/Vendors/Contractors tabs, and print or share the table.",
+      "module": "Finance",
+      "page_features": [
+        {
+          "name": "Expenses / Bills / Vendors / Contractors tabs",
+          "keywords": [
+            "expenses tab",
+            "bills tab",
+            "vendors tab",
+            "contractors tab"
+          ],
+          "hint": "The tab row below the page header for switching between Expenses, Bills, Vendors, and Contractors.",
+          "locate": [
+            "Expenses",
+            "Bills",
+            "Vendors",
+            "Contractors"
+          ]
+        },
+        {
+          "name": "Batch Actions dropdown",
+          "keywords": [
+            "batch actions",
+            "bulk actions",
+            "select action"
+          ],
+          "hint": "The Batch Actions dropdown, top left of the expense table search bar.",
+          "locate": [
+            "Batch Actions"
+          ]
+        },
+        {
+          "name": "Print button",
+          "keywords": [
+            "print expenses",
+            "print table",
+            "print icon"
+          ],
+          "hint": "The Print icon button, top right of the table toolbar.",
+          "locate": [
+            "Print"
+          ]
+        },
+        {
+          "name": "Share button",
+          "keywords": [
+            "share expenses",
+            "share table",
+            "share icon"
+          ],
+          "hint": "The Share icon button, next to Print in the table toolbar.",
+          "locate": [
+            "Share"
+          ]
+        },
+        {
+          "name": "View/Edit link",
+          "keywords": [
+            "view edit expense",
+            "open expense",
+            "edit expense row"
+          ],
+          "hint": "The 'View/Edit' link in the Actions column of each expense row.",
+          "locate": [
+            "View/Edit"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "create_estimate",
+      "pattern": "/create-estimate",
+      "icon": "📝",
+      "intent_keywords": [
+        "create a new estimate",
+        "new estimate",
+        "start an estimate",
+        "begin estimate",
+        "start a bid"
+      ],
+      "entity_required": "project",
+      "permission_required": "EST.REA",
+      "label_template": "Create Estimate",
+      "description": "Start a new sales estimate or bid",
+      "page_help": "Here you can start building a new estimate for a customer — pick a Good/Better/Best grade, view its details, and continue to the full estimate.",
+      "module": "Sales",
+      "page_features": [
+        {
+          "name": "Select grade button",
+          "keywords": [
+            "select good",
+            "select better",
+            "select best",
+            "choose grade",
+            "pick grade"
+          ],
+          "hint": "The Select button on each grade card (Good, Better, Best), center of the page — marks that grade as the chosen estimate.",
+          "locate": [
+            "Select Good",
+            "Select Better",
+            "Select Best"
+          ]
+        },
+        {
+          "name": "View details button",
+          "keywords": [
+            "view details",
+            "grade details",
+            "material breakdown"
+          ],
+          "hint": "The View details button on each grade card — opens a drawer with the full cost and material breakdown for that grade.",
+          "locate": [
+            "View details"
+          ]
+        },
+        {
+          "name": "Continue to estimate button",
+          "keywords": [
+            "continue to estimate",
+            "continue",
+            "proceed with grade"
+          ],
+          "hint": "The Continue to estimate button, bottom right of the fixed footer — proceeds to the full estimate view once a grade is selected.",
+          "locate": [
+            "Continue to estimate →"
+          ]
+        },
+        {
+          "name": "Job start date dialog",
+          "keywords": [
+            "job start date",
+            "select start date",
+            "team members unavailable",
+            "retry with date"
+          ],
+          "hint": "The Select a Job Start Date dialog, appears when team members are unavailable for the default start date — pick a date and click Retry with this date.",
+          "locate": [
+            "Select a Job Start Date",
+            "Retry with this date"
+          ]
+        },
+        {
+          "name": "Select [Grade] button",
+          "keywords": [
+            "select good better best grade"
+          ],
+          "hint": "Marks a Good/Better/Best tier as the chosen estimate.",
+          "locate": [
+            "Select [Grade]"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "create_bid",
+      "pattern": "/createbid",
+      "icon": "➕",
+      "intent_keywords": [
+        "create bid",
+        "new bid",
+        "start a bid",
+        "create a bid",
+        "bid wizard",
+        "make a bid",
+        "start new bid",
+        "start bid wizard",
+        "add bid to cart",
+        "new customer bid",
+        "create estimate for customer",
+        "bid creation",
+        "new project",
+        "create project",
+        "create a new project",
+        "create new project",
+        "start a project",
+        "start new project",
+        "start a new project",
+        "how to create a project",
+        "set up a new project"
+      ],
+      "entity_required": null,
+      "permission_required": "PRO.CRE",
+      "label_template": "Create Bid",
+      "description": "Start a BRAND NEW project from scratch (called a bid before it's booked) -- a 5-step wizard: Customer Info, Asset Info, Trade Selection, Requirements, Finalize & Schedule, with autosave and cart/booking checkout. This is the ONLY place a new project is created; it has no existing project yet. Not to be confused with create_change_order, which modifies an EXISTING, already-created project.",
+      "module": "Sales",
+      "page_help": "Here you can create a new bid through a 5-step wizard: Customer Information, Asset Information, Trade Selection, Requirements, and Finalize Bid & Schedule Discussion. Progress autosaves as you go.",
+      "page_features": [
+        {
+          "name": "Step navigation stepper",
+          "keywords": [
+            "steps",
+            "wizard steps",
+            "stepper",
+            "bid steps"
+          ],
+          "hint": "The 5-step vertical stepper on the left side of the wizard, listing each stage of the bid.",
+          "locate": [
+            "Customer Information",
+            "Asset Information",
+            "Trade Selection",
+            "Requirements",
+            "Finalize Bid & Schedule Discussion"
+          ]
+        },
+        {
+          "name": "Next button",
+          "keywords": [
+            "next",
+            "next step",
+            "continue wizard"
+          ],
+          "hint": "The Next button, top navigation bar of the wizard — advances to the next step once the current step's required fields are filled.",
+          "locate": [
+            "Next"
+          ]
+        },
+        {
+          "name": "Previous button",
+          "keywords": [
+            "previous",
+            "back",
+            "go back a step"
+          ],
+          "hint": "The Previous button, top navigation bar of the wizard, hidden on the first step.",
+          "locate": [
+            "Previous"
+          ]
+        },
+        {
+          "name": "Continue button",
+          "keywords": [
+            "continue",
+            "confirm trade selection"
+          ],
+          "hint": "The Continue button, on the Trade Selection step — locks in the chosen trade before moving forward (customer and trade cannot be edited after this).",
+          "locate": [
+            "Continue"
+          ]
+        },
+        {
+          "name": "Exit and Add to cart button",
+          "keywords": [
+            "exit and add to cart",
+            "save and exit",
+            "exit wizard"
+          ],
+          "hint": "The Exit and Add to cart button, top navigation bar on later steps — saves the in-progress bid and exits the wizard.",
+          "locate": [
+            "Exit and Add to cart"
+          ]
+        },
+        {
+          "name": "Submit button",
+          "keywords": [
+            "submit",
+            "submit bid"
+          ],
+          "hint": "The Submit button, shown on Trade Selection, Requirements, and Finalize steps once a job start date is set — submits the bid.",
+          "locate": [
+            "Submit"
+          ]
+        },
+        {
+          "name": "Add to Cart / Update button",
+          "keywords": [
+            "add to cart",
+            "update bid",
+            "finalize bid"
+          ],
+          "hint": "The Add to Cart (new bid) or Update (existing bid) button, on the Finalize Bid & Schedule Discussion step — completes the wizard.",
+          "locate": [
+            "Add to Cart",
+            "Update"
+          ]
+        },
+        {
+          "name": "Autosave status indicator",
+          "keywords": [
+            "autosave",
+            "saving status",
+            "draft saved"
+          ],
+          "hint": "The autosave status indicator next to the wizard title — shows Saving/Saved/Error state for the in-progress bid draft, with a retry option on error.",
+          "locate": [
+            "Saving Draft..."
+          ]
+        },
+        {
+          "name": "Add to Cart / Submit button",
+          "keywords": [
+            "add bid to cart",
+            "submit bid",
+            "checkout bid"
+          ],
+          "hint": "Serializes the bid and adds it to cart, or opens the sales-booking calendar to submit.",
+          "locate": [
+            "Add to Cart / Submit"
+          ]
+        },
+        {
+          "name": "Grade selection cards",
+          "keywords": [
+            "select good better best grade"
+          ],
+          "hint": "Good/Better/Best tier selection cards during the wizard.",
+          "locate": [
+            "Grade selection cards"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sales_project_management",
+      "pattern": "/sales",
+      "icon": "📈",
+      "intent_keywords": [
+        "sales",
+        "sales management",
+        "sales projects"
+      ],
+      "entity_required": null,
+      "permission_required": "TARREP.REA",
+      "label_template": "Sales",
+      "description": "Sales project management workspace",
+      "page_help": "Here you can manage sales projects and the pipeline, review margin and closing-ratio metrics, and act on pending verifications.",
+      "module": "Sales",
+      "page_features": [
+        {
+          "name": "Notes panel toggle",
+          "keywords": [
+            "show notes",
+            "hide notes",
+            "project notes",
+            "notes panel",
+            "add a note",
+            "create a note",
+            "write a note",
+            "new note",
+            "add note"
+          ],
+          "hint": "The Notes toggle icon button, fixed at the top right of the page — expands or collapses the Project Hub notes panel.",
+          "locate": [
+            "Hide Notes",
+            "Show Notes"
+          ]
+        },
+        {
+          "name": "Select salesperson dropdown",
+          "keywords": [
+            "select salesperson",
+            "best margin",
+            "margin by trade"
+          ],
+          "hint": "The Select salesperson dropdown inside the Best Margin Sold by Trade card — filters the trade spotlight metrics by salesperson.",
+          "locate": [
+            "Select salesperson",
+            "Best Margin Sold by Trade"
+          ]
+        },
+        {
+          "name": "Salesperson dropdown (Closing Ratio Forecast)",
+          "keywords": [
+            "salesperson",
+            "closing ratio",
+            "closing ratio forecast"
+          ],
+          "hint": "The Salesperson dropdown inside the Closing Ratio Forecast card — selects the employee shown in the closing ratio pie chart.",
+          "locate": [
+            "Salesperson",
+            "Closing Ratio Forecast"
+          ]
+        },
+        {
+          "name": "Month/Year toggle",
+          "keywords": [
+            "month",
+            "year",
+            "target period toggle"
+          ],
+          "hint": "The Month/Year toggle buttons inside the Closing Ratio Forecast card — switches the target period used for the achievement KPIs.",
+          "locate": [
+            "Month",
+            "Year"
+          ]
+        },
+        {
+          "name": "Search projects search box",
+          "keywords": [
+            "search projects",
+            "upcoming verification search"
+          ],
+          "hint": "The Search projects search box, top of the Upcoming Verification table — filters verification rows as you type.",
+          "locate": [
+            "Search projects..."
+          ]
+        },
+        {
+          "name": "View button",
+          "keywords": [
+            "view project",
+            "view",
+            "upcoming verification"
+          ],
+          "hint": "The View button, in the Action column of an Upcoming Verification row — opens the project information page.",
+          "locate": [
+            "View"
+          ]
+        },
+        {
+          "name": "View Estimate button",
+          "keywords": [
+            "view estimate",
+            "estimate view"
+          ],
+          "hint": "The View Estimate button, in the Action column of an Upcoming Verification row when an estimate already exists — opens the estimate view.",
+          "locate": [
+            "View Estimate"
+          ]
+        },
+        {
+          "name": "Show/Hide Notes toggle",
+          "keywords": [
+            "show notes",
+            "hide notes"
+          ],
+          "hint": "Expands/collapses the Project Hub notes panel (requires Project Hub + notes.READ).",
+          "locate": [
+            "Show/Hide Notes toggle"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "customer_project_management",
+      "pattern": "/customerprojectmanagement",
+      "icon": "🏢",
+      "intent_keywords": [
+        "customer projects",
+        "customer project management",
+        "manage customer projects"
+      ],
+      "entity_required": null,
+      "permission_required": "TARREP.REA",
+      "label_template": "Customer Project Management",
+      "description": "Manage projects on behalf of a customer",
+      "page_help": "Here you can manage projects for a specific customer — post a bid advertisement, check project status, and review recent activity.",
+      "module": "Production",
+      "page_features": [
+        {
+          "name": "Create Bid Advertisement",
+          "keywords": [
+            "create bid advertisement",
+            "new bid ad",
+            "advertise bid",
+            "post bid advertisement"
+          ],
+          "hint": "The Create Bid Advertisement panel, top of the main column on the customer project management dashboard.",
+          "locate": [
+            "Create Bid Advertisement"
+          ]
+        },
+        {
+          "name": "Project Status panel",
+          "keywords": [
+            "project status",
+            "project status overview",
+            "status board"
+          ],
+          "hint": "The Project Status widget below the bid advertisement panel, visible only to users with project read permission.",
+          "locate": [
+            "Project Status"
+          ]
+        },
+        {
+          "name": "Project Activity panel",
+          "keywords": [
+            "project activity",
+            "recent activity",
+            "activity feed"
+          ],
+          "hint": "The Project Activity panel in the right-hand column of the dashboard.",
+          "locate": [
+            "Project Activity"
+          ]
+        },
+        {
+          "name": "Create Bid button",
+          "keywords": [
+            "create bid button",
+            "create bid advertisement button"
+          ],
+          "hint": "Navigates to the bid-creation wizard.",
+          "locate": [
+            "Create Bid"
+          ]
+        },
+        {
+          "name": "Enter OTP button",
+          "keywords": [
+            "enter otp",
+            "approve project"
+          ],
+          "hint": "Shown for projects awaiting Salesperson Approval — opens an OTP-entry modal.",
+          "locate": [
+            "Enter OTP"
+          ]
+        },
+        {
+          "name": "Sign Contract button",
+          "keywords": [
+            "sign contract"
+          ],
+          "hint": "Shown for projects awaiting Contract Upload — navigates to the contract signing page.",
+          "locate": [
+            "Sign Contract"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "vendor_management",
+      "pattern": "/vendormanagement",
+      "icon": "🤝",
+      "intent_keywords": [
+        "manage vendors",
+        "vendor management",
+        "edit vendor",
+        "vendor settings"
+      ],
+      "entity_required": null,
+      "permission_required": "VEN.REA",
+      "label_template": "Vendor Management",
+      "description": "Manage vendor details and settings",
+      "page_help": "Here you can edit vendor details and settings, search and filter the vendor list, and add or delete vendors.",
+      "module": "Procurement",
+      "page_features": [
+        {
+          "name": "Vendor search box",
+          "keywords": [
+            "search vendors",
+            "find vendor",
+            "vendor lookup"
+          ],
+          "hint": "The search input in the toolbar, top-left of the vendor table.",
+          "locate": [
+            "Search vendors..."
+          ]
+        },
+        {
+          "name": "Status filter pills",
+          "keywords": [
+            "filter vendors by status",
+            "active vendors",
+            "inactive vendors",
+            "all vendors"
+          ],
+          "hint": "The All / Active / Inactive filter pills next to the Status label in the toolbar.",
+          "locate": [
+            "All",
+            "Active",
+            "Inactive",
+            "Status:"
+          ]
+        },
+        {
+          "name": "Add New Vendor button",
+          "keywords": [
+            "add vendor",
+            "create new vendor",
+            "register vendor"
+          ],
+          "hint": "The Add New Vendor button on the right side of the toolbar.",
+          "locate": [
+            "Add New Vendor"
+          ]
+        },
+        {
+          "name": "Edit vendor icon",
+          "keywords": [
+            "edit vendor",
+            "update vendor details"
+          ],
+          "hint": "The pencil icon in the Action column of each vendor row.",
+          "locate": [
+            "Edit"
+          ]
+        },
+        {
+          "name": "Delete vendor icon",
+          "keywords": [
+            "delete vendor",
+            "remove vendor",
+            "deactivate vendor"
+          ],
+          "hint": "The trash-can icon in the Action column of each vendor row, opens a confirmation dialog.",
+          "locate": [
+            "Delete"
+          ]
+        },
+        {
+          "name": "Vendor stats badges",
+          "keywords": [
+            "total vendors",
+            "active vendor count"
+          ],
+          "hint": "The Total and Active count badges in the dark gradient header at the top of the page.",
+          "locate": [
+            "Total",
+            "Active"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "employee_list",
+      "pattern": "/employeeList",
+      "icon": "👥",
+      "intent_keywords": [
+        "employees",
+        "employee list",
+        "staff list",
+        "team members",
+        "workforce list"
+      ],
+      "entity_required": null,
+      "permission_required": "RES.REA",
+      "label_template": "Employees",
+      "description": "List of employees and staff",
+      "page_help": "Here you can review the list of employees, search and filter by status, and invite a new employee.",
+      "module": "HR",
+      "target_route": "/admin",
+      "target_route_state": {
+        "selectedTab": "1"
+      },
+      "page_features": [
+        {
+          "name": "Employee search box",
+          "keywords": [
+            "search employees",
+            "find employee",
+            "employee search"
+          ],
+          "hint": "The search input in the toolbar of the Employee Management table, filters as you type (3+ characters).",
+          "locate": [
+            "Search employees..."
+          ]
+        },
+        {
+          "name": "Status filter pills",
+          "keywords": [
+            "filter by status",
+            "active employees",
+            "inactive employees",
+            "invited employees",
+            "registered employees"
+          ],
+          "hint": "Status filter pill buttons (All, Active, Inactive, Invited, Registered) next to the search box.",
+          "locate": [
+            "All",
+            "Active",
+            "Inactive",
+            "Invited",
+            "Registered"
+          ]
+        },
+        {
+          "name": "Invite Employee button",
+          "keywords": [
+            "invite employee",
+            "add employee",
+            "new employee",
+            "create employee",
+            "add user",
+            "add a user",
+            "create user",
+            "create a user",
+            "add a new user",
+            "new user account",
+            "add employee login"
+          ],
+          "hint": "The Invite Employee button, top right of the Employee Management toolbar — lets you create a new user account.",
+          "locate": [
+            "Invite Employee"
+          ]
+        },
+        {
+          "name": "Edit employee action",
+          "keywords": [
+            "edit employee",
+            "update employee details"
+          ],
+          "hint": "The edit (pencil) icon button in the Action column of each active employee row.",
+          "locate": [
+            "Edit"
+          ]
+        },
+        {
+          "name": "View employee details action",
+          "keywords": [
+            "view employee",
+            "view inactive employee"
+          ],
+          "hint": "The eye icon button in the Action column for inactive employee rows, opens read-only view.",
+          "locate": [
+            "View Details"
+          ]
+        },
+        {
+          "name": "Employee stats header",
+          "keywords": [
+            "total employees",
+            "active employee count"
+          ],
+          "hint": "Total and Active count badges in the dark gradient header of the Employee Management page.",
+          "locate": [
+            "Total",
+            "Active"
+          ]
+        },
+        {
+          "name": "Edit (row icon)",
+          "keywords": [
+            "edit employee"
+          ],
+          "hint": "Pencil icon, shown for active employees — opens their record for editing.",
+          "locate": [
+            "Edit"
+          ]
+        },
+        {
+          "name": "View Details (row icon)",
+          "keywords": [
+            "view employee details"
+          ],
+          "hint": "Eye icon, shown for inactive employees — opens their record read-only.",
+          "locate": [
+            "View Details"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "employment",
+      "pattern": "/employment",
+      "icon": "👤",
+      "intent_keywords": [
+        "employment",
+        "employment details",
+        "hire",
+        "employment records"
+      ],
+      "entity_required": null,
+      "permission_required": "RES.REA",
+      "label_template": "Employment",
+      "description": "Employment records and details",
+      "page_help": "Here you can review employment records, switching between the Personal info and Employment details tabs.",
+      "module": "HR",
+      "page_features": [
+        {
+          "name": "Personal info tab",
+          "keywords": [
+            "personal info",
+            "employee personal details"
+          ],
+          "hint": "The Personal info tab on the Employment page for viewing/editing basic employee details.",
+          "locate": [
+            "Personal info"
+          ]
+        },
+        {
+          "name": "Employment details tab",
+          "keywords": [
+            "employment details",
+            "employment record",
+            "job details"
+          ],
+          "hint": "The Employement details tab, visible only to users with modify permission.",
+          "locate": [
+            "Employement details"
+          ]
+        },
+        {
+          "name": "Personal info / Employment details tabs",
+          "keywords": [
+            "employment details tab",
+            "personal info tab"
+          ],
+          "hint": "Tabs at the top switch between the employee's personal info and employment details (employment details requires the resource.MODIFY permission).",
+          "locate": [
+            "Personal info / Employment details tabs"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "admin_customer",
+      "pattern": "/admin/customer",
+      "icon": "🏢",
+      "intent_keywords": [
+        "customer admin",
+        "manage customer",
+        "customer settings"
+      ],
+      "entity_required": null,
+      "permission_required": "CON.MAN",
+      "label_template": "Customer Admin",
+      "description": "Administer customer accounts",
+      "page_help": "Here you can manage customer account settings — personal info, billing address, and property/asset links.",
+      "module": "Admin",
+      "page_features": [
+        {
+          "name": "Customer profile photo upload",
+          "keywords": [
+            "upload customer photo",
+            "customer profile picture"
+          ],
+          "hint": "The circular profile photo upload card at the top of the Personal Info section.",
+          "locate": [
+            "Upload profile"
+          ]
+        },
+        {
+          "name": "Billing address fields",
+          "keywords": [
+            "customer address",
+            "billing address",
+            "customer city state zip"
+          ],
+          "hint": "The Billing Address section with street address, city, state, country, and zip code fields.",
+          "locate": [
+            "Billing Address",
+            "Street Address",
+            "City",
+            "State",
+            "Country",
+            "Zip Code"
+          ]
+        },
+        {
+          "name": "View property details link",
+          "keywords": [
+            "view customer property",
+            "view assets",
+            "property details"
+          ],
+          "hint": "A text link below the address fields that navigates to the customer's asset/property list.",
+          "locate": [
+            "click to view property details"
+          ]
+        },
+        {
+          "name": "Save/Update customer button",
+          "keywords": [
+            "save customer",
+            "update customer"
+          ],
+          "hint": "The primary Save (new customer) or Update (existing customer) button at the bottom of the form.",
+          "locate": [
+            "Save",
+            "Update"
+          ]
+        },
+        {
+          "name": "Save / Update button",
+          "keywords": [
+            "save customer profile",
+            "update customer profile"
+          ],
+          "hint": "The Save or Update button on the customer's personal info/billing page.",
+          "locate": [
+            "Save / Update"
+          ]
+        },
+        {
+          "name": "Profile photo upload",
+          "keywords": [
+            "upload customer photo",
+            "add profile picture"
+          ],
+          "hint": "Click the profile image card to upload/preview a photo.",
+          "locate": [
+            "Profile photo upload"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "contract_signing",
+      "pattern": "/contract",
+      "icon": "✍️",
+      "intent_keywords": [
+        "sign contract",
+        "contract signing",
+        "e-sign contract",
+        "get contract signed"
+      ],
+      "entity_required": null,
+      "permission_required": "DOC.REA",
+      "label_template": "Contract Signing",
+      "description": "Send or sign a contract",
+      "page_help": "Here you can sign or send out a contract for signature, attach PDFs, and save as a draft.",
+      "module": "Documents",
+      "page_features": [
+        {
+          "name": "Download PDF button",
+          "keywords": [
+            "download pdf",
+            "export contract pdf"
+          ],
+          "hint": "The PDF icon button at the top right of the contract document card.",
+          "locate": [
+            "Download Pdf Format"
+          ]
+        },
+        {
+          "name": "Attach File button",
+          "keywords": [
+            "attach file",
+            "upload pdf attachment"
+          ],
+          "hint": "Primary 'Attach File' button in the Attachments header, shown only when no attachments exist yet and only PDFs are accepted.",
+          "locate": [
+            "Attach File",
+            "Only PDF files are accepted"
+          ]
+        },
+        {
+          "name": "Signature button",
+          "keywords": [
+            "add signature",
+            "sign contract"
+          ],
+          "hint": "Outlined 'Signature' button with a pen icon in the contract action bar.",
+          "locate": [
+            "Signature"
+          ]
+        },
+        {
+          "name": "Save / Save Contract button",
+          "keywords": [
+            "save contract",
+            "publish contract",
+            "submit signature"
+          ],
+          "hint": "The Save button in the action bar, disabled until a signature is added.",
+          "locate": [
+            "Save",
+            "Please add your signature first"
+          ]
+        },
+        {
+          "name": "Save as Draft button",
+          "keywords": [
+            "save draft",
+            "draft contract"
+          ],
+          "hint": "Outlined 'Save as Draft' button shown for non-signature users in the action bar.",
+          "locate": [
+            "Save as Draft"
+          ]
+        },
+        {
+          "name": "Draw Your Signature modal",
+          "keywords": [
+            "signature pad",
+            "draw signature",
+            "sign here"
+          ],
+          "hint": "Modal titled 'Draw Your Signature' with a signature canvas and Clear, Cancel, and Confirm buttons.",
+          "locate": [
+            "Draw Your Signature",
+            "Use your mouse or touch to sign below",
+            "Clear",
+            "Cancel",
+            "Confirm"
+          ]
+        },
+        {
+          "name": "Save / Save as Draft button",
+          "keywords": [
+            "save contract",
+            "save contract draft"
+          ],
+          "hint": "Uploads the contract HTML, attachments, and generated PDF.",
+          "locate": [
+            "Save / Save as Draft"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "create_asset",
+      "pattern": "/asset",
+      "icon": "🔧",
+      "intent_keywords": [
+        "add a new asset",
+        "create asset",
+        "register equipment",
+        "add machinery"
+      ],
+      "entity_required": null,
+      "permission_required": null,
+      "label_template": "Create Asset",
+      "description": "Register a new company asset or equipment",
+      "page_help": "Here you can add a new asset to the register.",
+      "module": "Assets",
+      "page_features": [
+        {
+          "name": "Save / Update button",
+          "keywords": [
+            "save asset",
+            "update asset"
+          ],
+          "hint": "Submits the asset creation or edit form.",
+          "locate": [
+            "Save / Update"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tenant_configuration",
+      "pattern": "/tenantconfiguration",
+      "icon": "⚙️",
+      "intent_keywords": [
+        "tenant configuration",
+        "tenant settings",
+        "company settings",
+        "settings",
+        "configuration",
+        "configurations"
+      ],
+      "entity_required": null,
+      "permission_required": "CON.MAN",
+      "label_template": "Tenant Configuration",
+      "description": "Company-wide tenant configuration settings",
+      "page_help": "Here you can adjust company-wide configuration settings across General, Asset, Trade, Finance, Mail, and Workflow Metrics tabs.",
+      "module": "Admin",
+      "page_features": [
+        {
+          "name": "General Configuration tab",
+          "keywords": [
+            "general configuration",
+            "company settings",
+            "general settings",
+            "app settings",
+            "company profile"
+          ],
+          "hint": "The General Configuration tab in Settings -- company profile, address, working hours and working days.",
+          "locate": [
+            "General Configuration"
+          ]
+        },
+        {
+          "name": "Trade Configuration tab",
+          "keywords": [
+            "trade configuration",
+            "trade setup",
+            "set up trade",
+            "add new trade",
+            "add a trade",
+            "create a trade",
+            "add trade",
+            "remove a trade",
+            "remove trade",
+            "delete a trade",
+            "delete trade",
+            "update a trade",
+            "update trade",
+            "edit a trade",
+            "edit trade",
+            "change a trade",
+            "manage trades",
+            "trade management",
+            "enable a trade",
+            "disable a trade",
+            "turn off a trade"
+          ],
+          "hint": "Settings (profile menu) > Trade Configuration tab -- this is where trades are managed. Its 'Trade SetUp' button opens a dialog with two lists: move a trade from 'List of Trades' into 'Selected Trades' to add it, or move it back to remove it, then press Save. Adding and removing both happen there; there is no separate screen for editing a trade's own name or details. Not to be confused with Create Bid's 'Trade Selection' step, which picks an EXISTING trade for a new bid.",
+          "locate": [
+            "Trade Configuration"
+          ],
+          "post_click_locate": [
+            "Trade SetUp"
+          ]
+        },
+        {
+          "name": "Finance Settings tab",
+          "keywords": [
+            "finance settings",
+            "financial configuration"
+          ],
+          "hint": "Tab for tenant-level finance settings.",
+          "locate": [
+            "Finance Settings"
+          ]
+        },
+        {
+          "name": "Mail Configuration tab",
+          "keywords": [
+            "mail configuration",
+            "email settings"
+          ],
+          "hint": "Tab for configuring outgoing mail/email settings for the tenant.",
+          "locate": [
+            "Mail Configuration"
+          ]
+        },
+        {
+          "name": "Asset tab",
+          "keywords": [
+            "asset questions",
+            "asset configuration",
+            "asset settings",
+            "asset question set"
+          ],
+          "hint": "The Asset tab in Settings -- edits the asset question set.",
+          "locate": [
+            "Asset"
+          ]
+        },
+        {
+          "name": "Subcontractor Configuration tab",
+          "keywords": [
+            "subcontractor configuration",
+            "subcontractor settings"
+          ],
+          "hint": "The Subcontractor Configuration tab in Settings. Only shown when the subcontractor feature is enabled for the tenant.",
+          "locate": [
+            "Subcontractor Configuration"
+          ]
+        },
+        {
+          "name": "Process Workflow Metrics tab",
+          "keywords": [
+            "process workflow metrics",
+            "workflow metrics",
+            "process metrics"
+          ],
+          "hint": "The Process Workflow Metrics tab in Settings.",
+          "locate": [
+            "Process Workflow Metrics"
+          ]
+        },
+        {
+          "name": "Time & Payroll tab",
+          "keywords": [
+            "time and payroll",
+            "time payroll",
+            "payroll settings",
+            "payroll configuration"
+          ],
+          "hint": "The Time & Payroll tab in Settings -- time tracking and payroll configuration.",
+          "locate": [
+            "Time & Payroll"
+          ]
+        },
+        {
+          "name": "Clock-In Settings tab",
+          "keywords": [
+            "clock in settings",
+            "clock-in settings",
+            "clock in configuration",
+            "clock in",
+            "clockin settings",
+            "clock out settings"
+          ],
+          "hint": "The Clock-In Settings tab in Settings -- controls how employees clock in and out.",
+          "locate": [
+            "Clock-In Settings"
+          ]
+        },
+        {
+          "name": "Configuration tabs",
+          "keywords": [
+            "what configurations",
+            "list configurations",
+            "which settings",
+            "configuration tabs",
+            "settings tabs",
+            "all settings"
+          ],
+          "hint": "Settings has these tabs: General Configuration, Asset, Trade Configuration, Subcontractor Configuration (when enabled for the tenant), Finance Settings, Mail Configuration, Process Workflow Metrics, Time & Payroll, and Clock-In Settings.",
+          "locate": [
+            "General Configuration"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "general_configuration",
+      "pattern": "/Generalconfiguration",
+      "target_route": "/tenantconfiguration",
+      "icon": "⚙️",
+      "intent_keywords": [],
+      "entity_required": null,
+      "permission_required": "CON.MAN",
+      "label_template": "General Configuration",
+      "description": "General application configuration settings",
+      "page_help": "Here you can adjust general application settings — company profile, address, working hours and days.",
+      "module": "Admin",
+      "page_features": [
+        {
+          "name": "Company logo upload",
+          "keywords": [
+            "upload company logo",
+            "tenant logo"
+          ],
+          "hint": "Clickable logo upload card on the right side of the header section.",
+          "locate": [
+            "Click to Upload company logo"
+          ]
+        },
+        {
+          "name": "Company address fields",
+          "keywords": [
+            "company address",
+            "company city state zip country"
+          ],
+          "hint": "Street address, city, state, country, and zip code fields with map picker integration.",
+          "locate": [
+            "Street Address",
+            "City",
+            "State",
+            "Country",
+            "Zip Code"
+          ]
+        },
+        {
+          "name": "Enable Overtime checkbox",
+          "keywords": [
+            "enable overtime",
+            "overtime setting"
+          ],
+          "hint": "Checkbox toggle to enable overtime for the organization.",
+          "locate": [
+            "Enable Overtime for your Organization?"
+          ]
+        },
+        {
+          "name": "Working Hours pickers",
+          "keywords": [
+            "work start time",
+            "work end time",
+            "working hours"
+          ],
+          "hint": "Time pickers for setting the organization's work start and end time.",
+          "locate": [
+            "Working Hours:",
+            "Work Start Time",
+            "Work End Time"
+          ]
+        },
+        {
+          "name": "Working Days checkboxes",
+          "keywords": [
+            "working days",
+            "select working days"
+          ],
+          "hint": "Checkboxes for each day of the week (Sun–Sat) to select the organization's working days.",
+          "locate": [
+            "Sun",
+            "Mon",
+            "Tue",
+            "Wed",
+            "Thu",
+            "Fri",
+            "Sat",
+            "Working Days:"
+          ]
+        },
+        {
+          "name": "Save/Update button",
+          "keywords": [
+            "save general configuration",
+            "update company settings"
+          ],
+          "hint": "Primary Save (first-time setup) or Update (existing) button at the bottom of the form.",
+          "locate": [
+            "Save",
+            "Update"
+          ]
+        },
+        {
+          "name": "Save / Update button",
+          "keywords": [
+            "save company settings",
+            "update company settings"
+          ],
+          "hint": "The Save (first-time setup) or Update (existing settings) button for tenant company profile, working hours, and overtime settings.",
+          "locate": [
+            "Save / Update"
+          ]
+        },
+        {
+          "name": "Logo upload",
+          "keywords": [
+            "upload company logo",
+            "change logo"
+          ],
+          "hint": "Click the logo card to upload a new company logo.",
+          "locate": [
+            "Logo upload"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "question_builder",
+      "pattern": "/questionBuilder",
+      "icon": "❓",
+      "intent_keywords": [
+        "question builder",
+        "build questions",
+        "estimate questions",
+        "edit questionnaire"
+      ],
+      "entity_required": null,
+      "permission_required": null,
+      "label_template": "Question Builder",
+      "description": "Build and edit estimating questionnaires",
+      "page_help": "Here you can build or edit the estimating question set — add templates, select a trade, and configure conditional questions.",
+      "module": "Sales",
+      "page_features": [
+        {
+          "name": "Add Question Template button",
+          "keywords": [
+            "add question template",
+            "new question template",
+            "create template"
+          ],
+          "hint": "The Add Question Template button, top of the Question Template List table — opens the question builder form for a new trade or asset template.",
+          "locate": [
+            "Add Question Template"
+          ]
+        },
+        {
+          "name": "Select Your Trade dropdown",
+          "keywords": [
+            "select your trade",
+            "select trade",
+            "trade dropdown"
+          ],
+          "hint": "The Select Your Trade dropdown, top of the question builder form — chooses which trade's question template is being edited.",
+          "locate": [
+            "Select Your Trade"
+          ]
+        },
+        {
+          "name": "Trade Questions tab",
+          "keywords": [
+            "trade questions",
+            "trade questions tab"
+          ],
+          "hint": "The Trade Questions tab, above the question groups — shows the trade-specific question set being edited.",
+          "locate": [
+            "Trade Questions"
+          ]
+        },
+        {
+          "name": "Question Template List table",
+          "keywords": [
+            "question template list",
+            "templates table",
+            "trade name",
+            "created by"
+          ],
+          "hint": "The Question Template List table, main panel of the page — lists templates with Version, Trade Name, Created By, Created Date, and Status columns.",
+          "locate": [
+            "Question Template List",
+            "Version",
+            "Trade Name"
+          ]
+        },
+        {
+          "name": "Conditional Render menu item",
+          "keywords": [
+            "conditional render",
+            "add condition",
+            "conditional expression"
+          ],
+          "hint": "The Conditional Render menu item, in the right-click/overflow menu on a question or item group card — attaches a conditional display expression to it.",
+          "locate": [
+            "Conditional Render"
+          ]
+        },
+        {
+          "name": "Data Type dropdown",
+          "keywords": [
+            "data type",
+            "question type",
+            "field type"
+          ],
+          "hint": "The Data Type dropdown on each question card — sets the answer type (Integer, Text, Single Choice, Multi Choice, Date, etc.).",
+          "locate": [
+            "Data Type"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "customer_table",
+      "pattern": "/customertable",
+      "icon": "🏢",
+      "intent_keywords": [
+        "customer table",
+        "customer list",
+        "all customers",
+        "list of customers"
+      ],
+      "entity_required": null,
+      "permission_required": "CON.MAN",
+      "label_template": "Customers",
+      "description": "List of all customer accounts",
+      "page_help": "Here you can browse the full customer list, search and filter by status, and invite a new customer.",
+      "module": "Admin",
+      "target_route": "/admin",
+      "target_route_state": {
+        "selectedTab": "3"
+      },
+      "page_features": [
+        {
+          "name": "Customer search box",
+          "keywords": [
+            "search customers",
+            "find customer"
+          ],
+          "hint": "The search input in the Customers toolbar, filters as you type (3+ characters).",
+          "locate": [
+            "Search customers…"
+          ]
+        },
+        {
+          "name": "Status filter chips",
+          "keywords": [
+            "filter customers by status",
+            "active customers",
+            "invited customers",
+            "inactive customers"
+          ],
+          "hint": "Status filter chips (All, Active, Invited, Inactive) in the customer toolbar.",
+          "locate": [
+            "All",
+            "Active",
+            "Invited",
+            "Inactive"
+          ]
+        },
+        {
+          "name": "Invite Customer button",
+          "keywords": [
+            "invite customer",
+            "add customer",
+            "new customer"
+          ],
+          "hint": "The Invite Customer button, top right of the Customers toolbar.",
+          "locate": [
+            "Invite Customer"
+          ]
+        },
+        {
+          "name": "Edit customer action",
+          "keywords": [
+            "edit customer"
+          ],
+          "hint": "The pencil icon button in the Action column, opens the customer edit form.",
+          "locate": [
+            "Edit customer"
+          ]
+        },
+        {
+          "name": "Customer KPI pills",
+          "keywords": [
+            "total customers",
+            "active customer count",
+            "invited customer count"
+          ],
+          "hint": "KPI pill badges (Total, Active, Invited, Inactive) in the Customers card header.",
+          "locate": [
+            "Total",
+            "Active",
+            "Invited",
+            "Inactive"
+          ]
+        },
+        {
+          "name": "Edit customer (row icon)",
+          "keywords": [
+            "edit customer"
+          ],
+          "hint": "Pencil icon per row — opens the customer record for editing on the Customer profile page.",
+          "locate": [
+            "Edit customer"
+          ]
+        },
+        {
+          "name": "View Asset (row link)",
+          "keywords": [
+            "view customer asset",
+            "customer property"
+          ],
+          "hint": "Shown only when the customer has an asset on file; navigates to the Asset List for that customer.",
+          "locate": [
+            "View Asset"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "customer_info_dashboard",
+      "pattern": "/CustomerInfoDashboard",
+      "icon": "🏢",
+      "intent_keywords": [
+        "customer info dashboard",
+        "customer overview",
+        "customer summary"
+      ],
+      "entity_required": null,
+      "permission_required": "CON.MAN",
+      "label_template": "Customer Info Dashboard",
+      "description": "Internal, tenant-wide overview and payment reconciliation across EVERY customer account — search all customers, verify payments, and check invoices for any of them, not a single customer's own self-service view",
+      "page_help": "Here you can see a summary overview for this customer, view or verify payments, and check project invoices.",
+      "module": "Admin",
+      "page_features": [
+        {
+          "name": "Search Customer field",
+          "keywords": [
+            "search customer payments",
+            "find customer invoice"
+          ],
+          "hint": "Search box for filtering customers on the Customer Info Dashboard.",
+          "locate": [
+            "Search Customer"
+          ]
+        },
+        {
+          "name": "Total/Active Customers cards",
+          "keywords": [
+            "total customers",
+            "active customers count"
+          ],
+          "hint": "Summary cards at the top showing Total Customers and Active Customers counts.",
+          "locate": [
+            "Total Customers",
+            "Active Customers"
+          ]
+        },
+        {
+          "name": "View Payments button",
+          "keywords": [
+            "view customer payments",
+            "payment history"
+          ],
+          "hint": "Button on each customer card that opens the payment list for that customer.",
+          "locate": [
+            "View Payments"
+          ]
+        },
+        {
+          "name": "Verify Payment button",
+          "keywords": [
+            "verify payment",
+            "upload receipt"
+          ],
+          "hint": "Button on each customer card that opens the receipt upload dialog to verify a payment.",
+          "locate": [
+            "Verify Payment"
+          ]
+        },
+        {
+          "name": "View Project Invoices button",
+          "keywords": [
+            "view project invoices",
+            "payment reconciliation"
+          ],
+          "hint": "Button on each customer card that opens payment reconciliation.",
+          "locate": [
+            "View Project Invoices"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "common_dashboard",
+      "pattern": "/commondashboard",
+      "icon": "📊",
+      "intent_keywords": [
+        "common dashboard",
+        "general dashboard",
+        "shared dashboard"
+      ],
+      "entity_required": null,
+      "permission_required": "DASH.REA",
+      "label_template": "Common Dashboard",
+      "description": "Shared company-wide dashboard view",
+      "page_help": "Here you can view the shared company dashboard — it routes automatically to the right home page based on your role.",
+      "module": "dashboard",
+      "page_features": [
+        {
+          "name": "Role-based dashboard router",
+          "keywords": [
+            "dashboard",
+            "my dashboard",
+            "home page",
+            "landing page"
+          ],
+          "hint": "This page renders no UI of its own — it routes straight to the right home page for your role.",
+          "locate": []
+        }
+      ]
+    },
+    {
+      "id": "subscription_plans",
+      "pattern": "/subscription",
+      "icon": "💳",
+      "intent_keywords": [
+        "subscription",
+        "subscription plans",
+        "billing plan",
+        "upgrade plan",
+        "my plan"
+      ],
+      "entity_required": null,
+      "permission_required": "TAS.REA",
+      "label_template": "Subscription Plans",
+      "description": "Manage your FIELDCRAFT subscription plan",
+      "page_help": "Here you can review or change your subscription plan, and manage payment methods for checkout.",
+      "module": "Admin",
+      "page_features": [
+        {
+          "name": "Purchase Plan button",
+          "keywords": [
+            "purchase plan",
+            "buy subscription",
+            "select plan"
+          ],
+          "hint": "The Purchase Plan button on each pricing card (Monthly/Annual FIELDCRAFT Turbo plan).",
+          "locate": [
+            "Purchase Plan"
+          ]
+        },
+        {
+          "name": "Payment method selection",
+          "keywords": [
+            "select payment method",
+            "choose card"
+          ],
+          "hint": "Dialog listing saved cards with radio selection after choosing a plan.",
+          "locate": [
+            "Select Payment Method",
+            "Continue"
+          ]
+        },
+        {
+          "name": "Add Payment Method button",
+          "keywords": [
+            "add payment method",
+            "add new card"
+          ],
+          "hint": "Button shown when no saved payment methods exist, opens the add-card form.",
+          "locate": [
+            "Add Payment Method"
+          ]
+        },
+        {
+          "name": "Confirm and start now button",
+          "keywords": [
+            "confirm subscription payment",
+            "start subscription"
+          ],
+          "hint": "Final confirmation button in the checkout dialog that charges the card and activates the subscription.",
+          "locate": [
+            "Confirm & start now"
+          ]
+        },
+        {
+          "name": "Suspend Plan button",
+          "keywords": [
+            "suspend subscription",
+            "pause plan"
+          ],
+          "hint": "Opens a dialog to choose when to suspend the subscription.",
+          "locate": [
+            "Suspend Plan"
+          ]
+        },
+        {
+          "name": "Cancel Plan button",
+          "keywords": [
+            "cancel subscription"
+          ],
+          "hint": "Opens a dialog to choose when to cancel the subscription.",
+          "locate": [
+            "Cancel Plan"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bill_form",
+      "pattern": "/bill",
+      "icon": "🧾",
+      "intent_keywords": [
+        "vendor bill",
+        "view bill",
+        "bill form",
+        "enter vendor bill",
+        "bill details",
+        "bill payment",
+        "pay vendor bill",
+        "subcontractor bill",
+        "bill line items",
+        "bill total",
+        "bill tax breakdown",
+        "record vendor payment"
+      ],
+      "entity_required": "project",
+      "permission_required": "BIL.REA",
+      "label_template": "Project Bills",
+      "description": "This project's bills — the Bill tab, listing every bill for this project",
+      "module": "Finance",
+      "page_help": "The Vendor Bill page shows the itemized bill received from a vendor or subcontractor against a project's purchase order. Review line items (cost code, description, quantity, unit cost, amount), item receipt status, applicable taxes, and the total due. Use the Payment Types panel on the right to record or process payment against the bill, and Save to persist edits when the bill is in Generated status.",
+      "page_features": [
+        {
+          "name": "Save button",
+          "keywords": [
+            "save bill",
+            "save vendor bill",
+            "submit bill"
+          ],
+          "hint": "The Save button at the bottom of the bill card, shown when status is Generated.",
+          "locate": [
+            "Save"
+          ]
+        },
+        {
+          "name": "Bill items table",
+          "keywords": [
+            "bill line items",
+            "bill items",
+            "cost code table",
+            "bom items",
+            "subcontractor items"
+          ],
+          "hint": "The itemized table listing cost code, description, quantity, unit cost, and amount for the bill.",
+          "locate": [
+            "Code",
+            "Description",
+            "Quantity",
+            "Unit Cost",
+            "Amount",
+            "Item Status",
+            "Item Received"
+          ]
+        },
+        {
+          "name": "Tax breakdown fields",
+          "keywords": [
+            "bill tax",
+            "tax name",
+            "tax percentage",
+            "tax value"
+          ],
+          "hint": "The read-only Tax Name, Percentage, and Value fields listed below the item table.",
+          "locate": [
+            "Tax Name",
+            "Percentage",
+            "Value"
+          ]
+        },
+        {
+          "name": "Subtotal and Total display",
+          "keywords": [
+            "bill subtotal",
+            "bill total",
+            "amount due"
+          ],
+          "hint": "The Subtotal and Total amount readouts on the right side of the bill card, above the note section.",
+          "locate": [
+            "Subtotal:",
+            "Total:"
+          ]
+        },
+        {
+          "name": "Payment Types panel",
+          "keywords": [
+            "pay bill",
+            "record payment",
+            "payment types",
+            "vendor payment"
+          ],
+          "hint": "The Payment Types card in the right-hand column, used to process payment for the bill.",
+          "locate": []
+        },
+        {
+          "name": "Delete line item",
+          "keywords": [
+            "delete bill line item",
+            "remove bill item"
+          ],
+          "hint": "Trash icon per row, shown only for Approved bills with items not yet Received — removes the row locally (not persisted to the server).",
+          "locate": [
+            "Delete line item"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "admin_home",
+      "pattern": "/admin",
+      "icon": "🛠️",
+      "intent_keywords": [
+        "admin",
+        "admin panel",
+        "settings home",
+        "admin dashboard",
+        "manage employees vendors customers",
+        "admin management",
+        "go to admin",
+        "administration",
+        "manage tools resources",
+        "vendor management",
+        "manage subcontractors"
+      ],
+      "entity_required": null,
+      "permission_required": "CON.MAN",
+      "label_template": "Admin",
+      "description": "Central admin landing page with tabs for managing Employees, Vendors, Customers, Tools, Resources, Subcontractors, QuickBooks, ABC Supply, and Access Control — QuickBooks syncs payment and accounting data",
+      "module": "Admin",
+      "page_help": "This is the main Admin page. Use the tabs to switch between managing Employees, Vendors, Customers, Tools, Resources, and other configured integrations. Materials and Inventory now live under Material Mart.",
+      "page_features": [
+        {
+          "name": "Employees tab",
+          "keywords": [
+            "manage employees",
+            "employee list",
+            "employee tab"
+          ],
+          "hint": "The Employees tab, first tab on the Admin page.",
+          "locate": [
+            "Employees"
+          ],
+          "route_state": {
+            "selectedTab": "1"
+          }
+        },
+        {
+          "name": "Vendors tab",
+          "keywords": [
+            "manage vendors",
+            "vendor list"
+          ],
+          "hint": "The Vendors tab on the Admin page.",
+          "locate": [
+            "Vendors"
+          ],
+          "route_state": {
+            "selectedTab": "2"
+          }
+        },
+        {
+          "name": "Customers tab",
+          "keywords": [
+            "manage customers",
+            "customer list"
+          ],
+          "hint": "The Customers tab on the Admin page.",
+          "locate": [
+            "Customers"
+          ],
+          "route_state": {
+            "selectedTab": "3"
+          }
+        },
+        {
+          "name": "Tools tab",
+          "keywords": [
+            "manage tools",
+            "tool list"
+          ],
+          "hint": "The Tools tab on the Admin page.",
+          "locate": [
+            "Tools"
+          ],
+          "route_state": {
+            "selectedTab": "4"
+          }
+        },
+        {
+          "name": "Resources tab",
+          "keywords": [
+            "resources tab",
+            "resource list",
+            "resources",
+            "manage resources",
+            "show resources"
+          ],
+          "hint": "The Resources tab on the Admin page.",
+          "locate": [
+            "Resources"
+          ],
+          "route_state": {
+            "selectedTab": "6"
+          }
+        },
+        {
+          "name": "Subcontractors tab",
+          "keywords": [
+            "manage subcontractors",
+            "subcontractor list",
+            "subcontractors tab",
+            "open subcontractors tab",
+            "subcontractors",
+            "subcontractor",
+            "subs"
+          ],
+          "hint": "Feature-flagged Subcontractors tab, visible only when the subcontractor flag is enabled.",
+          "locate": [
+            "Subcontractors"
+          ],
+          "route_state": {
+            "selectedTab": "7"
+          }
+        },
+        {
+          "name": "QuickBooks tab",
+          "keywords": [
+            "quickbooks",
+            "quickbooks tab",
+            "quickbooks integration",
+            "quickbooks table",
+            "open quickbooks",
+            "payment sync",
+            "accounting sync",
+            "sync payments",
+            "quickbooks payment"
+          ],
+          "hint": "Feature-flagged QuickBooks tab, visible only for tenants with QuickBooks access enabled.",
+          "locate": [
+            "QuickBooks"
+          ],
+          "route_state": {
+            "selectedTab": "9"
+          }
+        },
+        {
+          "name": "ABC Supply tab",
+          "keywords": [
+            "abc supply",
+            "abc supply tab",
+            "abc supply integration",
+            "abc supply connection",
+            "open abc supply"
+          ],
+          "hint": "The ABC Supply tab with connection settings and, once connected, a supply order table.",
+          "locate": [
+            "ABC Supply"
+          ],
+          "route_state": {
+            "selectedTab": "10"
+          }
+        },
+        {
+          "name": "Show/Hide Notes toggle",
+          "keywords": [
+            "show project notes",
+            "hide notes panel"
+          ],
+          "hint": "Fixed icon button on the right edge of the page that toggles the ProjectHub notes side panel.",
+          "locate": [
+            "Hide Notes",
+            "Show Notes"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chat_ui",
+      "pattern": "/chatui",
+      "icon": "💬",
+      "intent_keywords": [
+        "chat with fieldcraft",
+        "ask a question",
+        "chatbot",
+        "open chat assistant",
+        "bid chat"
+      ],
+      "entity_required": null,
+      "permission_required": null,
+      "label_template": "FIELDCRAFT Chat Assistant",
+      "description": "A floating chat widget that lets a user pick a bid/project and ask status-related questions, returning canned or backend-generated answers, with an option to navigate elsewhere in the app.",
+      "module": "Support",
+      "page_help": "Click the chat bubble in the corner to open the assistant, select a bid to load context-aware suggested questions, and click a question to get an answer.",
+      "page_features": [
+        {
+          "name": "Chat toggle button",
+          "keywords": [
+            "open chat",
+            "close chat",
+            "chat bubble",
+            "chat fab"
+          ],
+          "hint": "The floating action button, bottom-right of the screen, that opens or closes the chat card.",
+          "locate": [
+            "Add"
+          ]
+        },
+        {
+          "name": "Chat launcher button",
+          "keywords": [
+            "open chat",
+            "close chat"
+          ],
+          "hint": "Floating bottom-right button that opens/closes the EDEN chat panel.",
+          "locate": [
+            "Chat launcher"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "user_access_warning",
+      "pattern": "/cancel",
+      "target_route": "/cancel",
+      "target_route_state": null,
+      "icon": "⚠️",
+      "intent_keywords": [
+        "subscription blocked",
+        "account suspended",
+        "no active subscription",
+        "access warning"
+      ],
+      "entity_required": null,
+      "permission_required": null,
+      "label_template": "Account Access Warning",
+      "description": "Blocking modal shown when a tenant's subscription is inactive, on hold, cancelled, or missing a payment card, with role-specific remediation actions.",
+      "module": "Finance",
+      "page_help": "Depending on the issue, you can resume a held subscription, resubscribe, request a trial extension, or add a payment card.",
+      "page_features": [
+        {
+          "name": "Resume Subscription button",
+          "keywords": [
+            "resume subscription"
+          ],
+          "hint": "Reactivates a held subscription plan.",
+          "locate": [
+            "Resume Subscription"
+          ]
+        },
+        {
+          "name": "Resubscribe button",
+          "keywords": [
+            "resubscribe",
+            "buy new plan"
+          ],
+          "hint": "Navigates to the Plans page to purchase a new subscription.",
+          "locate": [
+            "Resubscribe"
+          ]
+        },
+        {
+          "name": "Request for Trial Extension button",
+          "keywords": [
+            "request trial extension"
+          ],
+          "hint": "Requests an extension to the trial period.",
+          "locate": [
+            "Request for Trial Extension"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "subscription_plans_page",
+      "pattern": "/plans",
+      "target_route": "/plans",
+      "target_route_state": null,
+      "icon": "💰",
+      "intent_keywords": [
+        "subscription plans",
+        "buy plan",
+        "fieldcraft turbo plans",
+        "purchase subscription"
+      ],
+      "entity_required": null,
+      "permission_required": null,
+      "label_template": "Subscription Plans",
+      "description": "Plan selection and checkout page for FIELDCRAFT Turbo subscriptions.",
+      "module": "Finance",
+      "page_help": "Pick a plan, choose or add a payment method, then confirm to start the subscription.",
+      "page_features": [
+        {
+          "name": "Purchase Plan button",
+          "keywords": [
+            "purchase plan",
+            "buy subscription"
+          ],
+          "hint": "Opens payment-method selection for the chosen plan.",
+          "locate": [
+            "Purchase Plan"
+          ]
+        },
+        {
+          "name": "Confirm & start now button",
+          "keywords": [
+            "confirm subscription",
+            "start subscription"
+          ],
+          "hint": "Creates the subscription and starts it immediately.",
+          "locate": [
+            "Confirm & start now"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "quickbooks_callback",
+      "pattern": "/quickbooks/oauth-return",
+      "target_route": "/admin",
+      "target_route_state": {
+        "selectedTab": "9"
+      },
+      "icon": "📘",
+      "intent_keywords": [
+        "quickbooks oauth callback",
+        "quickbooks connection callback"
+      ],
+      "entity_required": null,
+      "permission_required": "CON.MAN",
+      "label_template": "QuickBooks Callback",
+      "description": "Handles the OAuth redirect from QuickBooks to finalize the QuickBooks integration connection; not a user-navigated page.",
+      "module": "Admin",
+      "page_help": "This page runs automatically after connecting QuickBooks — it has no user actions.",
+      "page_features": []
+    },
+    {
+      "id": "home",
+      "pattern": "/",
+      "target_route": "/",
+      "target_route_state": null,
+      "icon": "🏠",
+      "intent_keywords": [
+        "home page",
+        "login page",
+        "landing page"
+      ],
+      "entity_required": null,
+      "permission_required": null,
+      "label_template": "Home",
+      "description": "Login landing/splash page shown to unauthenticated users, with the sign-in panel.",
+      "module": "Core",
+      "page_help": "Select Login to sign in with your FIELDCRAFT Cloud account.",
+      "page_features": [
+        {
+          "name": "Login button",
+          "keywords": [
+            "login",
+            "sign in"
+          ],
+          "hint": "Starts the OIDC sign-in redirect flow.",
+          "locate": [
+            "Login"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "welcome",
+      "pattern": "/welcome",
+      "target_route": "/welcome",
+      "target_route_state": null,
+      "icon": "👋",
+      "intent_keywords": [
+        "welcome page",
+        "post login redirect"
+      ],
+      "entity_required": null,
+      "permission_required": null,
+      "label_template": "Welcome",
+      "description": "Post-login dispatcher that routes a new user to onboarding, or an existing user to their first permitted page; has no buttons of its own.",
+      "module": "Core",
+      "page_help": "This page redirects automatically — there is nothing to click here.",
+      "page_features": []
+    },
+    {
+      "id": "employment_admin",
+      "pattern": "/admin/employment",
+      "icon": "👤",
+      "intent_keywords": [
+        "employment",
+        "employment details",
+        "hire",
+        "employment records"
+      ],
+      "entity_required": null,
+      "permission_required": "RES.REA",
+      "label_template": "Employment",
+      "description": "Employment records and details",
+      "page_help": "Here you can review employment records, switching between the Personal info and Employment details tabs.",
+      "module": "HR",
+      "page_features": [
+        {
+          "name": "Personal info tab",
+          "keywords": [
+            "personal info",
+            "employee personal details"
+          ],
+          "hint": "The Personal info tab on the Employment page for viewing/editing basic employee details.",
+          "locate": [
+            "Personal info"
+          ]
+        },
+        {
+          "name": "Employment details tab",
+          "keywords": [
+            "employment details",
+            "employment record",
+            "job details"
+          ],
+          "hint": "The Employement details tab, visible only to users with modify permission.",
+          "locate": [
+            "Employement details"
+          ]
+        },
+        {
+          "name": "Personal info / Employment details tabs",
+          "keywords": [
+            "employment details tab",
+            "personal info tab"
+          ],
+          "hint": "Tabs at the top switch between the employee's personal info and employment details (employment details requires the resource.MODIFY permission).",
+          "locate": [
+            "Personal info / Employment details tabs"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "customers_projects",
+      "pattern": "/customers-projects",
+      "icon": "🧲",
+      "intent_keywords": [
+        "customers and projects",
+        "my customers",
+        "customers dashboard",
+        "customers projects page",
+        "customer projects",
+        "projects",
+        "active projects",
+        "project list",
+        "my projects",
+        "running projects",
+        "project status",
+        "ongoing projects",
+        "current projects",
+        "leads and customers",
+        "customer book",
+        "customer pipeline",
+        "customer list",
+        "crm",
+        "sales estimate"
+      ],
+      "entity_required": null,
+      "permission_required": "CUS.REA",
+      "label_template": "Customers & Projects",
+      "description": "Your customers and their projects in one place — see each customer's health, project count and deal value, filter by stage, and open any customer or project.",
+      "module": "CRM",
+      "page_help": "Here you can see your customers with health, project count, and deal value, expand a customer to see their projects, filter by stage tab or the Filters panel, search, and create a new customer.",
+      "page_features": [
+        {
+          "name": "Create Customer button",
+          "keywords": [
+            "create customer button",
+            "create a new customer",
+            "create customer",
+            "create a customer",
+            "create new customer"
+          ],
+          "hint": "The Create Customer button in the header (DOM id cp-invite). Deliberately NOT sharing the invite_customer capability with leads_customers/customer_table: those two are a genuine same-permission disambiguation (both reachable at once), but leads_customers and customers_projects are flag-controlled ALTERNATES (ENABLE_SALES_CRM_CONSOLIDATION) -- only one is ever actually live in a given deployed build, and EDEN has no signal to tell which. Sharing the capability produced a 3-way tie asking about a page that doesn't exist in the current build -- caught by test_invite_customer_with_only_crm_permission_navigates_directly.",
+          "locate": [
+            "Create Customer"
+          ]
+        },
+        {
+          "name": "Stage tabs",
+          "keywords": [
+            "customer stage tabs",
+            "project stages",
+            "project stage",
+            "stage tabs"
+          ],
+          "hint": "The stage tab pills above the customer list -- All, Lead, Estimate, Sold & in production, Complete, and Turned Down.",
+          "locate": [
+            "Lead",
+            "Estimate",
+            "Sold",
+            "In production",
+            "Complete"
+          ]
+        },
+        {
+          "name": "Lead tab",
+          "keywords": [
+            "lead tab",
+            "lead stage",
+            "leads stage",
+            "show lead stage",
+            "leads",
+            "new lead",
+            "open leads",
+            "roofmaxx lead"
+          ],
+          "hint": "The Lead tab in the stage pills above the customer list.",
+          "locate": [
+            "Lead"
+          ]
+        },
+        {
+          "name": "Estimate tab",
+          "keywords": [
+            "estimate tab",
+            "estimate stage",
+            "estimates stage",
+            "estimate",
+            "estimating",
+            "job estimate"
+          ],
+          "hint": "The Estimate tab in the stage pills above the customer list.",
+          "locate": [
+            "Estimate"
+          ]
+        },
+        {
+          "name": "Sold & in production tab",
+          "keywords": [
+            "sold tab",
+            "in production tab",
+            "sold and production",
+            "sold and in production",
+            "sold & in production",
+            "sold in production",
+            "in production stage",
+            "sold production",
+            "production"
+          ],
+          "hint": "The Sold & in production tab in the stage pills above the customer list.",
+          "locate": [
+            "Sold & in production"
+          ]
+        },
+        {
+          "name": "Complete tab",
+          "keywords": [
+            "complete tab",
+            "completed tab",
+            "complete stage",
+            "completed projects"
+          ],
+          "hint": "The Complete tab in the stage pills above the customer list.",
+          "locate": [
+            "Complete"
+          ]
+        },
+        {
+          "name": "Turned Down tab",
+          "keywords": [
+            "turned down tab",
+            "turned down stage",
+            "turned down projects",
+            "turndown tab",
+            "lost leads"
+          ],
+          "hint": "The Turned Down tab in the stage pills above the customer list.",
+          "locate": [
+            "Turned Down"
+          ]
+        },
+        {
+          "name": "KPI cards",
+          "keywords": [
+            "customer kpis",
+            "potential revenue",
+            "needs attention customers"
+          ],
+          "hint": "The row of KPI cards under the header -- customer count, potential revenue, and needs-attention.",
+          "locate": [
+            "Customers",
+            "Potential revenue",
+            "Needs attention"
+          ]
+        },
+        {
+          "name": "Filters panel",
+          "keywords": [
+            "customer filters",
+            "filter customers",
+            "filter by lead source",
+            "filter by recency"
+          ],
+          "hint": "The Filters button (DOM id cp-filters) -- opens recency, status, date range, lead source, and value-sort filters, all applied client-side over already-loaded data.",
+          "locate": [
+            "Filters"
+          ]
+        },
+        {
+          "name": "Search box",
+          "keywords": [
+            "search customers and projects",
+            "find customer or project"
+          ],
+          "hint": "The search box above the customer list (DOM id cp-search).",
+          "locate": [
+            "Search by customer, project no. or date"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "performance",
+      "pattern": "/performance",
+      "icon": "📊",
+      "intent_keywords": [
+        "performance page",
+        "sales performance",
+        "how many in sales stage",
+        "leaderboard",
+        "sales associates",
+        "pipeline",
+        "sales pipeline",
+        "pipeline performance",
+        "deal stages",
+        "sales stages"
+      ],
+      "entity_required": null,
+      "permission_required": "CUS.REA",
+      "label_template": "Performance",
+      "description": "Sales pipeline performance — compare sales associates, see where deals sit on the stage map, and drill into a rep's boards.",
+      "module": "CRM",
+      "page_help": "Here you can toggle between a Performance view and a Stage map view of the sales pipeline, and drill into a specific rep's Bidboard, In Production and Turn Down boards. There is no year selector -- this always shows the current calendar year.",
+      "page_features": [
+        {
+          "name": "Performance view toggle",
+          "keywords": [
+            "performance view",
+            "switch to performance"
+          ],
+          "hint": "The Performance option in the Performance / Stage map toggle, top of the page.",
+          "locate": [
+            "Performance"
+          ]
+        },
+        {
+          "name": "Stage map view toggle",
+          "keywords": [
+            "stage map view",
+            "switch to stage map",
+            "stage map",
+            "show the stage map"
+          ],
+          "hint": "The Stage map option in the Performance / Stage map toggle, top of the page.",
+          "locate": [
+            "Stage map"
+          ]
+        },
+        {
+          "name": "Sales associates leaderboard",
+          "keywords": [
+            "sales leaderboard",
+            "top performers",
+            "rep leaderboard",
+            "who's my best performer"
+          ],
+          "hint": "The per-rep leaderboard on the Performance view -- click a row to drill into that rep's boards.",
+          "locate": [
+            "Sales associates"
+          ]
+        },
+        {
+          "name": "Stage map filters",
+          "keywords": [
+            "stage map filters",
+            "filter by stage",
+            "filter by health"
+          ],
+          "hint": "Stage and Health filter chips on the Stage map view -- only visible after switching to Stage map.",
+          "locate": [
+            "Stage map"
+          ],
+          "post_click_locate": [
+            "Lead",
+            "Sales",
+            "Pre-con",
+            "Active",
+            "Post",
+            "Awaiting payment",
+            "Turned down"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "customer_portal",
+      "pattern": "/leadscustomers/:id",
+      "icon": "🧲",
+      "intent_keywords": [
+        "customer profile",
+        "customer portal",
+        "this lead",
+        "this customer",
+        "customer overview",
+        "customer assets",
+        "lead details"
+      ],
+      "entity_required": null,
+      "permission_required": "CUS.REA",
+      "label_template": "Customer Portal",
+      "description": "A single customer/lead's detail portal — overview, profile, and assets tabs",
+      "module": "CRM",
+      "page_help": "Here you can review a customer's overview, edit their profile, and manage their assets, switching between tabs at the top.",
+      "target_route": "/customers-projects",
+      "page_features": [
+        {
+          "name": "Overview tab",
+          "keywords": [
+            "customer overview",
+            "lead overview"
+          ],
+          "hint": "The Overview tab, default view for a customer/lead's portal.",
+          "locate": [
+            "Overview"
+          ]
+        },
+        {
+          "name": "Profile tab",
+          "keywords": [
+            "edit customer profile",
+            "customer profile"
+          ],
+          "hint": "The Profile tab — view/edit this customer's contact and lead details.",
+          "locate": [
+            "Profile"
+          ]
+        },
+        {
+          "name": "Assets tab",
+          "keywords": [
+            "customer assets",
+            "customer properties"
+          ],
+          "hint": "The Assets tab — this customer's assets/properties, with add/edit actions.",
+          "locate": [
+            "Assets"
+          ]
+        },
+        {
+          "name": "Back button",
+          "keywords": [
+            "back to leads",
+            "back to customers"
+          ],
+          "hint": "Returns to the Customers & Projects list.",
+          "locate": [
+            "Back"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation_plans",
+      "pattern": "/automationplans",
+      "icon": "⚡",
+      "intent_keywords": [
+        "automation plans",
+        "automation plan",
+        "customer follow-up",
+        "automated messages",
+        "trigger sequences"
+      ],
+      "entity_required": null,
+      "permission_required": "AUT.REA",
+      "label_template": "Automation Plans",
+      "description": "Automated customer follow-up — build action plans and manage the email and SMS templates they send.",
+      "module": "CRM",
+      "page_help": "Here you can review automation plans, see enrollment and step KPIs, and (if your account allows it) create, edit, duplicate or delete a plan. Switch between the Action Plans, Email templates and SMS templates tabs at the top.",
+      "page_features": [
+        {
+          "name": "Action Plans tab",
+          "keywords": [
+            "action plans tab",
+            "action plans"
+          ],
+          "hint": "The Action Plans tab, top of the page — the list of automation plans.",
+          "locate": [
+            "Action Plans"
+          ]
+        },
+        {
+          "name": "Email templates tab",
+          "keywords": [
+            "email templates tab",
+            "email templates",
+            "email template"
+          ],
+          "hint": "The Email templates tab, top of the page.",
+          "locate": [
+            "Email templates"
+          ]
+        },
+        {
+          "name": "SMS templates tab",
+          "keywords": [
+            "sms templates tab",
+            "sms templates",
+            "sms template",
+            "text templates"
+          ],
+          "hint": "The SMS templates tab, top of the page.",
+          "locate": [
+            "SMS templates"
+          ]
+        },
+        {
+          "name": "KPI cards",
+          "keywords": [
+            "total plans",
+            "enrolled customers",
+            "steps automated",
+            "inactive plans"
+          ],
+          "hint": "The KPI cards above the plans table — Total plans, Enrolled customers, Steps automated and Inactive plans.",
+          "locate": [
+            "Total plans",
+            "Enrolled customers",
+            "Steps automated",
+            "Inactive plans"
+          ]
+        },
+        {
+          "name": "New plan button",
+          "keywords": [
+            "new plan",
+            "create a plan",
+            "create automation plan",
+            "new automation plan"
+          ],
+          "hint": "The New plan button above the plans table — opens the plan builder.",
+          "locate": [
+            "New plan"
+          ]
+        },
+        {
+          "name": "Search box",
+          "keywords": [
+            "search plans",
+            "search automation plans",
+            "find a plan"
+          ],
+          "hint": "The Search plans box above the plans table.",
+          "locate": [
+            "Search plans"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "inventory_report",
+      "pattern": "/materialmart/report",
+      "icon": "📊",
+      "intent_keywords": [
+        "inventory report",
+        "stock valuation",
+        "inventory value",
+        "stock metrics",
+        "generate inventory report",
+        "inventory export",
+        "material valuation"
+      ],
+      "entity_required": null,
+      "permission_required": "MAT.REA",
+      "label_template": "Inventory Report",
+      "description": "Inventory valuation report and stock metrics — generated from the Material Mart page's Generate Report button",
+      "module": "Materials",
+      "page_help": "Here you can switch between the Report and Stock metrics tabs, search materials, and print, export as PDF, or export as Excel (CSV).",
+      "page_features": [
+        {
+          "name": "Report / Stock metrics tabs",
+          "keywords": [
+            "report tab",
+            "stock metrics tab"
+          ],
+          "hint": "The two tabs at the top of the inventory report page.",
+          "locate": [
+            "Report",
+            "Stock metrics"
+          ]
+        },
+        {
+          "name": "Search box",
+          "keywords": [
+            "search material",
+            "search sku",
+            "search vendor"
+          ],
+          "hint": "The search box — searches material, SKU, vendor, or manufacturer.",
+          "locate": [
+            "Search material, SKU, vendor, or manufacturer"
+          ]
+        },
+        {
+          "name": "Print report",
+          "keywords": [
+            "print report",
+            "print inventory"
+          ],
+          "hint": "The Print report icon button.",
+          "locate": [
+            "Print report"
+          ]
+        },
+        {
+          "name": "Export as PDF",
+          "keywords": [
+            "export pdf",
+            "download pdf report"
+          ],
+          "hint": "The Export as PDF icon button.",
+          "locate": [
+            "Export as PDF"
+          ]
+        },
+        {
+          "name": "Export as Excel (CSV)",
+          "keywords": [
+            "export csv",
+            "export excel",
+            "download csv"
+          ],
+          "hint": "The Export as Excel (CSV) icon button.",
+          "locate": [
+            "Export as Excel"
+          ]
+        },
+        {
+          "name": "KPI tiles",
+          "keywords": [
+            "inventory value",
+            "potential sell value",
+            "unrealized margin",
+            "low stock items"
+          ],
+          "hint": "The KPI tiles on the Report tab — inventory value, potential sell value, unrealized margin, average gross margin, materials shown, on-hand units, low-stock items.",
+          "locate": [
+            "Inventory value",
+            "Potential sell value",
+            "Unrealized margin",
+            "Low-stock items"
+          ]
+        }
+      ]
+    }
+  ],
+  "global_features": [
+    {
+      "name": "Notifications",
+      "keywords": [
+        "notifications",
+        "notification",
+        "new updates",
+        "any updates",
+        "updates",
+        "whats new",
+        "what's new",
+        "alerts",
+        "any news",
+        "recent updates",
+        "notification bell"
+      ],
+      "hint": "The bell icon in the top bar — your latest updates and alerts.",
+      "locate": [
+        "Notifications",
+        "notification"
+      ]
+    },
+    {
+      "name": "Cart & Drafts",
+      "keywords": [
+        "cart",
+        "my cart",
+        "view cart",
+        "drafts",
+        "bid cart",
+        "cart and drafts",
+        "saved drafts",
+        "edit bid",
+        "delete bid",
+        "remove bid",
+        "cancel bid"
+      ],
+      "hint": "The cart icon in the top bar — your personal Cart & Drafts.",
+      "locate": [
+        "Cart",
+        "Cart & Drafts",
+        "cart"
+      ],
+      "permission_required_any": ["CART.REA", "SALESCART.REA", "BID.REA"]
+    },
+    {
+      "name": "Admin Cart / Sales Cart List",
+      "keywords": [
+        "admin cart",
+        "sales cart",
+        "all carts",
+        "team cart",
+        "carts by customer",
+        "customer sales cart"
+      ],
+      "hint": "The second cart icon — Admin Cart, showing sales carts across all associates.",
+      "locate": [
+        "Admin Cart",
+        "Customer Sales Cart"
+      ],
+      "permission_required": "SALESCART.REA"
+    },
+    {
+      "name": "Completed Task Feed tab",
+      "keywords": [
+        "completed tasks",
+        "completed task feed",
+        "finished tasks",
+        "task history",
+        "past tasks"
+      ],
+      "hint": "The Completed Task Feed tab in the sidebar — your completed tasks.",
+      "locate": [
+        "Completed Task Feed"
+      ]
+    },
+    {
+      "name": "GoPAL tab (Active Task)",
+      "keywords": [
+        "gopal",
+        "active task",
+        "my active task",
+        "current task",
+        "task timer"
+      ],
+      "hint": "The GoPAL tab in the sidebar — your active task, with clock-in/out and complete actions.",
+      "locate": [
+        "GoPAL"
+      ]
+    },
+    {
+      "name": "Upload Bill",
+      "keywords": [
+        "upload bill",
+        "upload a bill",
+        "add bill",
+        "upload vendor bill",
+        "bill upload",
+        "upload receipt"
+      ],
+      "hint": "The Upload Bill button in the top bar — upload a vendor bill for AI extraction.",
+      "locate": [
+        "Upload Bill"
+      ]
+    }
+  ]
+}

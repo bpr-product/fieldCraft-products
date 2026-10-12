@@ -1,0 +1,79 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "gold_canonical.asset",
+  "version": "1.1.0",
+  "description": "Canonical Gold — physical asset/property record (roof, building, etc.). One document per (tenantId, assetUid), deduped from silver.customer_asset. One asset can legitimately span multiple projects over time (verified live: same asset_uid recurring across several customer_asset rows with different project_id values) — projectIds is an array. asset_address/billing_address are parsed from JSON-holding TEXT columns.",
+  "x-database": "gold_canonical",
+  "x-collection": "asset",
+  "x-grain": "asset",
+  "x-etl-trigger": "batch only (15-min cron) — no streaming job",
+  "x-upsert-guard": "_silverLsn",
+  "type": "object",
+  "required": [
+    "tenantId",
+    "assetUid",
+    "_grain",
+    "_schemaVersion",
+    "_silverLsn",
+    "goldUpdatedAt",
+    "_env"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "pipelineRunId": { "type": ["string", "null"] },
+    "goldCreatedAt": { "type": ["string", "null"], "format": "date-time" },
+    "goldUpdatedAt": { "type": ["string", "null"], "format": "date-time" },
+    "sourceUpdatedAt": { "type": ["string", "null"], "format": "date-time" },
+    "dataOrigin": { "type": ["string", "null"] },
+    "sourceEnv": {
+      "type": ["string", "null"],
+      "description": "Silver _s_env. Part of the upsert key.",
+      "x-rbac-roles": ["all"]
+    },
+    "_env": {
+      "type": ["string", "null"],
+      "description": "Deployment tier that wrote this doc (PIPELINE_ENV) — different axis from sourceEnv.",
+      "x-rbac-roles": ["all"]
+    },
+    "tenantId": { "type": "string", "minLength": 1, "x-rbac-roles": ["all"], "x-source-table": "silver.customer_asset" },
+    "assetUid": { "type": "string", "minLength": 1, "description": "Grain key.", "x-rbac-roles": ["all"], "x-source-table": "silver.customer_asset" },
+    "name": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.customer_asset" },
+    "assetType": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.customer_asset" },
+    "address": {
+      "type": ["object", "null"],
+      "description": "Parsed from asset_address (TEXT holding JSON).",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.customer_asset"
+    },
+    "billingAddress": {
+      "type": ["object", "null"],
+      "description": "Parsed from billing_address (TEXT holding JSON).",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.customer_asset"
+    },
+    "customerUid": { "type": ["string", "null"], "description": "Links to gold_canonical.customer.customerUid.", "x-rbac-roles": ["all"], "x-source-table": "silver.customer_asset" },
+    "customerName": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.customer_asset" },
+    "projectIds": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Every distinct project_id this asset_uid appears against in silver.customer_asset.",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.customer_asset"
+    },
+    "_grain": { "type": "string", "const": "canonical_asset", "x-rbac-roles": ["all"] },
+    "_schemaVersion": { "type": "integer", "const": 1, "x-rbac-roles": ["all"] },
+    "_silverLsn": { "type": "integer", "minimum": 0, "x-rbac-roles": ["all"] },
+    "dataAsOf": { "type": "string", "format": "date-time", "x-rbac-roles": ["all"] },
+    "isDeleted": { "type": "boolean", "x-rbac-roles": ["all"] },
+    "_silverWatermarks": {
+      "type": "object",
+      "additionalProperties": false,
+      "x-rbac-roles": ["all"],
+      "properties": {
+        "customer_asset": { "type": ["string", "null"], "format": "date-time", "x-source-table": "silver.customer_asset" }
+      }
+    },
+    "lafieldcraft": { "type": "integer", "minimum": 0, "x-rbac-roles": ["all"] }
+  },
+  "x-upsert-key": ["tenantId", "assetUid", "sourceEnv"]
+}

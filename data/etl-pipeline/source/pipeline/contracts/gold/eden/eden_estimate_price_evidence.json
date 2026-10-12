@@ -1,0 +1,211 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "gold_eden.estimate_price_evidence",
+  "version": "1.0.0",
+  "description": "Eden Finance agent — deterministic evidence for 'why did this project's estimate price change' (Q1). One document per (tenantId, projectId, version) of silver.project_estimate. Reconciles SUM(silver.bom.total_cost) for the same version against project_estimate.material_cost, and resolves the vendor price (silver.material_cost via silver.vendor_material_map) that was in force at the estimate's created_at vs the immediately preceding price. Schema mirrors gold/src/eden/load_estimate_price_evidence.py shape_doc() exactly. Ruled out as causes: receipts.project_id / purchase_order.project_id (0/3 and 1/8 rows populated in the tenant checked) — not built on here.",
+  "x-database": "gold_eden",
+  "x-collection": "estimate_price_evidence",
+  "x-grain": "eden_estimate_price_evidence",
+  "x-etl-trigger": "batch (run_pipeline.py); not yet wired into gold_eden_stream.py CDC trigger table — see reason field in infra/config/gold_config.yml loaders.load_estimate_price_evidence",
+  "x-upsert-guard": "_silverLsn",
+  "type": "object",
+  "required": [
+    "tenantId",
+    "projectId",
+    "version",
+    "_grain",
+    "_schemaVersion",
+    "_silverLsn",
+    "goldUpdatedAt",
+    "_env"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "pipelineRunId":   { "type": ["string", "null"] },
+    "goldCreatedAt":   { "type": ["string", "null"], "format": "date-time" },
+    "goldUpdatedAt":   { "type": ["string", "null"], "format": "date-time" },
+    "sourceUpdatedAt": { "type": ["string", "null"], "format": "date-time" },
+    "dataOrigin":      { "type": ["string", "null"] },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Tenant identifier. Part of the compound upsert key.",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.project_estimate"
+    },
+    "projectId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Project identifier cast to string. Part of the compound upsert key.",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.project_estimate"
+    },
+    "projectName": {
+      "type": ["string", "null"],
+      "description": "silver.project.description (pre-formatted '{customer}, {city}-{trade}-{orderNo}'), fallback customer display name, fallback order_no.",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.project"
+    },
+    "orderNo": {
+      "type": ["string", "null"],
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.project"
+    },
+    "version": {
+      "type": ["integer", "null"],
+      "description": "silver.project_estimate.version. Grain key.",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.project_estimate"
+    },
+    "prevVersion": {
+      "type": ["integer", "null"],
+      "description": "Immediately preceding version for the same project (window LAG), or null if this is the first version.",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.project_estimate"
+    },
+    "createdAt": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.project_estimate"
+    },
+    "prevCreatedAt": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.project_estimate"
+    },
+    "materialCost":  { "type": ["number", "null"], "x-unit": "USD", "x-rbac-roles": ["all"], "x-source-table": "silver.project_estimate" },
+    "workerCost":    { "type": ["number", "null"], "x-unit": "USD", "x-rbac-roles": ["all"], "x-source-table": "silver.project_estimate" },
+    "toolCost":      { "type": ["number", "null"], "x-unit": "USD", "x-rbac-roles": ["all"], "x-source-table": "silver.project_estimate" },
+    "overheadCost":  { "type": ["number", "null"], "x-unit": "USD", "x-rbac-roles": ["all"], "x-source-table": "silver.project_estimate" },
+    "margin": {
+      "type": ["number", "null"],
+      "x-unit": "USD",
+      "description": "Margin bucket, same row silver.project_estimate.margin reads from. NOTE (Q3): silver.role_permission has no permission distinguishing 'view an estimate' from 'view its margin' (all 149 distinct permission values checked) — a field-level RBAC gate on this property is application-layer logic, not yet enforced by ContractValidator or Mongo. See docs/canonical/user_access_management_model.md.",
+      "x-rbac-roles": ["tenant_admin", "estimator"],
+      "x-source-table": "silver.project_estimate"
+    },
+    "totalCost":     { "type": ["number", "null"], "x-unit": "USD", "x-rbac-roles": ["all"], "x-source-table": "silver.project_estimate" },
+    "costDeltas": {
+      "type": "object",
+      "description": "Per-bucket delta vs prevVersion (current - previous). Null when there is no previous version or either value is null.",
+      "additionalProperties": false,
+      "x-rbac-roles": ["all"],
+      "properties": {
+        "materialCost": { "type": ["number", "null"], "x-unit": "USD" },
+        "workerCost":   { "type": ["number", "null"], "x-unit": "USD" },
+        "toolCost":     { "type": ["number", "null"], "x-unit": "USD" },
+        "overheadCost": { "type": ["number", "null"], "x-unit": "USD" },
+        "margin":       { "type": ["number", "null"], "x-unit": "USD" },
+        "totalCost":    { "type": ["number", "null"], "x-unit": "USD" }
+      }
+    },
+    "changedBuckets": {
+      "type": "array",
+      "description": "Names of costDeltas keys that are non-null and non-zero — which bucket(s) actually moved between prevVersion and version.",
+      "items": { "type": "string" },
+      "x-rbac-roles": ["all"]
+    },
+    "bomReconciliation": {
+      "type": "object",
+      "description": "Deterministic proof mechanism: SUM(silver.bom.total_cost) for this (project, version), filtered invalid=FALSE, compared against project_estimate.material_cost.",
+      "additionalProperties": false,
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.bom",
+      "properties": {
+        "bomTotalCost":         { "type": ["number", "null"], "x-unit": "USD" },
+        "estimateMaterialCost": { "type": ["number", "null"], "x-unit": "USD" },
+        "delta":                { "type": ["number", "null"], "x-unit": "USD" },
+        "reconciled":           { "type": "boolean", "description": "True when |delta| <= toleranceUsed — a deterministic, provable cause rather than a guess." },
+        "toleranceUsed":        { "type": "number" }
+      }
+    },
+    "bomLines": {
+      "type": "array",
+      "description": "BOM lines for this (project, version) — what changed (line added vs unit price rise), not just that something changed.",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.bom",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "materialName":        { "type": ["string", "null"] },
+          "quantity":            { "type": ["number", "null"] },
+          "unit":                { "type": ["string", "null"] },
+          "unitCost":            { "type": ["number", "null"], "x-unit": "USD" },
+          "lineTotal":           { "type": ["number", "null"], "x-unit": "USD" },
+          "vendorMaterialMapId": { "type": ["string", "null"] },
+          "priceAtEstimate":     { "type": ["number", "null"], "x-unit": "USD", "description": "silver.material_cost.cost effective at this estimate's created_at." },
+          "priceEffectiveFrom":  { "type": ["string", "null"], "format": "date-time" },
+          "priceEffectiveTo":    { "type": ["string", "null"], "format": "date-time" },
+          "priceBefore":         { "type": ["number", "null"], "x-unit": "USD", "description": "Immediately preceding material_cost.cost row (effective_enddate < createdAt), or null if none exists." },
+          "vendorPriceChanged":  { "type": "boolean", "description": "True only when both priceAtEstimate and priceBefore are known and differ — the concrete 'did the vendor's price change' signal." }
+        }
+      }
+    },
+    "materialPriceChanges": {
+      "type": "array",
+      "description": "Subset of bomLines where vendorPriceChanged=true — the direct evidence for a vendor-price-driven estimate change.",
+      "x-rbac-roles": ["all"],
+      "items": { "type": "object" }
+    },
+    "_grain": {
+      "type": "string",
+      "const": "eden_estimate_price_evidence",
+      "x-rbac-roles": ["all"]
+    },
+    "_schemaVersion": {
+      "type": "integer",
+      "const": 1,
+      "x-rbac-roles": ["all"]
+    },
+    "_silverLsn": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "silver.project_estimate._s_lsn at write time. Upsert guard.",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.project_estimate"
+    },
+    "dataAsOf": {
+      "type": "string",
+      "format": "date-time",
+      "x-rbac-roles": ["all"]
+    },
+    "isDeleted": {
+      "type": "boolean",
+      "description": "Always false — superseded project_estimate rows (invalid=TRUE) are excluded at the Silver query, not soft-deleted here.",
+      "x-rbac-roles": ["all"]
+    },
+    "_silverWatermarks": {
+      "type": "object",
+      "additionalProperties": false,
+      "x-rbac-roles": ["all"],
+      "properties": {
+        "project_estimate": { "type": ["string", "null"], "format": "date-time", "x-source-table": "silver.project_estimate" },
+        "bom":              { "type": ["string", "null"], "format": "date-time", "x-source-table": "silver.bom" },
+        "project":          { "type": ["string", "null"], "format": "date-time", "x-source-table": "silver.project" }
+      }
+    },
+    "lafieldcraft": {
+      "type": "integer",
+      "minimum": 0,
+      "x-rbac-roles": ["all"]
+    },
+    "sourceEnv": {
+      "type": ["string", "null"],
+      "description": "Silver _s_env — logical source environment (si_dev, datamart, ...).",
+      "x-rbac-roles": ["all"]
+    },
+    "_env": {
+      "type": "string",
+      "enum": ["dev", "qa", "stg", "sbx", "prd"]
+    }
+  },
+  "x-upsert-key": [
+    "tenantId",
+    "projectId",
+    "version",
+    "sourceEnv"
+  ]
+}

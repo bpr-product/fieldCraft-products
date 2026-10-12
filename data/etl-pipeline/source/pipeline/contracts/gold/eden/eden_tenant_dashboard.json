@@ -1,0 +1,273 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "gold_eden.tenant_dashboard",
+  "version": "4.0.0",
+  "description": "Eden AI Assistant \u2014 cross-project tenant-level rollup. One document per tenantId. Used when the user has no active project. Schema mirrors gold/src/eden/load_tenant_dashboard.py shape_doc() exactly. Aggregates across many projects, so the upsert guard is _silverLsnMax (MAX of per-project _s_lsn), not a single _silverLsn.",
+  "x-database": "gold_eden",
+  "x-collection": "tenant_dashboard",
+  "x-grain": "eden_tenant_dashboard",
+  "x-etl-trigger": "event-driven on writes to silver.project, silver.task, silver.project_schedule, silver.invoice",
+  "x-upsert-guard": "_silverLsnMax",
+  "type": "object",
+  "required": [
+    "tenantId",
+    "_grain",
+    "_schemaVersion",
+    "_silverLsnMax",
+    "goldUpdatedAt",
+    "_env"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "pipelineRunId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "goldCreatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "goldUpdatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Tenant identifier. Sole upsert key for this collection.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "_grain": {
+      "type": "string",
+      "const": "eden_tenant_dashboard",
+      "description": "ETL grain identifier.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_schemaVersion": {
+      "type": "integer",
+      "const": 1,
+      "description": "Integer schema version.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_silverLsnMax": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "MAX of silver.project._s_lsn across all of this tenant's projects. Upsert guard for the tenant-level aggregate \u2014 no single project LSN is meaningful here.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "dataAsOf": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC effective data snapshot time. Prompt-cache key component.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "projectCount": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Total number of active (non-CLOSED, non-CANCELLED) projects for this tenant.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "atRiskCount": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Number of active projects with schedule slip_days > 0.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project_schedule"
+    },
+    "totalOutstanding": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Sum of outstanding invoice amounts across all active projects.",
+      "x-unit": "USD",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "accountant"
+      ],
+      "x-source-table": "silver.invoice"
+    },
+    "activeProjects": {
+      "type": "array",
+      "description": "Per-project summary rows for all active projects in this tenant.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "projectId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "orderNo": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "completionPct": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 100
+          },
+          "overdueTaskCount": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "scheduleRisk": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "on_track",
+              "at_risk",
+              "unknown",
+              null
+            ]
+          },
+          "outstandingAmt": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "x-unit": "USD"
+          }
+        }
+      }
+    },
+    "nextMilestone": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Nearest upcoming milestone across active projects. Currently always null until milestone tracking is available.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_silverWatermarks": {
+      "type": "object",
+      "description": "Per-source-table high-water _s_silver_ts timestamps (tenant-level MAX) at the time this document was last written.",
+      "additionalProperties": false,
+      "x-rbac-roles": [
+        "all"
+      ],
+      "properties": {
+        "project": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "x-source-table": "silver.project"
+        },
+        "task": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "x-source-table": "silver.task"
+        },
+        "project_schedule": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "x-source-table": "silver.project_schedule"
+        },
+        "invoice": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "x-source-table": "silver.invoice"
+        }
+      }
+    },
+    "lafieldcraft": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Milliseconds between the loader run and the oldest contributing Silver watermark.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "sourceEnv": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Silver _s_env \u2014 logical source environment (si_dev, datamart, ...).",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_env": {
+      "type": "string",
+      "enum": [
+        "dev",
+        "qa",
+        "stg",
+        "sbx",
+        "prd"
+      ]
+    }
+  },
+  "x-upsert-key": [
+    "tenantId",
+    "sourceEnv"
+  ]
+}

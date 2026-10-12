@@ -1,0 +1,281 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "gold_eden.agent_plan",
+  "version": "2.0.0",
+  "description": "Eden agent plan store — goal + multi-step plan + execution state for an agent task. One document per (tenantId, planId). Written at AGENT RUNTIME. Gives Eden goal tracking, plan generation/execution tracking, step dependency tracking, and human-in-the-loop checkpoints — the substrate for autonomous multi-step work and resumability.",
+  "x-database": "gold_eden",
+  "x-collection": "agent_plan",
+  "x-grain": "eden_agent_plan",
+  "x-written-by": "agent-runtime",
+  "x-upsert-key": [
+    "tenantId",
+    "planId"
+  ],
+  "type": "object",
+  "required": [
+    "tenantId",
+    "planId",
+    "agentId",
+    "goal",
+    "status",
+    "_grain",
+    "_schemaVersion",
+    "goldUpdatedAt",
+    "_env"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "pipelineRunId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "goldCreatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "goldUpdatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "sourceUpdatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "dataOrigin": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Tenant identifier. First half of the compound key.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "planId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique plan identifier (uuid4). Second half of the compound key.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_grain": {
+      "type": "string",
+      "const": "eden_agent_plan",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_schemaVersion": {
+      "type": "integer",
+      "const": 1,
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "agentId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Agent that owns this plan.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "sessionId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Conversation/session that spawned the plan.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "projectId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Project the plan operates on, if any.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "goalId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Stable id for the goal, so multiple plan revisions can share a goal.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "goal": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Natural-language statement of what the plan is trying to achieve.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "in_progress",
+        "blocked",
+        "awaiting_approval",
+        "completed",
+        "failed",
+        "cancelled"
+      ],
+      "description": "Overall plan lifecycle state.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "steps": {
+      "type": "array",
+      "description": "Ordered plan steps with per-step execution state and dependencies.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "stepId": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string",
+            "description": "What this step does (tool call, sub-goal, reasoning step)."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "in_progress",
+              "blocked",
+              "awaiting_approval",
+              "completed",
+              "failed",
+              "skipped"
+            ]
+          },
+          "dependsOn": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "stepIds that must complete before this step can start."
+          },
+          "toolName": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Tool invoked by this step, if any. Joins to tool_execution."
+          },
+          "executionId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "tool_execution.executionId produced by this step, if any."
+          },
+          "result": {
+            "type": [
+              "object",
+              "string",
+              "null"
+            ],
+            "description": "Step output / outcome."
+          },
+          "hitlRequired": {
+            "type": "boolean",
+            "description": "Whether this step needs human approval before/after running."
+          },
+          "approvedBy": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "User who approved the step at a human-in-the-loop checkpoint."
+          },
+          "startedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "completedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        }
+      }
+    },
+    "currentStepId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Step currently executing — supports resume after restart.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "createdAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "isDeleted": {
+      "type": "boolean",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "sourceEnv": {
+      "type": ["string", "null"],
+      "description": "Silver _s_env — logical source environment (si_dev, datamart, ...).",
+      "x-rbac-roles": ["all"]
+    },
+    "_env": {
+      "type": "string",
+      "enum": [
+        "dev",
+        "qa",
+        "stg",
+        "sbx",
+        "prd"
+      ]
+    }
+  }
+}

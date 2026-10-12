@@ -1,0 +1,163 @@
+# config/environments.yaml
+#
+# Declarative per-environment datasource config. Drives connector stamping,
+# Silver _s_env partitioning, and union schema discovery — one file, no code changes.
+#
+# tier: deployment tier. Matches ETL_ENV.
+#   local   → hub names local.cdc.events  (Docker Compose / local dev)
+#   nonprod → hub names nonprod.cdc.events (shared non-prod AKS stack)
+#   prod    → hub names prod.cdc.events   (production AKS stack)
+#
+# To activate an environment:
+#   1. Add its ${ENV_VAR} values to .env.local (never commit credentials).
+#   2. Set cdc_enabled: true below.
+#   3. Change tier: to match ETL_ENV if running on a different stack.
+#
+# System-baseline excludes (flyway_schema_history, trade.trade_logo,
+# tenant_configuration.data, public.tenant on per-tenant connectors) are
+# always merged in automatically — no need to repeat them here.
+#
+# Full schema reference: docs/multi-env/configuration_reference.md
+
+tier: local
+
+environments:
+
+  # ── DATAMART ──────────────────────────────────────────────────────────────
+  # This was previously the single "local" source (POSTGRES_HOST).
+  # Now properly named as the datamart environment under multi-env.
+  datamart:
+    cdc_enabled: false
+    snapshot_mode: never
+    source:
+      host:         ${DATAMART_PG_HOST}
+      port:         5432
+      user:         ${DATAMART_PG_USER}
+      password:     ${DATAMART_PG_PASSWORD}
+      provider_db:  ${DATAMART_PG_DBNAME}
+      ssl_mode:     require
+    tables:
+      columns:
+        trade:
+          drop: [trade_logo]
+        tenant_configuration:
+          drop: [data]
+
+  # ── DEV ───────────────────────────────────────────────────────────────────
+  dev:
+    cdc_enabled: false
+    snapshot_mode: initial
+    source:
+      host:         ${DEV_PG_HOST}
+      port:         5432
+      user:         ${DEV_PG_USER}
+      password:     ${DEV_PG_PASSWORD}
+      provider_db:  ${DEV_PG_DBNAME}
+      ssl_mode:     require
+    tables:
+      columns:
+        worker:
+          drop: [ssn, date_of_birth]
+
+  # ── SI DEV ───────────────────────────────────────────────────────────────
+  si_dev:
+    cdc_enabled: false
+    snapshot_mode: never
+    source:
+      host:         ${SI_DEV_PG_HOST}
+      port:         5432
+      user:         ${SI_DEV_PG_USER}
+      password:     ${SI_DEV_PG_PASSWORD}
+      provider_db:  ${SI_DEV_PG_DBNAME}
+      ssl_mode:     require
+    tables:
+      columns:
+        worker:
+          drop: [ssn, date_of_birth]
+
+  # ── QA ────────────────────────────────────────────────────────────────────
+  qa:
+    cdc_enabled: false
+    # See the STAGING block's comment below -- "when_needed" is rejected by
+    # this tier's actual debezium/connect:2.5 image. Use "initial".
+    snapshot_mode: initial
+    source:
+      host:         ${QA_PG_HOST}
+      port:         5432
+      user:         ${QA_PG_USER}
+      password:     ${QA_PG_PASSWORD}
+      provider_db:  ${QA_PG_DBNAME}
+      ssl_mode:     require
+    tables:
+      columns:
+        worker:
+          drop: [ssn, date_of_birth]
+
+  # ── STAGING ───────────────────────────────────────────────────────────────
+  staging:
+    cdc_enabled: true
+    # NOTE: "when_needed" is documented for some Debezium connectors but is
+    # NOT a valid enum value for io.debezium.connector.postgresql.PostgresConnector
+    # in the debezium/connect:2.5 image actually deployed here — Kafka Connect's
+    # own config validation rejects it ("Value must be one of always, never,
+    # initial_only, initial, custom"), confirmed against a live worker on
+    # 2026-08-12. Reverted to "initial" (first-run snapshot; env_config_watcher.py's
+    # auto-reconciliation flow this comment described does not apply until/unless
+    # a Debezium version that actually supports when_needed is confirmed).
+    snapshot_mode: initial
+    source:
+      host:         ${STAGING_PG_HOST}
+      port:         5432
+      user:         ${STAGING_PG_USER}
+      password:     ${STAGING_PG_PASSWORD}
+      provider_db:  ${STAGING_PG_DBNAME}
+      ssl_mode:     require
+    tables:
+      # old_task is a per-task VERSION-HISTORY table (every reschedule appends a
+      # new row rather than overwriting) -- confirmed live 2026-08-18: ~1.76M
+      # rows across 4 tenants on the nonprod staging env, ~71% of that env's
+      # entire Silver footprint, and NOT read by any Gold loader/EDEN/BPE/
+      # Recommendation code. Excluding it skips it during BOTH the initial
+      # Debezium snapshot and ongoing CDC. Existing already-replicated rows in
+      # Silver are NOT deleted by this alone; that needs a separate explicit
+      # DROP/TRUNCATE.
+      exclude: [old_task]
+      columns:
+        worker:
+          drop: [ssn, date_of_birth]
+
+  # ── SANDBOX ───────────────────────────────────────────────────────────────
+  sandbox:
+    cdc_enabled: false
+    # See the STAGING block's comment above -- "when_needed" is rejected by
+    # this tier's actual debezium/connect:2.5 image. Use "initial".
+    snapshot_mode: initial
+    source:
+      host:         ${SANDBOX_PG_HOST}
+      port:         5432
+      user:         ${SANDBOX_PG_USER}
+      password:     ${SANDBOX_PG_PASSWORD}
+      provider_db:  ${SANDBOX_PG_DBNAME}
+      ssl_mode:     require
+    tables:
+      columns: {}
+
+  # ── PROD ──────────────────────────────────────────────────────────────────
+  # Production — credentials must come from Azure Key Vault, not .env.local.
+  # tier: must be changed to "prod" and ETL_ENV=prod on the prod AKS stack.
+  prod:
+    cdc_enabled: false
+    # See the STAGING block's comment above -- "when_needed" is rejected by
+    # this tier's actual debezium/connect:2.5 image. Use "initial".
+    snapshot_mode: initial
+    source:
+      host:         ${PROD_PG_HOST}
+      port:         5432
+      user:         ${PROD_PG_USER}
+      password:     ${PROD_PG_PASSWORD}
+      provider_db:  ${PROD_PG_DBNAME}
+      ssl_mode:     require
+    tables:
+      columns:
+        worker:
+          drop: [ssn, date_of_birth]

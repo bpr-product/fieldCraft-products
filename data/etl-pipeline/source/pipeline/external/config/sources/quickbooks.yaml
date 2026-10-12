@@ -1,0 +1,28 @@
+source_name: quickbooks
+source_entity: invoice
+connector_type: rest_api
+
+auth:
+  type: oauth2
+  token_url: https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer
+  client_id: ${QUICKBOOKS_CLIENT_ID}
+  client_secret: ${QUICKBOOKS_CLIENT_SECRET}
+  scopes: [com.intuit.quickbooks.accounting]
+
+poll:
+  schedule: "*/15 * * * *"
+  base_url: https://quickbooks.api.intuit.com/v3/company/{realm_id}/query
+  cursor_param: query
+  incremental_field: MetaData.LastUpdatedTime
+  cursor_strategy: timestamp
+  page_size: 100
+  max_pages: 500
+  initial_cursor: "1970-01-01T00:00:00"
+  results_field: QueryResponse.Invoice
+
+routing:
+  strategy: kafka
+  kafka_threshold_rows: 10000
+
+id_field: Id
+ts_field: MetaData.LastUpdatedTime

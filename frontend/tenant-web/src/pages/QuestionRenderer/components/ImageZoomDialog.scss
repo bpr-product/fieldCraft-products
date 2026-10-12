@@ -1,0 +1,79 @@
+/*
+* Copyright (C) FIELDCRAFT Inc - All Rights Reserved
+* This file is part of FieldCraft. - Proprietary and confidential
+* Unauthorized copying of this file, via any medium is strictly prohibited
+* 
+* Created on   : 09-Feb-2026
+* @author      : Vaisnave I M
+* @since       : 2.0.0
+* Requirement# : BID-2.0
+* Purpose      : Design code for displaying images on clicking zoom icon in bid 2.0
+* -----------------------------------------------------------------------------
+* Revision History
+* -----------------------------------------------------------------------------
+* Requirement/
+* Issue/WorkItem |   DATE      |    AUTHOR       |   DESCRIPTION OF CHANGE
+* -----------------------------------------------------------------------------
+
+*/
+
+.image-zoom-dialog-paper {
+    max-width: 600px;
+    width: 100%;
+}
+
+.image-zoom-dialog-content {
+    padding: 0;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #000;
+    min-height: 300px;
+}
+
+.image-zoom-dialog-close-btn {
+    position: absolute !important;
+    top: 8px;
+    right: 8px;
+    color: white !important;
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    z-index: 10;
+
+    &:hover {
+        background-color: rgba(0, 0, 0, 0.7) !important;
+    }
+
+    &::before {
+        content: "×";
+        font-size: 24px;
+        line-height: 1;
+    }
+}
+
+.image-zoom-dialog-image-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.image-zoom-dialog-image {
+    max-width: 100%;
+    max-height: 80vh;
+    object-fit: contain;
+}
+
+.image-zoom-dialog-label {
+    width: 100%;
+    padding: 12px 16px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    text-align: center;
+    font-size: 14px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+}

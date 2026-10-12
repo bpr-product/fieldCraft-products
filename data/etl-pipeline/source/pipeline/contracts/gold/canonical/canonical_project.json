@@ -1,0 +1,79 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "gold_canonical.project",
+  "version": "1.3.0",
+  "description": "Canonical Gold — lean project directory. One document per (tenantId, projectId), sourced directly from silver.project. Deliberately NOT a duplicate of gold_eden.project_health, which stays the feature-owned source for task/financial/schedule detail — this collection exists so bpe/eden/qa_recommendation can all resolve a project's basic identity/customer/asset linkage from one shared place instead of each re-deriving it from silver.project independently. assetUid is resolved via silver.customer_asset (silver.project itself has no asset_uid column).",
+  "x-database": "gold_canonical",
+  "x-collection": "project",
+  "x-grain": "project",
+  "x-etl-trigger": "batch only (15-min cron) — no streaming job",
+  "x-upsert-guard": "_silverLsn",
+  "type": "object",
+  "required": [
+    "tenantId",
+    "projectId",
+    "_grain",
+    "_schemaVersion",
+    "_silverLsn",
+    "goldUpdatedAt",
+    "_env"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "pipelineRunId": { "type": ["string", "null"] },
+    "goldCreatedAt": { "type": ["string", "null"], "format": "date-time" },
+    "goldUpdatedAt": { "type": ["string", "null"], "format": "date-time" },
+    "sourceUpdatedAt": { "type": ["string", "null"], "format": "date-time" },
+    "dataOrigin": { "type": ["string", "null"] },
+    "sourceEnv": {
+      "type": ["string", "null"],
+      "description": "Silver _s_env. Part of the upsert key.",
+      "x-rbac-roles": ["all"]
+    },
+    "_env": {
+      "type": ["string", "null"],
+      "description": "Deployment tier that wrote this doc (PIPELINE_ENV) — different axis from sourceEnv.",
+      "x-rbac-roles": ["all"]
+    },
+    "tenantId": { "type": "string", "minLength": 1, "x-rbac-roles": ["all"], "x-source-table": "silver.project" },
+    "projectId": { "type": "string", "minLength": 1, "description": "Grain key.", "x-rbac-roles": ["all"], "x-source-table": "silver.project" },
+    "projectUid": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.project" },
+    "orderNo": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.project" },
+    "projectName": { "type": ["string", "null"], "description": "Denormalized project name. Source system pre-formats silver.project.description as \"{customer name}, {city}-{trade}-{orderNo}\" (e.g. \"vijay cus, Chennai-Roof Enhancement-708869\"); falls back to orderNo, then projectUid.", "x-rbac-roles": ["all"], "x-source-table": "silver.project" },
+    "customerUid": { "type": ["string", "null"], "description": "Links to gold_canonical.customer.customerUid.", "x-rbac-roles": ["all"], "x-source-table": "silver.project" },
+    "assetUid": { "type": ["string", "null"], "description": "Links to gold_canonical.asset.assetUid; resolved via silver.customer_asset, not a project column.", "x-rbac-roles": ["all"], "x-source-table": "silver.customer_asset" },
+    "status": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.project" },
+    "trade": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.project" },
+    "tradeType": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.project" },
+    "tradeOid": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.project" },
+    "projectType": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.project" },
+    "scheduledType": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.project" },
+    "location": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.project" },
+    "zipcode": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.project" },
+    "metroCode": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.project" },
+    "jobsiteLat": { "type": ["number", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.project" },
+    "jobsiteLng": { "type": ["number", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.project" },
+    "referenceProjectId": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.project" },
+    "parentProjectId": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.project" },
+    "createdAt": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.project" },
+    "createdBy": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.project" },
+    "silverUpdatedAt": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.project" },
+    "_grain": { "type": "string", "const": "canonical_project", "x-rbac-roles": ["all"] },
+    "_schemaVersion": { "type": "integer", "const": 1, "x-rbac-roles": ["all"] },
+    "_silverLsn": { "type": "integer", "minimum": 0, "x-rbac-roles": ["all"] },
+    "dataAsOf": { "type": "string", "format": "date-time", "x-rbac-roles": ["all"] },
+    "isDeleted": { "type": "boolean", "x-rbac-roles": ["all"], "x-source-table": "silver.project" },
+    "deletedAt": { "type": ["string", "null"], "format": "date-time", "x-rbac-roles": ["all"], "x-source-table": "silver.project" },
+    "_silverWatermarks": {
+      "type": "object",
+      "additionalProperties": false,
+      "x-rbac-roles": ["all"],
+      "properties": {
+        "project": { "type": ["string", "null"], "format": "date-time", "x-source-table": "silver.project" },
+        "customer_asset": { "type": ["string", "null"], "format": "date-time", "x-source-table": "silver.customer_asset" }
+      }
+    },
+    "lafieldcraft": { "type": "integer", "minimum": 0, "x-rbac-roles": ["all"] }
+  },
+  "x-upsert-key": ["tenantId", "projectId", "sourceEnv"]
+}

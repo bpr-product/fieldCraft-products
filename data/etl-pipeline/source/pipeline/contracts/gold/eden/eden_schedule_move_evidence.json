@@ -1,0 +1,223 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "gold_eden.schedule_move_evidence",
+  "version": "1.0.0",
+  "description": "Eden Schedule agent — corroborating evidence for 'why did this project's tentative start/end date move' (Q2). One document per (tenantId, projectId, version) of silver.project_schedule. project_schedule.actual_startdate/actual_enddate are 0% populated fleet-wide, so this diffs successive `version` rows' startdate/enddate/job_startdate/job_enddate instead. Correlates against silver.resource_schedule (status='completed'), silver.audit_log (resource_id joins via silver.project.project_uid, not project.id), and silver.rule_solve_snapshot (attributes_snapshot deliberately NOT parsed — opaque/unmapped) within a time window around the version change. No field here proves causation — see evidenceSummary.caveat. crew_expansion_proposal/rule_task_trace/stage_transition (all 0 rows or absent) and task_version (project-level, not task-level) were checked and ruled out. Schema mirrors gold/src/eden/load_schedule_move_evidence.py shape_doc() exactly.",
+  "x-database": "gold_eden",
+  "x-collection": "schedule_move_evidence",
+  "x-grain": "eden_schedule_move_evidence",
+  "x-etl-trigger": "batch (run_pipeline.py); not yet wired into gold_eden_stream.py CDC trigger table",
+  "x-upsert-guard": "_silverLsn",
+  "type": "object",
+  "required": [
+    "tenantId",
+    "projectId",
+    "version",
+    "_grain",
+    "_schemaVersion",
+    "_silverLsn",
+    "goldUpdatedAt",
+    "_env"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "pipelineRunId":   { "type": ["string", "null"] },
+    "goldCreatedAt":   { "type": ["string", "null"], "format": "date-time" },
+    "goldUpdatedAt":   { "type": ["string", "null"], "format": "date-time" },
+    "sourceUpdatedAt": { "type": ["string", "null"], "format": "date-time" },
+    "dataOrigin":      { "type": ["string", "null"] },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Tenant identifier. Part of the compound upsert key.",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.project_schedule"
+    },
+    "projectId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Project identifier cast to string. Part of the compound upsert key.",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.project_schedule"
+    },
+    "projectUid": {
+      "type": ["string", "null"],
+      "description": "silver.project.project_uid — the UUID silver.audit_log.resource_id actually matches (not project.id).",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.project"
+    },
+    "projectName": {
+      "type": ["string", "null"],
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.project"
+    },
+    "orderNo":  { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.project" },
+    "version":     { "type": ["integer", "null"], "description": "silver.project_schedule.version. Grain key.", "x-rbac-roles": ["all"], "x-source-table": "silver.project_schedule" },
+    "prevVersion": { "type": ["integer", "null"], "description": "Immediately preceding version for the same project (window LAG), or null if this is the first version.", "x-rbac-roles": ["all"], "x-source-table": "silver.project_schedule" },
+    "startDate":        { "type": ["string", "null"], "format": "date-time", "x-source-table": "silver.project_schedule", "x-rbac-roles": ["all"] },
+    "endDate":          { "type": ["string", "null"], "format": "date-time", "x-source-table": "silver.project_schedule", "x-rbac-roles": ["all"] },
+    "jobStartDate":     { "type": ["string", "null"], "format": "date-time", "x-source-table": "silver.project_schedule", "x-rbac-roles": ["all"] },
+    "jobEndDate":       { "type": ["string", "null"], "format": "date-time", "x-source-table": "silver.project_schedule", "x-rbac-roles": ["all"] },
+    "prevStartDate":    { "type": ["string", "null"], "format": "date-time", "x-rbac-roles": ["all"] },
+    "prevEndDate":      { "type": ["string", "null"], "format": "date-time", "x-rbac-roles": ["all"] },
+    "prevJobStartDate": { "type": ["string", "null"], "format": "date-time", "x-rbac-roles": ["all"] },
+    "prevJobEndDate":   { "type": ["string", "null"], "format": "date-time", "x-rbac-roles": ["all"] },
+    "reason": {
+      "type": ["string", "null"],
+      "description": "silver.project_schedule.reason, passed through read-only. NOT a causal code — checked live and confirmed it only ever holds two generic values fleet-wide (SAVE_TASKS, 'Auto Rescheduling Error').",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.project_schedule"
+    },
+    "moved": {
+      "type": "object",
+      "description": "Per-field change flags vs prevVersion. All false when prevVersion is null (nothing to diff against).",
+      "additionalProperties": false,
+      "x-rbac-roles": ["all"],
+      "properties": {
+        "startDate":    { "type": "boolean" },
+        "endDate":      { "type": "boolean" },
+        "jobStartDate": { "type": "boolean" },
+        "jobEndDate":   { "type": "boolean" }
+      }
+    },
+    "anyMoved": { "type": "boolean", "description": "True if any of moved.* is true.", "x-rbac-roles": ["all"] },
+    "daysMoved": {
+      "type": "object",
+      "description": "Whole-day delta (current - previous) per date field. Null when there is no previous version.",
+      "additionalProperties": false,
+      "x-rbac-roles": ["all"],
+      "properties": {
+        "startDate":    { "type": ["integer", "null"] },
+        "endDate":      { "type": ["integer", "null"] },
+        "jobStartDate": { "type": ["integer", "null"] },
+        "jobEndDate":   { "type": ["integer", "null"] }
+      }
+    },
+    "resourceCompletions": {
+      "type": "array",
+      "description": "silver.resource_schedule rows (status='completed') for THIS project, within the correlation window around this version's change. Evidence a crew/resource actually finished, not proof it caused the move.",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.resource_schedule",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "resourceId": { "type": ["string", "null"] },
+          "startTime":  { "type": ["string", "null"], "format": "date-time" },
+          "endTime":    { "type": ["string", "null"], "format": "date-time" },
+          "duration":   { "type": ["number", "integer", "null"] }
+        }
+      }
+    },
+    "auditEvents": {
+      "type": "array",
+      "description": "silver.audit_log rows matching this project (via project_uid) with a reschedule-related action, within the correlation window.",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.audit_log",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "action":       { "type": ["string", "null"] },
+          "resourceType": { "type": ["string", "null"] },
+          "createdAt":    { "type": ["string", "null"], "format": "date-time" },
+          "context":      { "description": "Raw data->'context' jsonb — not a clean contract, richest available payload." },
+          "taskUid":      { "type": ["string", "null"] }
+        }
+      }
+    },
+    "ruleSolveSnapshots": {
+      "type": "array",
+      "description": "silver.rule_solve_snapshot rows for this project within the correlation window — the GoPAL scheduling engine's own record of a solve/recompute run. attributes_snapshot is deliberately NOT included (opaque/unmapped).",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.rule_solve_snapshot",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "schedulingType":    { "type": ["string", "null"] },
+          "rulesHash":         { "type": ["string", "null"] },
+          "ruleCount":         { "type": ["integer", "null"] },
+          "firedCount":        { "type": ["integer", "null"] },
+          "convergencePasses": { "type": ["integer", "null"] },
+          "capturedAt":        { "type": ["string", "null"], "format": "date-time" }
+        }
+      }
+    },
+    "evidenceSummary": {
+      "type": "object",
+      "description": "Whether corroborating signals exist and a heuristic confidence level — never proof of causation.",
+      "additionalProperties": false,
+      "x-rbac-roles": ["all"],
+      "properties": {
+        "hasResourceCompletionEvidence": { "type": "boolean" },
+        "hasAuditLogEvidence":           { "type": "boolean" },
+        "hasRuleSolveEvidence":          { "type": "boolean" },
+        "confidence": {
+          "type": "string",
+          "enum": ["unconfirmed", "corroborated", "no_corroborating_signal"]
+        },
+        "caveat": { "type": "string" }
+      }
+    },
+    "_grain": {
+      "type": "string",
+      "const": "eden_schedule_move_evidence",
+      "x-rbac-roles": ["all"]
+    },
+    "_schemaVersion": {
+      "type": "integer",
+      "const": 1,
+      "x-rbac-roles": ["all"]
+    },
+    "_silverLsn": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "silver.project_schedule._s_lsn at write time. Upsert guard.",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.project_schedule"
+    },
+    "dataAsOf": {
+      "type": "string",
+      "format": "date-time",
+      "x-rbac-roles": ["all"]
+    },
+    "isDeleted": {
+      "type": "boolean",
+      "description": "Always false — project_schedule rows are not filtered/soft-deleted at the query beyond _s_is_deleted.",
+      "x-rbac-roles": ["all"]
+    },
+    "_silverWatermarks": {
+      "type": "object",
+      "additionalProperties": false,
+      "x-rbac-roles": ["all"],
+      "properties": {
+        "project_schedule":    { "type": ["string", "null"], "format": "date-time", "x-source-table": "silver.project_schedule" },
+        "project":             { "type": ["string", "null"], "format": "date-time", "x-source-table": "silver.project" },
+        "resource_schedule":   { "type": ["string", "null"], "format": "date-time", "x-source-table": "silver.resource_schedule" },
+        "audit_log":           { "type": ["string", "null"], "format": "date-time", "x-source-table": "silver.audit_log" },
+        "rule_solve_snapshot": { "type": ["string", "null"], "format": "date-time", "x-source-table": "silver.rule_solve_snapshot" }
+      }
+    },
+    "lafieldcraft": {
+      "type": "integer",
+      "minimum": 0,
+      "x-rbac-roles": ["all"]
+    },
+    "sourceEnv": {
+      "type": ["string", "null"],
+      "description": "Silver _s_env — logical source environment (si_dev, datamart, ...).",
+      "x-rbac-roles": ["all"]
+    },
+    "_env": {
+      "type": "string",
+      "enum": ["dev", "qa", "stg", "sbx", "prd"]
+    }
+  },
+  "x-upsert-key": [
+    "tenantId",
+    "projectId",
+    "version",
+    "sourceEnv"
+  ]
+}

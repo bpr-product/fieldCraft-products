@@ -1,0 +1,48 @@
+{
+  "name": "fieldcraft-realtime-connector",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "database.hostname": "${POSTGRES_HOST}",
+    "database.port": "${POSTGRES_PORT}",
+    "database.user": "${DEBEZIUM_DB_USER}",
+    "database.password": "${POSTGRES_PASSWORD}",
+    "database.dbname": "${PG_DBNAME}",
+    "database.server.name": "${DEBEZIUM_REALTIME_SERVER_NAME}",
+    "plugin.name": "pgoutput",
+    "publication.name": "${PG_PUBLICATION_NAME}",
+    "slot.name": "${PG_REPLICATION_SLOT_REALTIME}",
+
+    "table.include.list": "${DEBEZIUM_REALTIME_INCLUDE_LIST}",
+
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter.schemas.enable": "false",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable": "false",
+
+    "transforms": "unwrap,route",
+    "transforms.unwrap.type": "io.debezium.transforms.ExtractNewRecordState",
+    "transforms.unwrap.add.fields": "op,source.lsn:lsn,source.ts_ms:ts_ms,source.table:source_table,source.db:source_db",
+    "transforms.unwrap.add.fields.prefix": "",
+    "transforms.unwrap.delete.handling.mode": "rewrite",
+    "transforms.unwrap.drop.tombstones": "true",
+    "transforms.route.type": "org.apache.kafka.connect.transforms.RegexRouter",
+    "transforms.route.regex": "(.*)\\.public\\.(.*)",
+    "transforms.route.replacement": "${ETL_ENV}.cdc.events",
+
+    "message.key.columns": "${DEBEZIUM_REALTIME_KEY_COLUMNS}",
+
+    "topic.prefix": "${ETL_ENV}",
+    "decimal.handling.mode": "string",
+    "time.precision.mode": "connect",
+    "snapshot.mode": "initial",
+    "tasks.max": "1",
+    "producer.override.max.request.size": "1000000",
+    "producer.override.batch.size": "131072",
+    "producer.override.linger.ms": "10",
+    "max.queue.size": "81920",
+    "max.batch.size": "4096",
+    "poll.interval.ms": "100",
+    "heartbeat.interval.ms": "0",
+    "database.ssl.mode": "${POSTGRES_SSL_MODE}"
+  }
+}

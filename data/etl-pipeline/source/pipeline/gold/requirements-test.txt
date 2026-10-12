@@ -1,0 +1,7 @@
+# Test/dev dependencies for the Gold pipeline test suites.
+# Install with:  pip install -r gold/requirements.txt -r gold/requirements-test.txt
+-r requirements.txt
+
+pytest>=8.0
+pytest-cov>=5.0
+mongomock>=4.3.0   # in-process MongoDB for Silver→Gold automation tests (no live Cosmos needed)

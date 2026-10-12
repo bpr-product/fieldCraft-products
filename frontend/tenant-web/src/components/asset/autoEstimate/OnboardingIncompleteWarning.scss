@@ -1,0 +1,230 @@
+// Onboarding Incomplete Warning — styling per 'Onboarding Incomplete Warning (3a) Spec.md'.
+
+@keyframes w-pop {
+  0% {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+
+  60% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes w-shake {
+
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+
+  20% {
+    transform: rotate(-9deg);
+  }
+
+  40% {
+    transform: rotate(8deg);
+  }
+
+  60% {
+    transform: rotate(-5deg);
+  }
+
+  80% {
+    transform: rotate(3deg);
+  }
+}
+
+@keyframes w-ring {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.55;
+  }
+
+  100% {
+    transform: scale(1.55);
+    opacity: 0;
+  }
+}
+
+@keyframes w-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes w-dot {
+  from {
+    transform: scale(0);
+  }
+
+  to {
+    transform: scale(1);
+  }
+}
+
+.onboardingWarningBackdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(3px);
+}
+
+.onboardingWarningCard {
+  width: 460px;
+  max-width: calc(100vw - 32px);
+  background-color: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.3);
+  padding: 36px 36px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  font-family: Poppins, Helvetica, sans-serif;
+}
+
+.onboardingWarningIcon {
+  position: relative;
+  width: 96px;
+  height: 96px;
+
+  &__ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 3px solid #f59e0b;
+    animation: w-ring 1.6s 0.3s ease-out infinite;
+  }
+
+  &__circle {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background-color: #fef3c7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: w-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  &__inner {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background-color: #f59e0b;
+    box-shadow: 0 8px 20px rgba(245, 158, 11, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: w-shake 0.6s 0.55s ease-in-out both;
+  }
+
+  &__mark {
+    animation: w-draw 0.3s 0.3s ease-out forwards;
+  }
+
+  &__dot {
+    transform-origin: 12px 19px;
+    transform: scale(0);
+    animation: w-dot 0.25s 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  // prefers-reduced-motion turns every animation off and shows the icon fully drawn, per spec —
+  // the ring specifically is hidden rather than frozen mid-animation, since a static ring around
+  // the icon was never part of the design at rest.
+  &--reducedMotion {
+    .onboardingWarningIcon__ring {
+      display: none;
+    }
+
+    .onboardingWarningIcon__circle,
+    .onboardingWarningIcon__inner {
+      animation: none;
+    }
+
+    .onboardingWarningIcon__mark {
+      animation: none;
+      stroke-dashoffset: 0;
+    }
+
+    .onboardingWarningIcon__dot {
+      animation: none;
+      transform: scale(1);
+    }
+  }
+}
+
+.onboardingWarningTitle {
+  margin-top: 22px;
+  font-size: 21px;
+  font-weight: 600;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+}
+
+.onboardingWarningMessage {
+  margin-top: 12px;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: #475569;
+  text-wrap: pretty;
+}
+
+.onboardingWarningPathBox {
+  margin-top: 20px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background-color: #f8fafc;
+  border: 1px solid #e6ebf1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+
+  &__breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e3a5f;
+    white-space: nowrap;
+  }
+
+  &__separator {
+    color: #94a3b8;
+    font-weight: 400;
+  }
+
+  &__hint {
+    font-size: 12.5px;
+    color: #64748b;
+  }
+}
+
+.onboardingWarningCloseBtn {
+  margin-top: 26px;
+  width: 100%;
+  padding: 12px 18px;
+  border-radius: 10px;
+  background-color: #1e3a5f;
+  border: 1px solid #1e3a5f;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 14.5px;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #152c4a;
+    border-color: #152c4a;
+  }
+}

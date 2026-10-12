@@ -1,0 +1,381 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "gold_eden.task_intelligence",
+  "version": "4.0.0",
+  "description": "Eden AI Assistant \u2014 per-project task intelligence. One document per (tenantId, projectId). Pre-computes overdue tasks with assignee names, unassigned tasks, and the most-delayed task. Schema mirrors gold/src/eden/load_task_intelligence.py shape_doc() exactly.",
+  "x-database": "gold_eden",
+  "x-collection": "task_intelligence",
+  "x-grain": "eden_task_intelligence",
+  "x-etl-trigger": "event-driven on writes to silver.project, silver.task, silver.resource",
+  "x-upsert-guard": "_silverLsn",
+  "type": "object",
+  "required": [
+    "tenantId",
+    "projectId",
+    "_grain",
+    "_schemaVersion",
+    "_silverLsn",
+    "goldUpdatedAt",
+    "_env"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "pipelineRunId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "goldCreatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "goldUpdatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Tenant identifier. First half of the compound upsert key.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "projectId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Project identifier cast to string. Second half of the compound upsert key.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "_grain": {
+      "type": "string",
+      "const": "eden_task_intelligence",
+      "description": "ETL grain identifier.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_schemaVersion": {
+      "type": "integer",
+      "const": 1,
+      "description": "Integer schema version.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_silverLsn": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "PostgreSQL LSN of the silver.project row at write time. Upsert guard against stale overwrites.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "dataAsOf": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC effective data snapshot time. Prompt-cache key component.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "totalTaskCount": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Total count of non-invalid tasks on the project.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.task"
+    },
+    "doneTaskCount": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Count of tasks with status DONE or COMPLETED.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.task"
+    },
+    "overdueTaskCount": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Count of tasks whose end_time is past and status is not DONE/COMPLETED.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.task"
+    },
+    "unassignedTaskCount": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Count of non-done tasks with no assignee.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.task"
+    },
+    "completionPct": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Percentage of DONE/COMPLETED tasks out of total. Null when there are no tasks.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.task"
+    },
+    "overdueTasks": {
+      "type": "array",
+      "description": "Up to 10 overdue tasks ordered by due date, with assignee names resolved from silver.resource.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.task",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "taskId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "taskName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "daysLate": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "endTime": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "assignees": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "unassignedTasks": {
+      "type": "array",
+      "description": "Up to 10 unassigned non-done tasks ordered by due date.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.task",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "taskId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "taskName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "endTime": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        }
+      }
+    },
+    "mostDelayedTask": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "The single most-overdue task. Null when no overdue tasks exist.",
+      "additionalProperties": false,
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.task",
+      "properties": {
+        "taskId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "taskName": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "daysLate": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        }
+      }
+    },
+    "milestoneSummary": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Reserved \u2014 populated when silver.task carries task_type='MILESTONE'. Currently always null.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "completionTrend": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Reserved \u2014 populated when weekly task tracking is available. Currently always null.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "criticalPathAtRisk": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "description": "Reserved \u2014 derived from milestoneSummary when available. Currently always null.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "isDeleted": {
+      "type": "boolean",
+      "description": "Soft-delete tombstone \u2014 true when the source silver.project row is soft-deleted. On recompute the Gold doc is marked deleted (never physically removed/orphaned).",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "deletedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "UTC time the source row was soft-deleted (silver _s_deleted_at), stored as a native BSON date; null when live.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "_silverWatermarks": {
+      "type": "object",
+      "description": "Per-source-table high-water _s_silver_ts timestamps at the time this document was last written.",
+      "additionalProperties": false,
+      "x-rbac-roles": [
+        "all"
+      ],
+      "properties": {
+        "project": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "x-source-table": "silver.project"
+        },
+        "task": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "x-source-table": "silver.task"
+        }
+      }
+    },
+    "lafieldcraft": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Milliseconds between the loader run and the oldest contributing Silver watermark.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "sourceEnv": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Silver _s_env \u2014 logical source environment (si_dev, datamart, ...).",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_env": {
+      "type": "string",
+      "enum": [
+        "dev",
+        "qa",
+        "stg",
+        "sbx",
+        "prd"
+      ]
+    }
+  },
+  "x-upsert-key": [
+    "tenantId",
+    "projectId",
+    "sourceEnv"
+  ]
+}

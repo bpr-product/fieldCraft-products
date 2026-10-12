@@ -1,0 +1,25 @@
+source_name: fiserv
+source_entity: transaction
+connector_type: rest_api
+
+auth:
+  type: api_key
+  api_key_header: Api-Key
+  api_key_value: ${FISERV_API_KEY}
+
+poll:
+  schedule: "*/5 * * * *"
+  base_url: ${FISERV_API_BASE_URL}
+  cursor_param: fromDate
+  cursor_strategy: timestamp
+  page_size: 200
+  max_pages: 100
+  initial_cursor: "1970-01-01T00:00:00"
+  results_field: transactions
+
+routing:
+  strategy: kafka
+  kafka_threshold_rows: 10000
+
+id_field: transactionId
+ts_field: transactionDate

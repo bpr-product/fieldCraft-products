@@ -1,0 +1,19 @@
+# Personal credentials / generated builds
+.env
+.env.*
+!.env.example
+**/*.key
+**/*.pem
+**/*.p12
+**/*.pfx
+**/node_modules/
+**/__pycache__/
+**/.pytest_cache/
+**/.venv/
+**/dist/
+**/build/
+**/target/
+**/.gradle/
+**/*.log
+**/*.sqlite*
+**/*.db

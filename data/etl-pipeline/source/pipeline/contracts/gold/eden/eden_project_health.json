@@ -1,0 +1,1380 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "gold_eden.project_health",
+  "version": "4.1.0",
+  "description": "Eden AI Assistant \u2014 per-project health snapshot. One document per (tenantId, projectId). Pre-computes status, task, cost, and schedule signals so Eden never queries Silver at request time. Schema mirrors gold/src/eden/load_project_health.py shape_doc() exactly.",
+  "x-database": "gold_eden",
+  "x-collection": "project_health",
+  "x-grain": "eden_project_health",
+  "x-etl-trigger": "event-driven on writes to silver.project, silver.task, silver.project_estimate, silver.project_estimate_schedule, silver.purchase_order, silver.invoice, silver.project_schedule",
+  "x-upsert-guard": "_silverLsn",
+  "type": "object",
+  "required": [
+    "tenantId",
+    "projectId",
+    "_grain",
+    "_schemaVersion",
+    "_silverLsn",
+    "goldUpdatedAt",
+    "_env"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "pipelineRunId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "goldCreatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "goldUpdatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Tenant identifier. First half of the compound upsert key; enforces tenant isolation in every Mongo filter.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "projectId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Project identifier cast to string. Second half of the compound upsert key.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "orderNo": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Human-readable order number shown in the Eden UI. LLM uses this instead of the numeric projectId.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "projectName": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Project display name. Preference order: customer display name -> order_no (human-readable, populated on ~99.7% of projects) -> project_uid (raw UUID, last resort).",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-ai-context": "Used by the LLM to refer to the project by name in answers.",
+      "x-source-table": "silver.project"
+    },
+    "trade": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Trade / discipline of the project.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "location": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Project location string.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "_grain": {
+      "type": "string",
+      "const": "eden_project_health",
+      "description": "ETL grain identifier. Constant sentinel for schema validation.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_schemaVersion": {
+      "type": "integer",
+      "const": 1,
+      "description": "Integer schema version. Eden checks this on every fetch.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_silverLsn": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "PostgreSQL LSN of the silver.project row at write time. Upsert guard \u2014 a write only applies when the incoming _silverLsn is greater than the stored value, preventing stale overwrites.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "dataAsOf": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC effective data snapshot time. Used as a component of the Eden prompt-cache key (tenant, project, role_hash, dataAsOf).",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "completionPct": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Percentage of DONE/COMPLETED tasks out of total non-invalid tasks.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.task"
+    },
+    "totalTaskCount": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Total count of non-invalid tasks on the project.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.task"
+    },
+    "doneTaskCount": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Count of tasks with status DONE or COMPLETED.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.task"
+    },
+    "overdueTaskCount": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Count of tasks whose end_time is in the past and status is not DONE or COMPLETED.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.task"
+    },
+    "unassignedTaskCount": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Count of non-done tasks with no assignee.",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "project_manager",
+        "estimator",
+        "field_manager"
+      ],
+      "x-source-table": "silver.task"
+    },
+    "estimatedCost": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Total estimated cost from the latest non-invalid estimate version.",
+      "x-unit": "USD",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "project_manager",
+        "estimator",
+        "accountant"
+      ],
+      "x-source-table": "silver.project_estimate"
+    },
+    "estimateVersion": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1,
+      "description": "Version number of the estimate used to populate the cost fields.",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "project_manager",
+        "estimator",
+        "accountant"
+      ],
+      "x-source-table": "silver.project_estimate"
+    },
+    "materialCost": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Material cost component from the latest estimate.",
+      "x-unit": "USD",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "project_manager",
+        "estimator",
+        "accountant"
+      ],
+      "x-source-table": "silver.project_estimate"
+    },
+    "workerCost": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Labour/worker cost component from the latest estimate.",
+      "x-unit": "USD",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "project_manager",
+        "estimator",
+        "accountant"
+      ],
+      "x-source-table": "silver.project_estimate"
+    },
+    "toolCost": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Tool/equipment cost component from the latest estimate.",
+      "x-unit": "USD",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "project_manager",
+        "estimator",
+        "accountant"
+      ],
+      "x-source-table": "silver.project_estimate"
+    },
+    "overheadCost": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Overhead cost component from the latest estimate.",
+      "x-unit": "USD",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "project_manager",
+        "estimator",
+        "accountant"
+      ],
+      "x-source-table": "silver.project_estimate"
+    },
+    "margin": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Margin from the latest estimate. May be negative. Role-gated.",
+      "x-unit": "USD",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "project_manager",
+        "accountant"
+      ],
+      "x-source-table": "silver.project_estimate"
+    },
+    "estimateHistory": {
+      "type": "array",
+      "description": "Collapsed per-version estimate change timeline (WI 21303). Built from ALL retained silver.project_estimate versions for the project (superseded versions carry invalid=TRUE; the current version is the single invalid=FALSE row). No-op versions (sub-cent cost churn with no reason change) are collapsed; the baseline (first) and current versions are always kept. Ordered by version ascending; capped at the last 25 entries (baseline always retained). Lets Eden answer 'how / why has the estimate changed' from a single point read.",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "project_manager",
+        "estimator",
+        "accountant"
+      ],
+      "x-source-table": "silver.project_estimate",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "version",
+          "snapshot",
+          "isCurrent"
+        ],
+        "properties": {
+          "version": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "description": "Estimate version number (CAST(version AS INT))."
+          },
+          "validFrom": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Valid-time start \u2014 silver.project_estimate.created_at (when this version became true in the business). The trustworthy timeline axis."
+          },
+          "recordedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "System-time \u2014 silver _s_silver_ts (load time). Degenerate/identical across versions for backfilled projects; use validFrom for ordering."
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Native silver.project_estimate.reason \u2014 why this version changed (e.g. 'Customer Requested To Change'). Null when not recorded."
+          },
+          "snapshot": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "Cost breakdown at this version.",
+            "properties": {
+              "totalCost": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "x-unit": "USD"
+              },
+              "materialCost": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "x-unit": "USD"
+              },
+              "workerCost": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "x-unit": "USD"
+              },
+              "toolCost": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "x-unit": "USD"
+              },
+              "overheadCost": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "x-unit": "USD"
+              },
+              "margin": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "x-unit": "USD"
+              }
+            }
+          },
+          "delta": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": false,
+            "description": "Change vs the previous kept version (cent precision). Null for the baseline entry.",
+            "properties": {
+              "totalCost": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "x-unit": "USD"
+              },
+              "materialCost": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "x-unit": "USD"
+              },
+              "workerCost": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "x-unit": "USD"
+              },
+              "toolCost": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "x-unit": "USD"
+              },
+              "overheadCost": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "x-unit": "USD"
+              },
+              "margin": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "x-unit": "USD"
+              }
+            }
+          },
+          "scheduleIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Distinct silver.project_estimate_schedule.schedule_id values linked to this estimate version (1:many link, deduped; capped).",
+            "x-source-table": "silver.project_estimate_schedule"
+          },
+          "isCurrent": {
+            "type": "boolean",
+            "description": "True for the live (current) estimate version \u2014 the single invalid=FALSE source row."
+          },
+          "confidence": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "high",
+              "low",
+              "none",
+              null
+            ],
+            "description": "Deterministic evidence-support level for the recorded cause, computed once at ETL write time by joining silver.bom/silver.material_cost \u2014 never an LLM self-assessment (EDEN Customer Support Master Constraints Reference, Q1). 'high' = SUM(bom.total_cost) reconciles AND a specific line/material price change is attributable. 'low' = reconciles but no specific line attributable. 'none' = does not reconcile, or no BOM data exists for this version. Absent on documents written before this field was added (2026-08-01) \u2014 a missing key means the ETL has not yet recomputed it, not 'none'."
+          },
+          "inferredReason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "ETL-computed cause label, deliberately SEPARATE from the native `reason` column above \u2014 never written into it. `reason` is a faithful passthrough of whatever the source app recorded (often null for system-triggered re-estimates); inferredReason is the ETL's own deterministic verdict derived from `confidence`/`evidence`, e.g. 'Material price change: {materialName}' when confidence='high', a generic cost-change note when 'low', null when 'none'. Kept distinct so a consumer never mistakes an inferred label for something the source app or a user actually recorded."
+          },
+          "evidence": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": false,
+            "description": "The receipt for the confidence claim \u2014 traceable, not just asserted. All members null when bomReconciles is false or no line was attributable.",
+            "x-source-table": "silver.bom",
+            "properties": {
+              "bomLineId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "x-source-table": "silver.bom"
+              },
+              "materialName": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "priorUnitCost": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "x-unit": "USD",
+                "x-source-table": "silver.material_cost"
+              },
+              "newUnitCost": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "x-unit": "USD",
+                "x-source-table": "silver.material_cost"
+              },
+              "quantity": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "effectiveDate": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time",
+                "x-source-table": "silver.material_cost"
+              },
+              "triggeringReceiptId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Always null in this version \u2014 silver.receipts.project_id is populated on only 0/3 rows in the tenant checked, and the receipts\u2192stock_item.receipt_id\u2192stock_allocation FK chain, while structurally complete, is data-broken by a missing row. No reliable join exists yet. Documented gap, not a bug."
+              },
+              "bomReconciles": {
+                "type": "boolean",
+                "description": "True when SUM(silver.bom.total_cost) for this version reconciles against material_cost within tolerance."
+              },
+              "priceChangeDetected": {
+                "type": "boolean",
+                "description": "A weaker, UNPROVEN signal — deliberately separate from confidence/bomLineId/etc above. True when a material's price changed near this version's created_at (the same window-based mc_at/mc_prev lookup, unconditional on bomReconciles), vs. confidence/inferredReason which assert this change fully explains the dollar delta. Can be true while confidence stays 'none' — verified live (tenant tn22473627, project order_no 597339) where the estimate/BOM never reconciles but a real, traceable price change still occurred in the same window."
+              },
+              "priceChangeReason": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Human-readable label for priceChangeDetected — names the material and, when both prices are known, the old/new cost and the effective timestamp. Never asserts causation of the dollar delta (that's confidence/inferredReason's job); null when priceChangeDetected is false."
+              },
+              "priceHistory": {
+                "type": "array",
+                "description": "Full, UNCAPPED price-version history per material on this version's resolved BOM snapshot — deliberately NOT gated by bomReconciles/confidence. Verified live (tenant tn22473627, project order_no 597339) that a project's estimate/BOM numbers can fail to reconcile even when real, known price history exists for its materials — this surfaces that known history for manual investigation regardless of whether the strict reconciliation math passed. Only lists material(s) present on that specific version's BOM snapshot, not every material ever used on the project.",
+                "x-source-table": "silver.material_cost",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "materialName": {
+                      "type": ["string", "null"]
+                    },
+                    "vendorMaterialMapId": {
+                      "type": ["string", "null"]
+                    },
+                    "quantity": {
+                      "type": ["number", "null"]
+                    },
+                    "currentCost": {
+                      "type": ["number", "null"],
+                      "x-unit": "USD",
+                      "description": "The most recently-inserted still-open (year-3026 sentinel) material_cost row's cost — NOT simply MAX(effective_startdate); verified live that two open-ended rows can carry startdate values that don't match their actual insertion order."
+                    },
+                    "history": {
+                      "type": "array",
+                      "description": "Every material_cost row for this material, oldest first. Not collapsed/deduplicated — overlapping effective windows (a real data-quality pattern verified live) are shown as-is for manual investigation.",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "cost": { "type": ["number", "null"], "x-unit": "USD" },
+                          "costType": { "type": ["string", "null"] },
+                          "effectiveFrom": { "type": ["string", "null"], "format": "date-time" },
+                          "effectiveTo": { "type": ["string", "null"], "format": "date-time" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "estimateSummary": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": false,
+      "description": "Pre-computed roll-up of the estimate change history (WI 21303) so Eden answers 'how much has the estimate moved' without scanning the array. Null when the project has no estimate rows.",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "project_manager",
+        "estimator",
+        "accountant"
+      ],
+      "x-source-table": "silver.project_estimate",
+      "properties": {
+        "currentVersion": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "description": "Latest estimate version number."
+        },
+        "baselineVersion": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "description": "First (baseline) estimate version number."
+        },
+        "rawVersionCount": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "description": "Total retained version rows before collapse."
+        },
+        "meaningfulRevisionCount": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "description": "Number of meaningful changes after the baseline (no-op churn excluded). Use this, not rawVersionCount, when telling a user 'revised N times'."
+        },
+        "totalCostDelta": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "x-unit": "USD",
+          "description": "Current totalCost minus baseline totalCost (cent precision)."
+        },
+        "marginDelta": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "x-unit": "USD",
+          "description": "Current margin minus baseline margin (cent precision)."
+        },
+        "firstEstimatedAt": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "Baseline created_at (valid-time)."
+        },
+        "lastChangedAt": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "Current version created_at (valid-time)."
+        },
+        "lastReason": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Reason on the current version \u2014 why the estimate last changed."
+        }
+      }
+    },
+    "committedSpend": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Sum of approved/issued PO totals plus invoiced amounts. Defaults to 0.0.",
+      "x-unit": "USD",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "project_manager",
+        "accountant"
+      ],
+      "x-source-table": "silver.purchase_order"
+    },
+    "remainingBudget": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Derived: estimatedCost minus committedSpend. May be negative when over budget. Null when estimatedCost is null.",
+      "x-unit": "USD",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "project_manager",
+        "accountant"
+      ],
+      "x-source-table": "silver.project_estimate"
+    },
+    "outstandingInvoicesTotal": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Total amount across all outstanding (unpaid) invoices on this project.",
+      "x-unit": "USD",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "project_manager",
+        "accountant"
+      ],
+      "x-source-table": "silver.invoice"
+    },
+    "scheduleRisk": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "on_track",
+        "at_risk",
+        "unknown",
+        null
+      ],
+      "description": "Schedule risk state. 'at_risk' when slipDays > 0; 'on_track' when a schedule exists and is not slipping; 'unknown' when the project has no project_schedule row (no slip signal at all \u2014 must NOT be read as on_track).",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project_schedule"
+    },
+    "slipDays": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Number of days the project is behind schedule. 0 if on track or no schedule data.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project_schedule"
+    },
+    "scheduleRevisedCount": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Number of times the project schedule has been revised (latest schedule version number).",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "project_manager"
+      ],
+      "x-source-table": "silver.project_schedule"
+    },
+    "scheduleRevisions": {
+      "type": "array",
+      "description": "Collapsed per-version schedule reschedule timeline (WI 22463). Built from ALL retained silver.project_schedule versions (superseded carry invalid=TRUE; current is the single invalid=FALSE row). No-op versions (no job-date change and no reason change) are collapsed; baseline (first) and current always kept. Ordered by version ascending; capped at the last 25 entries (baseline always retained). Lets Eden answer 'how many times / why / when was this project rescheduled' from a single point read.",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "project_manager",
+        "field_manager"
+      ],
+      "x-source-table": "silver.project_schedule",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "version",
+          "snapshot",
+          "isCurrent"
+        ],
+        "properties": {
+          "version": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "description": "Schedule version number (CAST(version AS INT))."
+          },
+          "validFrom": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Valid-time start \u2014 silver.project_schedule.created_at (when this revision became true). The trustworthy timeline axis."
+          },
+          "recordedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "System-time \u2014 silver _s_silver_ts (load time). Degenerate/identical across versions for backfilled projects; use validFrom for ordering."
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Native silver.project_schedule.reason \u2014 why this revision happened (e.g. 'Task Delay Reschedule', 'Recurring Auto Rescheduling'). Null when not recorded."
+          },
+          "comment": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Native silver.project_schedule.comment \u2014 free-text note on the revision."
+          },
+          "snapshot": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "Planned/actual job dates at this version (date only, YYYY-MM-DD).",
+            "properties": {
+              "jobStartDate": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "jobEndDate": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "actualJobStartDate": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "actualJobEndDate": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          },
+          "delta": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": false,
+            "description": "Whole-day shift vs the previous kept version. Null for the baseline; a member is null when either side's date is missing.",
+            "properties": {
+              "jobStartShiftDays": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "x-unit": "days"
+              },
+              "jobEndShiftDays": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "x-unit": "days"
+              }
+            }
+          },
+          "estimateIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Distinct silver.project_estimate_schedule.estimate_id values linked to this schedule version (schedule_id\u2192estimate_id; deduped; capped).",
+            "x-source-table": "silver.project_estimate_schedule"
+          },
+          "isCurrent": {
+            "type": "boolean",
+            "description": "True for the live (current) schedule version \u2014 the single invalid=FALSE source row."
+          },
+          "confidence": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "low",
+              "none",
+              null
+            ],
+            "description": "Deterministic evidence-support level for the recorded schedule move, computed once at ETL write time by joining silver.resource_schedule/silver.audit_log \u2014 never an LLM self-assessment (EDEN Customer Support Master Constraints Reference, Q2). Ceiling is always 'low', never 'high' \u2014 no foreign key in this schema proves a freed-up resource caused this project's schedule to move. 'low' = a resource also assigned to this project completed an assignment on a DIFFERENT project AND a reschedule-tagged audit_log event exists for this project, both within a 7-day-back/1-day-forward correlation window. 'none' = one or both signals absent. Absent on documents written before this field was added (2026-08-01) \u2014 a missing key means the ETL has not yet recomputed it, not 'none'."
+          },
+          "evidence": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": false,
+            "description": "The correlating facts behind a 'low'-confidence claim \u2014 the receipt, not just an assertion. All members null when confidence is 'none'.",
+            "x-source-table": "silver.resource_schedule",
+            "properties": {
+              "resourceId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "x-source-table": "silver.resource_schedule"
+              },
+              "resourceName": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "x-source-table": "silver.resource"
+              },
+              "priorProjectId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "The DIFFERENT project this resource completed an assignment on."
+              },
+              "priorProjectOrderNo": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "x-source-table": "silver.project"
+              },
+              "priorProjectPlannedEnd": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time",
+                "description": "That project's most recent non-superseded silver.project_schedule.job_enddate.",
+                "x-source-table": "silver.project_schedule"
+              },
+              "priorProjectActualEnd": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time",
+                "description": "silver.resource_schedule.end_time \u2014 when the resource actually finished (status='completed').",
+                "x-source-table": "silver.resource_schedule"
+              },
+              "daysFinishedEarly": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "x-unit": "days",
+                "description": "priorProjectPlannedEnd minus priorProjectActualEnd, whole days. Positive = finished early."
+              },
+              "reschedulePersistedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time",
+                "x-source-table": "silver.audit_log"
+              }
+            }
+          }
+        }
+      }
+    },
+    "scheduleSummary": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": false,
+      "description": "Pre-computed roll-up of the reschedule history (WI 22463) so Eden answers 'how many real replans / how far has the finish slipped' without scanning the array. Null when the project has no schedule rows.",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "project_manager",
+        "field_manager"
+      ],
+      "x-source-table": "silver.project_schedule",
+      "properties": {
+        "currentVersion": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "description": "Latest schedule version number."
+        },
+        "baselineVersion": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "description": "First (baseline) schedule version number."
+        },
+        "rawVersionCount": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "description": "Total retained version rows before collapse."
+        },
+        "meaningfulRevisionCount": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "description": "Number of meaningful reschedules after baseline (no-op churn excluded). Use this, not rawVersionCount, when telling a user 'rescheduled N times'."
+        },
+        "originalJobStartDate": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Baseline planned start date (YYYY-MM-DD)."
+        },
+        "originalJobEndDate": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "First non-null planned end date across versions (YYYY-MM-DD)."
+        },
+        "currentJobStartDate": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Current planned start date (YYYY-MM-DD)."
+        },
+        "currentJobEndDate": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Current planned end date (YYYY-MM-DD)."
+        },
+        "totalEndShiftDays": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "x-unit": "days",
+          "description": "Whole-day shift of the current planned finish vs the original planned finish. Positive = finish pushed later (slip)."
+        },
+        "lastReason": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Reason on the current version \u2014 why the schedule last changed."
+        },
+        "firstPlannedAt": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "Baseline created_at (valid-time)."
+        },
+        "lastChangedAt": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "Current version created_at (valid-time)."
+        }
+      }
+    },
+    "statusTimeline": {
+      "type": "array",
+      "description": "Status-transition audit trail parsed from silver.project.state_change_history, oldest first. This is a direct read of the platform's own recorded state-change log \u2014 NOT a synthesized Change Order entity (there is no dedicated Change Order table in Silver; see docs/gold-layer/historical_data_strategy.md \u00a78). No approval-workflow or scope/value-delta fidelity is implied.",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "project_manager",
+        "field_manager"
+      ],
+      "x-source-table": "silver.project",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "changedAt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "changedBy": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "changeReason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "newState": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "jobStartDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Planned job start date, stored as a native BSON date (UTC midnight for date-only source columns).",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project_schedule"
+    },
+    "actualJobStartDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Actual job start date, stored as a native BSON date. Null if not yet started.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project_schedule"
+    },
+    "jobEndDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Planned job end date, stored as a native BSON date.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project_schedule"
+    },
+    "actualJobEndDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Actual job end date, stored as a native BSON date. Null if project not yet complete.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project_schedule"
+    },
+    "isDeleted": {
+      "type": "boolean",
+      "description": "Soft-delete tombstone \u2014 true when the source silver.project row is soft-deleted. On recompute the Gold doc is marked deleted (never physically removed/orphaned).",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "deletedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "UTC time the source row was soft-deleted (silver _s_deleted_at), stored as a native BSON date; null when live.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "_silverWatermarks": {
+      "type": "object",
+      "description": "Per-source-table high-water _s_silver_ts timestamps at the time this document was last written. Used for lag monitoring and replay.",
+      "additionalProperties": false,
+      "x-rbac-roles": [
+        "all"
+      ],
+      "properties": {
+        "project": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "x-source-table": "silver.project"
+        },
+        "task": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "x-source-table": "silver.task"
+        },
+        "projectEstimate": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "x-source-table": "silver.project_estimate"
+        },
+        "purchaseOrder": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "x-source-table": "silver.purchase_order"
+        },
+        "invoice": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "x-source-table": "silver.invoice"
+        },
+        "projectSchedule": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "x-source-table": "silver.project_schedule"
+        }
+      }
+    },
+    "lafieldcraft": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Milliseconds between the loader run (gold_ts) and the oldest contributing Silver watermark. End-to-end freshness signal.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_dataCompleteness": {
+      "type": "object",
+      "description": "Per-source-domain presence flags for this project at write time. Lets an agent distinguish a known-good zero (e.g. 0 overdue tasks because tasks were loaded and none are overdue) from absent data (no task rows at all). Each flag is true when that domain contributed data.",
+      "additionalProperties": false,
+      "x-rbac-roles": [
+        "all"
+      ],
+      "properties": {
+        "project": {
+          "type": "boolean",
+          "x-source-table": "silver.project"
+        },
+        "task": {
+          "type": "boolean",
+          "x-source-table": "silver.task"
+        },
+        "estimate": {
+          "type": "boolean",
+          "x-source-table": "silver.project_estimate"
+        },
+        "purchaseOrder": {
+          "type": "boolean",
+          "x-source-table": "silver.purchase_order"
+        },
+        "invoice": {
+          "type": "boolean",
+          "x-source-table": "silver.invoice"
+        },
+        "schedule": {
+          "type": "boolean",
+          "x-source-table": "silver.project_schedule"
+        }
+      }
+    },
+    "_confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Aggregate data-completeness confidence \u2014 fraction of contributing source domains that had data for this project (mean of _dataCompleteness flags). An agent should weight or caveat conclusions drawn from a low-confidence snapshot.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "sourceEnv": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Silver _s_env \u2014 logical source environment (si_dev, datamart, ...).",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_env": {
+      "type": "string",
+      "enum": [
+        "dev",
+        "qa",
+        "stg",
+        "sbx",
+        "prd"
+      ]
+    },
+    "assignees": {
+      "type": "array",
+      "description": "Tenant's effective 'admin'-role users, embedded identically on every project doc \u2014 a port of the legacy appendAdmins()/fetchTenantAdmins() Java flow, which wrote this same list into the source system's project.assignees array (field kept named assignees here to match that legacy structure, even though today it only ever contains admin-role entries). NOT project-scoped RBAC: silver.user_role_map assigns roles tenant-wide and silver.project_member carries no role, so a per-project admin cannot be computed from Silver as it stands (see docs/canonical/user_access_management_model.md). Every project in the tenant sees the same list.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.roles, silver.user_role_map, silver.user_account",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "userUid"
+        ],
+        "properties": {
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Admin's display name (firstname/middlename/lastname concatenated)."
+          },
+          "userUid": {
+            "type": "string",
+            "description": "silver.user_account.object_id (external IdP id). Named userUid, not resource_uid, to avoid implying a join to silver.resource \u2014 object_id has no relation to that table."
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Always [\"admin\"] \u2014 the role this loader filters on."
+          }
+        }
+      }
+    }
+  },
+  "x-upsert-key": [
+    "tenantId",
+    "projectId",
+    "sourceEnv"
+  ]
+}

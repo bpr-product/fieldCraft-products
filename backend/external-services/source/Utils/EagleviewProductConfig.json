@@ -1,0 +1,42 @@
+{
+    "productID": 84,
+    "name": "Bid Perfect™",
+    "description": "A report providing critical measurements for bidding",
+    "productGroup": "Total roof area, Pitch table, # of facets, 5 Aerial images of structure, Suggested Waste Factor",
+    "isTemporarilyUnavailable": false,
+    "priceMin": 6.0,
+    "priceMax": 7.0,
+    "deliveryProducts": [
+        {
+            "productID": 45,
+            "name": "QuickDelivery",
+            "description": "SLA under 2hours. Only applies for the Bid Perfect™ product.",
+            "isTemporarilyUnavailable": false,
+            "priceMin": 5.0,
+            "priceMax": 6.0
+        },
+        {
+            "productID": 8,
+            "name": "RegularDelivery",
+            "description": "If ordered during business hours (6AM - 6PM PST most days of the year) the guaranteed date is 2 business days, by close of day. If the report is ordered after close of business, it will not be processed until the next business day. Note: Premium reports are delivered within 6hrs.",
+            "isTemporarilyUnavailable": false,
+            "priceMin": 5.0,
+            "priceMax": 6.0
+        }
+    ],
+    "addOnProducts": [
+        {
+            "productID": 88,
+            "name": "Walls",
+            "description": "Our exterior walls report including",
+            "isTemporarilyUnavailable": false,
+            "priceMin": 5.0,
+            "priceMax": 6.0
+        }
+    ],
+    "measurementInstructionTypes": [1, 2],
+    "TypeOfStructure": 1,
+    "IsRoofProduct": true,
+    "SortOrder": 9,
+    "AllowsUserSubmittedPhotos": true
+}

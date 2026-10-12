@@ -1,0 +1,107 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "gold_canonical.question",
+  "version": "1.1.0",
+  "description": "Canonical Gold — Q&A template reference data. One document per template version, sourced from silver.fieldcraft_provider_question_template (global, provider-owned — NOT the empty bare silver.question_template; see load_question.py header). tenantId is the constant 'fieldcraft_provider' since this is not per-tenant data. tenantIds lists tenants with an explicit active row in silver.fieldcraft_provider_tenant_trade_map for the template's trade — a subscription list, not a usage list (a tenant can answer a template whose trade has no tenant_trade_map row at all).",
+  "x-database": "gold_canonical",
+  "x-collection": "question",
+  "x-grain": "question_template_version",
+  "x-etl-trigger": "batch only (15-min cron) — no streaming job; template catalog changes rarely",
+  "x-upsert-guard": "_silverLsn",
+  "type": "object",
+  "required": [
+    "tenantId",
+    "templateId",
+    "_grain",
+    "_schemaVersion",
+    "_silverLsn",
+    "goldUpdatedAt",
+    "_env"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "pipelineRunId": { "type": ["string", "null"] },
+    "goldCreatedAt": { "type": ["string", "null"], "format": "date-time" },
+    "goldUpdatedAt": { "type": ["string", "null"], "format": "date-time" },
+    "sourceUpdatedAt": { "type": ["string", "null"], "format": "date-time" },
+    "dataOrigin": { "type": ["string", "null"] },
+    "sourceEnv": {
+      "type": ["string", "null"],
+      "description": "Silver _s_env of the source template row. Part of the upsert key.",
+      "x-rbac-roles": ["all"]
+    },
+    "_env": {
+      "type": ["string", "null"],
+      "description": "Deployment tier that wrote this doc (PIPELINE_ENV) — different axis from sourceEnv.",
+      "x-rbac-roles": ["all"]
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Constant 'fieldcraft_provider' — this is global reference data, not per-tenant. See tenantIds for the subscribed-tenant list.",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.fieldcraft_provider_question_template"
+    },
+    "templateId": {
+      "type": "integer",
+      "description": "silver.fieldcraft_provider_question_template.id. Grain key.",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.fieldcraft_provider_question_template"
+    },
+    "name": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.fieldcraft_provider_question_template" },
+    "tradeOid": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.fieldcraft_provider_question_template" },
+    "tradeId": {
+      "type": ["integer", "null"],
+      "description": "silver.fieldcraft_provider_trade.id, resolved by joining trade_oid.",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.fieldcraft_provider_trade"
+    },
+    "tradeName": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.fieldcraft_provider_trade" },
+    "version": { "type": ["integer", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.fieldcraft_provider_question_template" },
+    "status": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.fieldcraft_provider_question_template" },
+    "type": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.fieldcraft_provider_question_template" },
+    "invalid": { "type": "boolean", "x-rbac-roles": ["all"], "x-source-table": "silver.fieldcraft_provider_question_template" },
+    "items": {
+      "type": "array",
+      "description": "Parsed ODM/SDM question_template_data — one entry per ItemDef.",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.fieldcraft_provider_question_template",
+      "items": {
+        "type": "object",
+        "properties": {
+          "itemOid": { "type": ["string", "null"] },
+          "question": { "type": ["string", "null"] },
+          "type": { "type": ["string", "null"] },
+          "required": { "type": "boolean" }
+        }
+      }
+    },
+    "itemCount": { "type": "integer", "minimum": 0, "x-rbac-roles": ["all"] },
+    "tenantIds": {
+      "type": "array",
+      "description": "Tenants with an explicit active silver.fieldcraft_provider_tenant_trade_map row for this template's trade. Subscription list, not a usage list — see collection description.",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.fieldcraft_provider_tenant_trade_map",
+      "items": { "type": "string" }
+    },
+    "createdBy": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.fieldcraft_provider_question_template" },
+    "createdDate": { "type": ["string", "null"], "format": "date-time", "x-rbac-roles": ["all"], "x-source-table": "silver.fieldcraft_provider_question_template" },
+    "updatedDate": { "type": ["string", "null"], "format": "date-time", "x-rbac-roles": ["all"], "x-source-table": "silver.fieldcraft_provider_question_template" },
+    "_grain": { "type": "string", "const": "canonical_question", "x-rbac-roles": ["all"] },
+    "_schemaVersion": { "type": "integer", "const": 1, "x-rbac-roles": ["all"] },
+    "_silverLsn": { "type": "integer", "minimum": 0, "x-rbac-roles": ["all"], "x-source-table": "silver.fieldcraft_provider_question_template" },
+    "dataAsOf": { "type": "string", "format": "date-time", "x-rbac-roles": ["all"] },
+    "isDeleted": { "type": "boolean", "x-rbac-roles": ["all"], "x-source-table": "silver.fieldcraft_provider_question_template" },
+    "deletedAt": { "type": ["string", "null"], "format": "date-time", "x-rbac-roles": ["all"], "x-source-table": "silver.fieldcraft_provider_question_template" },
+    "_silverWatermarks": {
+      "type": "object",
+      "additionalProperties": false,
+      "x-rbac-roles": ["all"],
+      "properties": {
+        "question_template": { "type": ["string", "null"], "format": "date-time", "x-source-table": "silver.fieldcraft_provider_question_template" }
+      }
+    },
+    "lafieldcraft": { "type": "integer", "minimum": 0, "x-rbac-roles": ["all"] }
+  },
+  "x-upsert-key": ["tenantId", "sourceEnv", "templateId"]
+}

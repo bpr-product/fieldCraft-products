@@ -1,0 +1,15 @@
+export const PROJECT_HUB = "projecthub";
+export const EAGLE_VIEW = "eagleview";
+export const ACTIVE = "ACTIVE";
+export const CANCELLED_STATE = "CANCELLED";
+export const ADMIN = "admin";
+export const SUPER_ADMIN = "superAdmin";
+export const CUSTOMER = "customer";
+export const BLOCKED = "BLOCKED";
+export const CANCEL = "CANCEL";
+export const SUSPEND = "SUSPEND";
+export const DELETE = "DELETE";
+export const SET_DEFAULT = "SET_DEFAULT";
+export const SUBSCRIPTIO_NOTIFICATION_MESSAGE_ID = "subscription";
+export const SUBSCRIPTION_CANCEL = "SUBSCRIPTION_CANCEL";
+export const QUICK_BOOKS = "quickbooks";

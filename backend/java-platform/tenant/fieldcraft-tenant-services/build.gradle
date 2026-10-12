@@ -1,0 +1,99 @@
+plugins {
+    id 'java'
+}
+
+description = 'FieldCraft Tenant Services'
+
+group = project.rootProject.group
+version = project.rootProject.version
+
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
+
+test {
+    useJUnitPlatform()
+}
+
+dependencies {
+    //spring
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.json:json:20231013'
+    // Use the raw MongoDB driver — Spring Data Mongo starter auto-configures beans that conflict with our per-tenant MongoClient setup.
+    implementation 'org.mongodb:mongodb-driver-sync'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+    implementation 'org.springframework.retry:spring-retry:1.3.1'
+    implementation 'org.modelmapper:modelmapper:3.1.1'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+
+    //log4j
+    //implementation 'org.apache.logging.log4j:log4j-api'
+
+    // Image and PDF thumbnail generation
+    implementation 'net.coobird:thumbnailator:0.4.20'
+    implementation 'com.openhtmltopdf:openhtmltopdf-pdfbox:1.0.10'
+    implementation 'org.jsoup:jsoup:1.17.2'
+
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.16.1'
+
+    implementation group: 'com.opencsv', name: 'opencsv', version: '5.8'
+
+    // https://mvnrepository.com/artifact/com.azure/azure-ai-formrecognizer
+    implementation('com.azure:azure-ai-formrecognizer:4.1.2')
+    //migrating form recognizer to Document intelligence
+    implementation('com.azure:azure-ai-documentintelligence:1.0.1')
+
+    // Firebase Admin SDK — FCM push notifications to FIELDCRAFT Navigator (mobile).
+    // Same version as fieldcraft-tenant-api (plain 'java' plugin has no 'api' scope,
+    // so each module compiling against the SDK declares it).
+    implementation 'com.google.firebase:firebase-admin:9.3.0'
+
+
+    // Use JUnit Jupiter for testing.
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.mockito:mockito-core:5.2.0'
+    implementation platform('org.mockito:mockito-bom:5.4.0')
+    testImplementation 'org.hamcrest:hamcrest:2.2'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    // Use the raw MongoDB driver — Spring Data Mongo starter auto-configures beans that conflict with our per-tenant MongoClient setup.
+    testImplementation 'org.mongodb:mongodb-driver-sync'
+    testImplementation 'com.h2database:h2:2.2.224'
+
+    //Local projects
+    implementation project(':tenant:fieldcraft-tenant-dal')
+    implementation project(':tenant:fieldcraft-tenantexternal-services')
+    implementation project(':tenant:fieldcraft-tenantresource-services')
+    implementation project(':tenant:fieldcraft-tenantcustomer-services')
+    implementation project(':tenant:fieldcraft-tenantprovider-services')
+    implementation project(':tenant:fieldcraft-tenantprojecthub-services')
+    implementation project(':tenant:fieldcraft-tenantsubscription-services')
+
+    implementation project(path: ':shared:fieldcraft-common:fieldcraft-shared')
+    implementation project(path: ':shared:fieldcraft-common:fieldcraft-utils')
+    implementation project(path: ':shared:fieldcraft-common:fieldcraft-utils-import')
+    implementation project(path: ':shared:fieldcraft-common-services')
+    implementation project(path: ':shared:fieldcraft-common-dal')
+
+    implementation project(path: ':shared:fieldcraft-shared-data:fieldcraft-core-data')
+    implementation project(path: ':shared:fieldcraft-shared-data:fieldcraft-tenant-data')
+    implementation project(path: ':shared:fieldcraft-shared-data:fieldcraft-customer-data')
+    implementation project(path: ':shared:fieldcraft-shared-data:fieldcraft-provider-data')
+
+    implementation project(path: ':shared:fieldcraft-ase:fieldcraft-ase-services')
+
+    implementation project(path: ':shared:fieldcraft-saas:fieldcraft-external-service')
+    implementation project(path: ':shared:fieldcraft-saas:fieldcraft-projecthub-service')
+    implementation project(path: ':shared:fieldcraft-saas:fieldcraft-subscription-service')
+    implementation project(path: ':shared:fieldcraft-saas:fieldcraft-infra-core')
+    implementation project(path: ':shared:fieldcraft-saas:fieldcraft-saas-service')
+    implementation project(path: ':shared:fieldcraft-saas:fieldcraft-resource-service')
+    implementation project(path: ':shared:fieldcraft-saas:fieldcraft-azureutils')
+}

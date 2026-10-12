@@ -1,0 +1,262 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "gold_eden.agent_memory",
+  "version": "2.0.0",
+  "description": "Eden agent memory store — persistent agent state across turns/sessions. One document per (tenantId, memoryId). Written at AGENT RUNTIME (not by the Silver→Gold ETL); it is agent-operational state, not a Silver projection. Holds episodic / semantic / working / session / user / project memories so Eden agents have continuity, recall, and the ability to learn across interactions. The memory embedding lives in the dedicated vector DB; only the embeddingModel/embeddingVersion/vectorSyncedAt linkage is kept here for semantic recall joins.",
+  "x-database": "gold_eden",
+  "x-collection": "agent_memory",
+  "x-grain": "eden_agent_memory",
+  "x-written-by": "agent-runtime",
+  "x-upsert-key": [
+    "tenantId",
+    "memoryId"
+  ],
+  "type": "object",
+  "required": [
+    "tenantId",
+    "memoryId",
+    "agentId",
+    "memoryType",
+    "scope",
+    "_grain",
+    "_schemaVersion",
+    "goldUpdatedAt",
+    "_env"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "pipelineRunId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "goldCreatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "goldUpdatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "sourceUpdatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "dataOrigin": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Tenant identifier. First half of the compound key; enforces tenant isolation on every memory read.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "memoryId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique memory identifier (uuid4). Second half of the compound key.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_grain": {
+      "type": "string",
+      "const": "eden_agent_memory",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_schemaVersion": {
+      "type": "integer",
+      "const": 1,
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "agentId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Which Eden agent owns/created this memory.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "sessionId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Conversation/session this memory belongs to. Null for long-lived (semantic/user/project) memory.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "userId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "End user the memory is about/for, when scope=user.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "projectId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Project the memory is scoped to, when scope=project.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "memoryType": {
+      "type": "string",
+      "enum": [
+        "episodic",
+        "semantic",
+        "working",
+        "session",
+        "user",
+        "project"
+      ],
+      "description": "Kind of memory. episodic=what happened; semantic=distilled knowledge; working=short-term scratch; session/user/project=scoped context.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "scope": {
+      "type": "string",
+      "enum": [
+        "session",
+        "user",
+        "project",
+        "tenant"
+      ],
+      "description": "Retention/visibility scope of the memory.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "content": {
+      "type": [
+        "object",
+        "string"
+      ],
+      "description": "The memory payload — free-form text or a structured object the agent recorded.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "summary": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Short human/agent-readable summary used for fast scanning and as the embed basis.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "importance": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Salience score (0-1) used for retention/eviction and recall ranking.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "embeddingModel": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Model the vector-DB side embeds this memory with. Vector lives in the vector DB, not here.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "embeddingVersion": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "vectorSyncedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "When this memory's vector was last published to the vector DB; null until stamped.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "expiresAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "TTL for short-lived (working/session) memory. Null = no expiry. A Mongo TTL index reaps expired rows.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "createdAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "isDeleted": {
+      "type": "boolean",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "sourceEnv": {
+      "type": ["string", "null"],
+      "description": "Silver _s_env — logical source environment (si_dev, datamart, ...).",
+      "x-rbac-roles": ["all"]
+    },
+    "_env": {
+      "type": "string",
+      "enum": [
+        "dev",
+        "qa",
+        "stg",
+        "sbx",
+        "prd"
+      ]
+    }
+  }
+}

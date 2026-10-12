@@ -1,0 +1,51 @@
+# Build-context exclusions for the eden-service image.
+#
+# Dockerfile line 22 is `COPY --chown=eden:eden . .` -- it copies the WHOLE
+# service directory into /app. Without this file that included every local
+# .env.*, so real credentials (the dev Cosmos connection string, two Azure
+# DevOps PATs) were baked into the image layer -- the same image tag prod
+# builds, readable by anyone who can pull or `docker exec` it. Being
+# gitignored does not help: .gitignore governs git, .dockerignore governs the
+# build context, and these are separate mechanisms.
+#
+# Runtime env comes from compose `env_file:` / `--env-file`, never from a file
+# inside the image, so nothing here is needed at run time. The load_dotenv()
+# calls throughout source/ look for a bare `.env` in the working directory,
+# which has never existed in this folder -- excluding these changes no
+# behavior.
+#
+# Do NOT add: contracts/ (route_registry.json is loaded from /app/contracts
+# at runtime -- see navigation_agent.py), source/, main.py, requirements.txt.
+
+# ── Secrets: every env file, including .env.workitems and .env.template ──
+.env
+.env.*
+
+# ── Git / VCS ──
+.git
+.gitignore
+
+# ── Python build + cache artifacts ──
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+.coverage
+htmlcov/
+
+# ── Local virtualenvs ──
+.venv/
+venv/
+env/
+
+# ── Docs and agent instructions: not read at runtime ──
+docs/
+.claude/
+CLAUDE.md
+
+# ── Local runtime output ──
+logs/
+*.log

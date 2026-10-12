@@ -1,0 +1,101 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "gold_canonical.customer",
+  "version": "1.2.0",
+  "description": "Canonical Gold — customer identity. One document per (tenantId, customerUid), deduped from silver.customer_asset (which denormalizes customer_name/email/mobile_no/account_no inline per project row) and LEFT JOINed to silver.fieldcraft_customer_customer (the proper normalized customer master table, keyed by customer_uuid) for richer fields. Data gap verified live 2026-07-11: fieldcraft_customer_customer has 0 rows in this environment — hasCustomerMasterRecord is false for every document until that table is populated; firstName/lastName/gender/birthDate/status will all be null until then, with only the customer_asset-derived name/email/mobileNo/accountNo available. One customer can span many projects/assets (verified live: up to 46 assets, 834 projects for one customer_uid) — projectIds/assetUids are arrays.",
+  "x-database": "gold_canonical",
+  "x-collection": "customer",
+  "x-grain": "customer",
+  "x-etl-trigger": "batch only (15-min cron) — no streaming job",
+  "x-upsert-guard": "_silverLsn",
+  "type": "object",
+  "required": [
+    "tenantId",
+    "customerUid",
+    "_grain",
+    "_schemaVersion",
+    "_silverLsn",
+    "goldUpdatedAt",
+    "_env"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "pipelineRunId": { "type": ["string", "null"] },
+    "goldCreatedAt": { "type": ["string", "null"], "format": "date-time" },
+    "goldUpdatedAt": { "type": ["string", "null"], "format": "date-time" },
+    "sourceUpdatedAt": { "type": ["string", "null"], "format": "date-time" },
+    "dataOrigin": { "type": ["string", "null"] },
+    "sourceEnv": {
+      "type": ["string", "null"],
+      "description": "Silver _s_env. Part of the upsert key.",
+      "x-rbac-roles": ["all"]
+    },
+    "_env": {
+      "type": ["string", "null"],
+      "description": "Deployment tier that wrote this doc (PIPELINE_ENV) — different axis from sourceEnv.",
+      "x-rbac-roles": ["all"]
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1,
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.customer_asset"
+    },
+    "customerUid": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Grain key. silver.customer_asset.customer_uid, matched to silver.fieldcraft_customer_customer.customer_uuid when present.",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.customer_asset"
+    },
+    "name": {
+      "type": ["string", "null"],
+      "description": "Derived: firstName+middleName+lastName when the customer master record is present, else the denormalized customer_name from customer_asset.",
+      "x-rbac-roles": ["all"]
+    },
+    "firstName": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.fieldcraft_customer_customer" },
+    "middleName": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.fieldcraft_customer_customer" },
+    "lastName": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.fieldcraft_customer_customer" },
+    "gender": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.fieldcraft_customer_customer" },
+    "birthDate": { "type": ["string", "null"], "format": "date-time", "x-rbac-roles": ["tenant_admin"], "x-source-table": "silver.fieldcraft_customer_customer" },
+    "email": { "type": ["string", "null"], "x-rbac-roles": ["tenant_admin"], "x-source-table": "silver.customer_asset" },
+    "mobileNo": { "type": ["string", "null"], "x-rbac-roles": ["tenant_admin"], "x-source-table": "silver.customer_asset" },
+    "alternateMobile": { "type": ["string", "null"], "x-rbac-roles": ["tenant_admin"], "x-source-table": "silver.fieldcraft_customer_customer" },
+    "accountNo": { "type": ["string", "null"], "x-rbac-roles": ["tenant_admin"], "x-source-table": "silver.customer_asset" },
+    "status": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.fieldcraft_customer_customer" },
+    "projectIds": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Every distinct project_id this customer_uid appears against in silver.customer_asset.",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.customer_asset"
+    },
+    "assetUids": {
+      "type": "array",
+      "items": { "type": "string" },
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.customer_asset"
+    },
+    "hasCustomerMasterRecord": {
+      "type": "boolean",
+      "description": "True only when a matching silver.fieldcraft_customer_customer row was found. Always false today (that table is empty) — see description.",
+      "x-rbac-roles": ["all"]
+    },
+    "_grain": { "type": "string", "const": "canonical_customer", "x-rbac-roles": ["all"] },
+    "_schemaVersion": { "type": "integer", "const": 1, "x-rbac-roles": ["all"] },
+    "_silverLsn": { "type": "integer", "minimum": 0, "x-rbac-roles": ["all"] },
+    "dataAsOf": { "type": "string", "format": "date-time", "x-rbac-roles": ["all"] },
+    "isDeleted": { "type": "boolean", "x-rbac-roles": ["all"] },
+    "_silverWatermarks": {
+      "type": "object",
+      "additionalProperties": false,
+      "x-rbac-roles": ["all"],
+      "properties": {
+        "customer_asset": { "type": ["string", "null"], "format": "date-time", "x-source-table": "silver.customer_asset" },
+        "fieldcraft_customer_customer": { "type": ["string", "null"], "format": "date-time", "x-source-table": "silver.fieldcraft_customer_customer" }
+      }
+    },
+    "lafieldcraft": { "type": "integer", "minimum": 0, "x-rbac-roles": ["all"] }
+  },
+  "x-upsert-key": ["tenantId", "customerUid", "sourceEnv"]
+}

@@ -1,0 +1,284 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "gold_eden.weather_schedule_cross",
+  "version": "2.0.0",
+  "description": "Eden Schedule agent \u2014 crosses the site_weather forecast against the task schedule to pre-identify weather-blocked tasks. One document per (tenantId, projectId, taskId, scheduledDate). Schema mirrors gold/src/eden/load_weather_schedule_cross.py shape_doc() exactly.",
+  "x-database": "gold_eden",
+  "x-collection": "weather_schedule_cross",
+  "x-grain": "eden_weather_schedule_cross",
+  "x-etl-trigger": "nightly batch rebuild after each site_weather refresh; incremental on silver.task / silver.site_weather change",
+  "x-upsert-guard": "_silverLsn",
+  "type": "object",
+  "required": [
+    "tenantId",
+    "projectId",
+    "taskId",
+    "scheduledDate",
+    "_grain",
+    "_schemaVersion",
+    "_silverLsn",
+    "goldUpdatedAt",
+    "_env"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "pipelineRunId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "goldCreatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "goldUpdatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "sourceUpdatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "dataOrigin": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Tenant identifier. First part of the compound upsert key.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.task"
+    },
+    "projectId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Project identifier cast to string. Part of the compound upsert key.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.task"
+    },
+    "taskId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Task id cast to string. Part of the compound upsert key.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.task"
+    },
+    "taskUid": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Task UUID (silver.task.task_uid).",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.task"
+    },
+    "taskName": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Denormalized task name.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.task"
+    },
+    "scheduledDate": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Scheduled work date (task.start_time::date, ISO yyyy-mm-dd). Part of the compound upsert key and the weather-match key. Native BSON date (day-precision, midnight UTC) as of the 2026-07-20 sweep -- see upsert-key migration note.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.task"
+    },
+    "_grain": {
+      "type": "string",
+      "const": "eden_weather_schedule_cross",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_schemaVersion": {
+      "type": "integer",
+      "const": 1,
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_silverLsn": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Max PostgreSQL LSN across the contributing task/weather rows at write time. Upsert guard against stale overwrites.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.task"
+    },
+    "dataAsOf": {
+      "type": "string",
+      "format": "date-time",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "weatherCondition": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Human-readable weather condition parsed from silver.site_weather.weather_data JSON. Exact key path depends on the Azure Maps payload \u2014 parsed best-effort.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.site_weather"
+    },
+    "precipitationMm": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Forecast precipitation (mm) parsed from weather_data JSON.",
+      "x-unit": "mm",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.site_weather"
+    },
+    "windSpeedKmh": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Forecast wind speed (km/h) parsed from weather_data JSON.",
+      "x-unit": "km/h",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.site_weather"
+    },
+    "blocked": {
+      "type": "boolean",
+      "description": "True when precipitation or wind exceeds the configured threshold (WEATHER_PRECIP_THRESHOLD_MM / WEATHER_WIND_THRESHOLD_KMH).",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "blockReason": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Human-readable block reason (e.g. 'Heavy rain forecast', 'High winds'); null when not blocked.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "isDeleted": {
+      "type": "boolean",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.task"
+    },
+    "deletedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.task"
+    },
+    "_silverWatermarks": {
+      "type": "object",
+      "additionalProperties": false,
+      "x-rbac-roles": [
+        "all"
+      ],
+      "properties": {
+        "project": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "x-source-table": "silver.project"
+        },
+        "task": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "x-source-table": "silver.task"
+        },
+        "site_weather": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "x-source-table": "silver.site_weather"
+        }
+      }
+    },
+    "lafieldcraft": {
+      "type": "integer",
+      "minimum": 0,
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "sourceEnv": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Silver _s_env \u2014 logical source environment (si_dev, datamart, ...).",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_env": {
+      "type": "string",
+      "enum": [
+        "dev",
+        "qa",
+        "stg",
+        "sbx",
+        "prd"
+      ]
+    }
+  },
+  "x-upsert-key": [
+    "tenantId",
+    "projectId",
+    "taskId",
+    "scheduledDate",
+    "sourceEnv"
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "gold_canonical.tenant",
+  "version": "1.2.0",
+  "description": "Canonical Gold — tenant business record. One document per tenantId, sourced from silver.tenant (provider-authoritative — see CLAUDE.md 'Tenant registry — single source of truth'). Cross-feature: any feature needing tenant business detail (name, contacts, address) reads this instead of re-deriving it.",
+  "x-database": "gold_canonical",
+  "x-collection": "tenant",
+  "x-grain": "tenant",
+  "x-etl-trigger": "batch only (15-min cron) — no streaming job; tenant records change rarely",
+  "x-upsert-guard": "_silverLsn",
+  "type": "object",
+  "required": [
+    "tenantId",
+    "_grain",
+    "_schemaVersion",
+    "_silverLsn",
+    "goldUpdatedAt",
+    "_env"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "pipelineRunId": { "type": ["string", "null"] },
+    "goldCreatedAt": { "type": ["string", "null"], "format": "date-time" },
+    "goldUpdatedAt": { "type": ["string", "null"], "format": "date-time" },
+    "sourceUpdatedAt": { "type": ["string", "null"], "format": "date-time" },
+    "dataOrigin": { "type": ["string", "null"] },
+    "sourceEnv": {
+      "type": ["string", "null"],
+      "description": "Silver _s_env — logical source environment (si_dev, datamart, ...). Part of the upsert key.",
+      "x-rbac-roles": ["all"]
+    },
+    "_env": {
+      "type": ["string", "null"],
+      "description": "Deployment tier that wrote this doc (PIPELINE_ENV) — different axis from sourceEnv.",
+      "x-rbac-roles": ["all"]
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Tenant identifier. Grain key.",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.tenant"
+    },
+    "tenantUuid": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.tenant" },
+    "name": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.tenant" },
+    "status": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.tenant" },
+    "email": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.tenant" },
+    "alternateEmail": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.tenant" },
+    "mobileNo": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.tenant" },
+    "alternateMobileNo": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.tenant" },
+    "primaryContact": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.tenant" },
+    "secondaryContact": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.tenant" },
+    "address": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.tenant" },
+    "city": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.tenant" },
+    "state": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.tenant" },
+    "country": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.tenant" },
+    "zipcode": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.tenant" },
+    "location": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.tenant" },
+    "website": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.tenant" },
+    "description": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.tenant" },
+    "createdAt": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.tenant" },
+    "createdBy": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.tenant" },
+    "silverUpdatedAt": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.tenant" },
+    "_grain": { "type": "string", "const": "canonical_tenant", "x-rbac-roles": ["all"] },
+    "_schemaVersion": { "type": "integer", "const": 1, "x-rbac-roles": ["all"] },
+    "_silverLsn": { "type": "integer", "minimum": 0, "x-rbac-roles": ["all"], "x-source-table": "silver.tenant" },
+    "dataAsOf": { "type": "string", "format": "date-time", "x-rbac-roles": ["all"] },
+    "isDeleted": { "type": "boolean", "x-rbac-roles": ["all"], "x-source-table": "silver.tenant" },
+    "deletedAt": { "type": ["string", "null"], "format": "date-time", "x-rbac-roles": ["all"], "x-source-table": "silver.tenant" },
+    "_silverWatermarks": {
+      "type": "object",
+      "additionalProperties": false,
+      "x-rbac-roles": ["all"],
+      "properties": {
+        "tenant": { "type": ["string", "null"], "format": "date-time", "x-source-table": "silver.tenant" }
+      }
+    },
+    "lafieldcraft": { "type": "integer", "minimum": 0, "x-rbac-roles": ["all"] }
+  },
+  "x-upsert-key": ["tenantId", "sourceEnv"]
+}

@@ -1,0 +1,57 @@
+# Control plane
+fastapi==0.110.3
+uvicorn[standard]==0.29.0
+pydantic==2.9.2
+python-dotenv==1.0.1
+python-jose[cryptography]==3.3.0
+pycryptodome==3.20.0
+httpx==0.28.1
+
+# Bronze/Silver/CDC — Kafka, Postgres, Iceberg
+# NOTE: apache-flink is intentionally NOT installed here. The control plane
+# (this container) never imports pyflink — only the ported job scripts
+# (bronze/src/jobs/universal_bronze_ingest.py, silver/src/jobs/universal_silver_merge.py)
+# do, and those run via `flink run` inside a separate Flink cluster's own
+# Python environment, not this FastAPI process. apache-flink pulls in
+# apache-beam, which caps pyarrow<12.0.0 — directly conflicting with
+# pyiceberg's pyarrow==14.0.2 pin below. Re-add only alongside a resolved
+# pyarrow/pyiceberg/apache-beam version set if this container ever needs to
+# submit those jobs itself.
+confluent-kafka==2.3.0
+psycopg2-binary==2.9.9
+pyarrow==14.0.2
+pyiceberg==0.6.1
+
+# External connectors — REST/file/DB ingestion
+requests==2.31.0
+sqlalchemy==2.0.29
+openpyxl==3.1.2
+adlfs==2024.2.0
+fsspec==2023.12.2
+PyYAML==6.0.1
+
+# DLQ watcher
+redis==5.0.4
+
+# Gold — Eden loaders (load_invoice_summary, load_project_health)
+pymongo==4.7.2
+
+# Shared — secrets, alerting
+azure-keyvault-secrets==4.8.0
+azure-identity==1.16.0
+
+# Event Hubs provisioning (provision_event_hubs.py) — ARM management-plane
+# path; without this, EVENT_HUBS_RESOURCE_GROUP/AZURE_SUBSCRIPTION_ID being
+# set has no effect since EventHubManagementClient can't import, silently
+# falling through to the far less reliable Kafka-AdminClient CreateTopics
+# path (Event Hubs' Kafka surface has no real controller broker, so that
+# path times out unpredictably regardless of credentials).
+azure-mgmt-eventhub==10.1.0
+
+# Gold — config/schema validation, dashboard export
+jsonschema==4.21.1
+structlog==24.1.0
+pandas==2.2.2
+# Optional — Claude-backed NL interpreter for gold/tools/nl_interpreter.py.
+# Requires ANTHROPIC_API_KEY; the dashboard falls back to a keyword router without it.
+anthropic==0.49.0

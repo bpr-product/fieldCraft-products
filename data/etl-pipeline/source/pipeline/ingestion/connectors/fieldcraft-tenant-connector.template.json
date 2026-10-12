@@ -1,0 +1,51 @@
+{
+  "name": "fieldcraft-tenant-${TENANT_ID}",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "plugin.name": "pgoutput",
+    "tasks.max": "1",
+
+    "database.hostname": "${SILVER_PG_HOST}",
+    "database.port": "5432",
+    "database.user": "${SILVER_PG_USER}",
+    "database.password": "${SILVER_PG_PASSWORD}",
+    "database.dbname": "${SILVER_PG_DBNAME}",
+    "database.server.name": "${SOURCE_DB_SERVER_NAME}",
+
+    "slot.name": "fieldcraft_slot_${TENANT_ID}",
+    "publication.name": "fieldcraft_pub_${TENANT_ID}",
+
+    "snapshot.mode": "initial",
+    "snapshot.locking.mode": "minimal",
+
+    "table.include.list": "public.project,public.task,public.task_assignment,public.invoice,public.purchase_order,public.timelog,public.bom,public.answers,public.project_estimate,public.resource_estimate,public.project_tool,public.project_schedule,public.payment_receives,public.vendor,public.resource,public.communication_log",
+
+    "column.exclude.list": "public.communication_log.body_snapshot,public.communication_log.body_tokens,public.communication_log.to_address,public.communication_log.from_address",
+
+    "decimal.handling.mode": "string",
+    "time.precision.mode": "connect",
+    "tombstones.on.delete": "false",
+    "heartbeat.interval.ms": "30000",
+
+    "topic.prefix": "${ETL_ENV}.${TENANT_ID}",
+
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter.schemas.enable": "false",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable": "false",
+
+    "transforms": "unwrap,addTenantId",
+    "transforms.unwrap.type": "io.debezium.transforms.ExtractNewRecordState",
+    "transforms.unwrap.drop.tombstones": "false",
+    "transforms.unwrap.delete.handling.mode": "rewrite",
+    "transforms.addTenantId.type": "org.apache.kafka.connect.transforms.InsertField$Value",
+    "transforms.addTenantId.static.field": "tenantid",
+    "transforms.addTenantId.static.value": "${TENANT_ID}",
+
+    "errors.tolerance": "all",
+    "errors.log.enable": "true",
+    "errors.log.include.messages": "true",
+    "errors.deadletterqueue.topic.name": "${ETL_ENV}.${TENANT_ID}.dlq",
+    "errors.deadletterqueue.topic.replication.factor": "1"
+  }
+}

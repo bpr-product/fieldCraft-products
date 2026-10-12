@@ -1,0 +1,206 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "gold.qa_recommendation.qa_answer",
+  "version": "4.0.0",
+  "description": "One document per Q&A answer (grain qa_answer). Raw passthrough of silver.answers (snake_case business fields, answers_data as a JSON object) plus embedded BOM lines from silver.bom, platform plumbing, and the standard lineage block. Upsert key (tenantId, answer_id). Written by the realtime qa_recommendation stream and the batch loader.",
+  "type": "object",
+  "required": [
+    "tenantId",
+    "answer_id",
+    "_grain",
+    "_schemaVersion",
+    "_env"
+  ],
+  "properties": {
+    "answer_id": {
+      "type": "integer"
+    },
+    "project_id": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "answers_data": {
+      "type": [
+        "object",
+        "array",
+        "null"
+      ],
+      "description": "parsed EventData JSON object; null if empty/unparseable"
+    },
+    "created_by": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "created_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "native BSON date (2026-07-20 sweep; previously raw PG text)"
+    },
+    "updated_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "native BSON date (2026-07-20 sweep; previously raw PG text)"
+    },
+    "invalid": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "raw text 'true'/'false'"
+    },
+    "question_template_version": {
+      "type": [
+        "integer",
+        "string",
+        "null"
+      ]
+    },
+    "schema_version": {
+      "type": [
+        "integer",
+        "string",
+        "null"
+      ],
+      "description": "business field from silver.answers (distinct from _schemaVersion)"
+    },
+    "status": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "trade_oid": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "version": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "bom": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Embedded BOM lines from silver.bom for this answer's project; null when no BOM rows exist",
+      "properties": {
+        "line_count": { "type": "integer" },
+        "total_cost": { "type": ["number", "null"] },
+        "lines": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "bom_id":               { "type": ["integer", "null"] },
+              "task_id":              { "type": ["integer", "null"] },
+              "material_name":        { "type": ["string", "null"] },
+              "material_uid":         { "type": ["string", "null"] },
+              "cost_code":            { "type": ["string", "null"] },
+              "quantity":             { "type": ["number", "null"] },
+              "unit":                 { "type": ["string", "null"] },
+              "unit_cost":            { "type": ["number", "null"] },
+              "total_cost":           { "type": ["number", "null"] },
+              "over_head":            { "type": ["number", "null"] },
+              "profit_margin":        { "type": ["number", "null"] },
+              "tax":                  { "type": ["array", "null"] },
+              "active":               { "type": ["boolean", "null"] },
+              "vendor_material_map_id": { "type": ["integer", "null"] },
+              "source_type_id":       { "type": ["integer", "null"] },
+              "bom_version":          { "type": ["integer", "null"] },
+              "bom_created_at":       { "type": ["string", "null"], "format": "date-time" },
+              "bom_updated_at":       { "type": ["string", "null"], "format": "date-time" }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "isDeleted": {
+      "type": "boolean"
+    },
+    "deletedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "_grain": {
+      "const": "qa_answer"
+    },
+    "_schemaVersion": {
+      "type": "integer",
+      "description": "3 — added bom field"
+    },
+    "_silverLsn": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "pipelineRunId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "goldUpdatedAt": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sourceUpdatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Silver _s_silver_ts"
+    },
+    "dataOrigin": {
+      "type": "string"
+    },
+    "createdAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "stamped on first insert by MongoUpsertSink"
+    },
+    "_pipelineRunId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "stream run id stamped by MongoUpsertSink"
+    },
+    "_env": {
+      "type": "string",
+      "enum": [
+        "dev",
+        "qa",
+        "stg",
+        "sbx",
+        "prd"
+      ]
+    }
+  },
+  "additionalProperties": true
+}

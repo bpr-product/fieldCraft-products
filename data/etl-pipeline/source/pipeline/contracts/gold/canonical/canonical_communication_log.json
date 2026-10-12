@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "gold_canonical.communication_log",
+  "version": "1.0.0",
+  "description": "Canonical Gold — CRM communication metadata (email/SMS send events). One document per (tenantId, communicationLogId), passthrough from silver.communication_log (source table lives in EACH TENANT'S OWN database, immutable/append-only, monthly-partitioned). Deliberately excludes body_snapshot/body_tokens/to_address/from_address — confirmed NULL on every row today and DPO-gated regardless. See docs/crm/eden_crm_gold_requirements.md G5.",
+  "x-database": "gold_canonical",
+  "x-collection": "communication_log",
+  "x-grain": "communication_log",
+  "x-etl-trigger": "realtime (Flink, gold-canonical-stream) + batch (--rebuild only)",
+  "x-upsert-guard": "_silverLsn",
+  "type": "object",
+  "required": [
+    "tenantId",
+    "communicationLogId",
+    "_grain",
+    "_schemaVersion",
+    "_silverLsn",
+    "goldUpdatedAt",
+    "_env"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "pipelineRunId": { "type": ["string", "null"] },
+    "goldCreatedAt": { "type": ["string", "null"], "format": "date-time" },
+    "goldUpdatedAt": { "type": ["string", "null"], "format": "date-time" },
+    "sourceUpdatedAt": { "type": ["string", "null"], "format": "date-time" },
+    "dataOrigin": { "type": ["string", "null"] },
+    "sourceEnv": {
+      "type": ["string", "null"],
+      "description": "Silver _s_env. Part of the upsert key.",
+      "x-rbac-roles": ["all"]
+    },
+    "_env": {
+      "type": ["string", "null"],
+      "description": "Deployment tier that wrote this doc (PIPELINE_ENV) — different axis from sourceEnv.",
+      "x-rbac-roles": ["all"]
+    },
+    "tenantId": { "type": "string", "minLength": 1, "x-rbac-roles": ["all"], "x-source-table": "silver.communication_log" },
+    "communicationLogId": {
+      "type": "string",
+      "description": "Grain key. silver.communication_log.id is a UUID column (confirmed 2026-09-25) — not the auto-increment int convention most other ported source tables use.",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.communication_log"
+    },
+    "channel": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.communication_log" },
+    "direction": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.communication_log" },
+    "status": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.communication_log" },
+    "subject": { "type": ["string", "null"], "description": "Subject line only — never body content.", "x-rbac-roles": ["all"], "x-source-table": "silver.communication_log" },
+    "occurredAt": { "type": ["string", "null"], "format": "date-time", "description": "Also the source table's monthly partition key.", "x-rbac-roles": ["all"], "x-source-table": "silver.communication_log" },
+    "actorType": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.communication_log" },
+    "actorRef": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.communication_log" },
+    "customerUuid": { "type": ["string", "null"], "description": "Soft reference to gold_canonical.customer — nullable (a communication can precede customer creation, i.e. sent to a lead). Not a real FK by design.", "x-rbac-roles": ["all"], "x-source-table": "silver.communication_log" },
+    "projectId": { "type": ["string", "null"], "description": "The project's ORDER NUMBER (silver.project.order_no), resolved via communication_log.project_id -> silver.project.id (confirmed 2026-09-25) — deliberately not the raw FK value. Nullable: a communication can be logged before a project exists (e.g. a pre-conversion lead's welcome email).", "x-rbac-roles": ["all"], "x-source-table": "silver.communication_log,silver.project" },
+    "providerMessageRef": { "type": ["string", "null"], "description": "Provider-side correlation id (Twilio SID, email provider id) — debug/audit only.", "x-rbac-roles": ["internal"], "x-source-table": "silver.communication_log" },
+    "_grain": { "type": "string", "const": "canonical_communication_log", "x-rbac-roles": ["all"] },
+    "_schemaVersion": { "type": "integer", "const": 1, "x-rbac-roles": ["all"] },
+    "_silverLsn": { "type": "integer", "minimum": 0, "x-rbac-roles": ["all"] },
+    "dataAsOf": { "type": "string", "format": "date-time", "x-rbac-roles": ["all"] },
+    "isDeleted": { "type": "boolean", "description": "Expected always false — source rows are immutable/append-only (a DB trigger blocks UPDATE). Kept for consistency with every other canonical loader.", "x-rbac-roles": ["all"] },
+    "_silverWatermarks": {
+      "type": "object",
+      "additionalProperties": false,
+      "x-rbac-roles": ["all"],
+      "properties": {
+        "communication_log": { "type": ["string", "null"], "format": "date-time", "x-source-table": "silver.communication_log" }
+      }
+    },
+    "lafieldcraft": { "type": "integer", "minimum": 0, "x-rbac-roles": ["all"] }
+  },
+  "x-upsert-key": ["tenantId", "communicationLogId", "sourceEnv"]
+}

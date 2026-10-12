@@ -1,0 +1,296 @@
+/*
+ * Copyright (C) FIELDCRAFT Inc - All Rights Reserved
+ * This file is part of FieldCraft. - Proprietary and confidential
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ *
+ * @author Bala Pradeep
+ *
+ * QuickBooksSettings — the workspace settings panel, styled on the --qbw-*
+ * tokens declared by QuickBooksWorkspace.scss.
+ *
+ * Classes are namespaced qbst-*. The panel is portalled to <body> by MUI's
+ * Dialog, so these rules sit at the top level rather than under .qbw-root.
+ * Compound selectors (.MuiDialog-paper.qbst-paper) out-specify MUI's
+ * single-class defaults without !important — the same approach the sibling
+ * "How it works" sheet takes.
+ *
+ * ── Shell metrics are the sibling sheet's, exactly ──────────────────────────
+ * Radius, shadow, header padding, title and subtitle sizes, close-button box
+ * and body padding are copied from `.qbsg-paper` in QuickBooksSyncGuide.scss.
+ * The two panels open from the same rail footer, so a reader who opens both in
+ * one sitting sees one surface in two states rather than two designs.
+ *
+ * ── The group is an inset grouped list ──────────────────────────────────────
+ * One bordered container per section, rows divided by a hairline that starts
+ * at the row's text inset rather than running the full width. The row itself
+ * carries no hover: only the switch is interactive, and lighting up a row the
+ * pointer cannot act on invites a click that does nothing.
+ *
+ * MUI's Switch is restyled here rather than themed globally, because the
+ * workspace owns its own visual language and a global override would reach
+ * every switch in the tenant app.
+ *
+ * Revision History
+ * -----------------------------------------------------------------------------
+ * Requirement/
+ * Issue/WorkItem |    DATE    |     AUTHOR      |   DESCRIPTION OF CHANGE
+ * -----------------------------------------------------------------------------
+ * AB#31584       | 22-09-2026 | Bala Pradeep    | Initial — settings panel shell,
+ *                |            |                 | sections and setting rows
+ * AB#31584       | 22-09-2026 | Bala Pradeep    | Choice cards, status footer,
+ *                |            |                 | neutral tone for the off state
+ * AB#31584       | 23-09-2026 | Bala Pradeep    | Preferences layout, restyled
+ *                |            |                 | switch, load placeholder
+ * AB#31584       | 23-09-2026 | Bala Pradeep    | Shell metrics matched to the
+ *                |            |                 | sibling sheet; inset separators
+ * -----------------------------------------------------------------------------
+ */
+
+/* ── Panel shell — metrics copied from .qbsg-paper ─────────────────────────── */
+.MuiDialog-paper.qbst-paper {
+  background: var(--qbw-card);
+  border: 0.5px solid var(--qbw-hair-strong);
+  border-radius: 16px;
+  box-shadow: 0 28px 80px -28px rgba(20, 24, 40, 0.44), 0 1px 3px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.qbst-root {
+  font-family: var(--qbw-font);
+  color: var(--qbw-ink);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+
+  *, *::before, *::after { box-sizing: border-box; }
+  svg { display: block; }
+}
+
+/* ── Header ────────────────────────────────────────────────────────────────── */
+.qbst-root .qbst-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  padding: 20px 22px 16px;
+  border-bottom: 0.5px solid var(--qbw-hair);
+}
+.qbst-root .qbst-head-mark {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(150deg, #2ca01c, #108000);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+.qbst-root .qbst-head-mark span {
+  color: #fff;
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: -0.5px;
+}
+.qbst-root .qbst-head-txt { min-width: 0; flex: 1; }
+.qbst-root .qbst-head-title {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.25px;
+  margin: 0;
+}
+.qbst-root .qbst-head-sub {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--qbw-muted);
+  margin: 3px 0 0;
+  max-width: 64ch;
+}
+.qbst-root .qbst-close {
+  flex-shrink: 0;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--qbw-faint);
+  padding: 5px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: background 0.13s ease, color 0.13s ease;
+}
+.qbst-root .qbst-close svg { width: 19px; height: 19px; }
+.qbst-root .qbst-close:hover { background: var(--qbw-card-2); color: var(--qbw-ink); }
+.qbst-root .qbst-close:focus-visible {
+  outline: 2px solid var(--qbw-accent);
+  outline-offset: 1px;
+}
+
+/* ── Body ──────────────────────────────────────────────────────────────────── */
+.qbst-root .qbst-body {
+  padding: 18px 22px 22px;
+  overflow-y: auto;
+  max-height: min(60vh, 560px);
+}
+.qbst-root .qbst-section + .qbst-section { margin-top: 20px; }
+
+/* Matches .qbw-rail-group, the rail's own section label. */
+.qbst-root .qbst-section-label {
+  font-size: 10px;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--qbw-faint);
+  margin: 0 0 7px;
+  padding-left: 2px;
+}
+
+.qbst-root .qbst-section-rows {
+  border: 0.5px solid var(--qbw-hair);
+  border-radius: 10px;
+  background: var(--qbw-card);
+  overflow: hidden;
+}
+
+/* ── Setting row ───────────────────────────────────────────────────────────── */
+.qbst-root .qbst-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 11px 14px;
+  background: var(--qbw-card);
+}
+/* Inset hairline: starts at the text, not at the container edge. */
+.qbst-root .qbst-row + .qbst-row::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 14px;
+  right: 0;
+  border-top: 0.5px solid var(--qbw-hair);
+}
+
+.qbst-root .qbst-row-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.qbst-root .qbst-row-label {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.1px;
+  color: var(--qbw-ink);
+}
+.qbst-root .qbst-row-desc {
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--qbw-muted);
+  max-width: 56ch;
+}
+/* Off is a preference the user is entitled to hold, so the hint is a quieter
+   grey rather than a warning colour. */
+.qbst-root .qbst-row-hint {
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--qbw-faint);
+  max-width: 56ch;
+}
+
+.qbst-root .qbst-row-control {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* ── Switch ────────────────────────────────────────────────────────────────── */
+.qbst-root .MuiSwitch-root {
+  width: 38px;
+  height: 22px;
+  padding: 0;
+  overflow: visible;
+}
+.qbst-root .MuiSwitch-switchBase {
+  padding: 0;
+  margin: 2px;
+  transition: transform 0.18s var(--qbw-ease);
+}
+.qbst-root .MuiSwitch-switchBase.Mui-checked { transform: translateX(16px); }
+.qbst-root .MuiSwitch-switchBase:hover,
+.qbst-root .MuiSwitch-switchBase.Mui-checked:hover { background: transparent; }
+.qbst-root .MuiSwitch-thumb {
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(20, 24, 40, 0.22), 0 0 1px rgba(20, 24, 40, 0.18);
+}
+.qbst-root .MuiSwitch-track {
+  border-radius: 999px;
+  background: var(--qbw-hair-strong);
+  opacity: 1;
+  transition: background 0.18s var(--qbw-ease);
+}
+.qbst-root .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track {
+  background: var(--qbw-accent);
+  opacity: 1;
+}
+.qbst-root .MuiSwitch-switchBase.Mui-disabled + .MuiSwitch-track { opacity: 0.45; }
+.qbst-root .MuiSwitch-switchBase.Mui-disabled .MuiSwitch-thumb { opacity: 0.75; }
+.qbst-root .MuiSwitch-input:focus-visible + .MuiSwitch-thumb {
+  outline: 2px solid var(--qbw-accent);
+  outline-offset: 2px;
+}
+
+/* Stands in for the switch until the saved value arrives, so an unloaded
+   preference never reads as off. */
+.qbst-root .qbst-row-loading {
+  width: 38px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--qbw-card-2);
+  border: 0.5px solid var(--qbw-hair);
+  animation: qbst-pulse 1.6s var(--qbw-ease) infinite;
+}
+@keyframes qbst-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .qbst-root .qbst-row-loading { animation: none; }
+  .qbst-root .MuiSwitch-switchBase { transition: none; }
+}
+
+/* ── Status footer ─────────────────────────────────────────────────────────── */
+.qbst-root .qbst-foot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 22px 11px;
+  border-top: 0.5px solid var(--qbw-hair);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--qbw-muted);
+}
+.qbst-root .qbst-foot svg { width: 14px; height: 14px; }
+.qbst-root .qbst-foot--saved { color: var(--qbw-ok); }
+.qbst-root .qbst-foot--error { color: var(--qbw-bad); }
+
+.qbst-root .qbst-empty {
+  font-size: 12.5px;
+  color: var(--qbw-muted);
+  margin: 0;
+  padding: 10px 2px;
+}
+
+/* ── Narrow viewports: the control drops under the copy rather than squeezing
+      the description to a few words per line. ── */
+@media (max-width: 480px) {
+  .qbst-root .qbst-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .qbst-root .qbst-row-control { justify-content: flex-end; }
+}

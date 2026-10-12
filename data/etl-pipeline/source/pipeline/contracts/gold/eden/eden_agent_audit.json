@@ -1,0 +1,222 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "gold_eden.agent_audit",
+  "version": "2.0.0",
+  "description": "Eden agent activity audit — append-only, immutable record of what an agent read, wrote, decided, or executed. One document per (tenantId, auditId). Written at AGENT RUNTIME, insert-only (never updated). Satisfies SOC 2 / ISO 27001 / GDPR agent-activity monitoring: who (agent + user) did what, on which data, and with what outcome. Required for autonomous agents acting on tenant/personal/financial data.",
+  "x-database": "gold_eden",
+  "x-collection": "agent_audit",
+  "x-grain": "eden_agent_audit",
+  "x-written-by": "agent-runtime",
+  "x-immutable": true,
+  "x-upsert-key": [
+    "tenantId",
+    "auditId"
+  ],
+  "type": "object",
+  "required": [
+    "tenantId",
+    "auditId",
+    "agentId",
+    "action",
+    "ts",
+    "_grain",
+    "_schemaVersion",
+    "goldUpdatedAt",
+    "_env"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "pipelineRunId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "goldCreatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "goldUpdatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "sourceUpdatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "dataOrigin": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Tenant identifier. First half of the compound key.",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "audit_reader"
+      ]
+    },
+    "auditId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique audit-event id (uuid4). Second half of the compound key.",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "audit_reader"
+      ]
+    },
+    "_grain": {
+      "type": "string",
+      "const": "eden_agent_audit",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "audit_reader"
+      ]
+    },
+    "_schemaVersion": {
+      "type": "integer",
+      "const": 1,
+      "x-rbac-roles": [
+        "tenant_admin",
+        "audit_reader"
+      ]
+    },
+    "agentId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Agent that performed the action.",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "audit_reader"
+      ]
+    },
+    "userId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "End user the agent acted on behalf of.",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "audit_reader"
+      ]
+    },
+    "sessionId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Session the action occurred in.",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "audit_reader"
+      ]
+    },
+    "action": {
+      "type": "string",
+      "enum": [
+        "read",
+        "write",
+        "tool_call",
+        "recommend",
+        "plan",
+        "decision",
+        "memory_write",
+        "login",
+        "denied"
+      ],
+      "description": "Class of action being audited.",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "audit_reader"
+      ]
+    },
+    "targetCollection": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Collection/resource the action touched.",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "audit_reader"
+      ]
+    },
+    "targetDocKey": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Key of the document/resource touched.",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "audit_reader"
+      ]
+    },
+    "outcome": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "allowed",
+        "denied",
+        "success",
+        "error",
+        null
+      ],
+      "description": "Result of the action.",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "audit_reader"
+      ]
+    },
+    "detail": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Structured context (e.g. fields read, reason for denial). Mask PII.",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "audit_reader"
+      ]
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the action occurred (event time).",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "audit_reader"
+      ]
+    },
+    "sourceEnv": {
+      "type": ["string", "null"],
+      "description": "Silver _s_env — logical source environment (si_dev, datamart, ...).",
+      "x-rbac-roles": ["all"]
+    },
+    "_env": {
+      "type": "string",
+      "enum": [
+        "dev",
+        "qa",
+        "stg",
+        "sbx",
+        "prd"
+      ]
+    }
+  }
+}

@@ -1,0 +1,345 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "gold_eden.bid_context",
+  "version": "3.0.0",
+  "description": "Eden AI Assistant \u2014 SDM form state per project. One document per (tenantId, projectId). Drives Eden Guide-mode field-by-field walkthrough. Schema mirrors gold/src/eden/load_bid_context.py shape_doc() exactly.",
+  "x-database": "gold_eden",
+  "x-collection": "bid_context",
+  "x-grain": "eden_bid_context",
+  "x-etl-trigger": "event-driven on writes to silver.project, silver.answers, silver.question_template",
+  "x-upsert-guard": "_silverLsn",
+  "type": "object",
+  "required": [
+    "tenantId",
+    "projectId",
+    "_grain",
+    "_schemaVersion",
+    "_silverLsn",
+    "goldUpdatedAt",
+    "_env"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "pipelineRunId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "goldCreatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "goldUpdatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Tenant identifier. First half of the compound upsert key.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "projectId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Project identifier cast to string. Second half of the compound upsert key.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "_grain": {
+      "type": "string",
+      "const": "eden_bid_context",
+      "description": "ETL grain identifier.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_schemaVersion": {
+      "type": "integer",
+      "const": 1,
+      "description": "Integer schema version.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_silverLsn": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "PostgreSQL LSN of the silver.project row at write time. Upsert guard against stale overwrites.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "dataAsOf": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC effective data snapshot time. Prompt-cache key component.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "template_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Question template identifier (equal to questionTemplateVersion in the current loader).",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.answers"
+    },
+    "questionTemplateVersion": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Version of the question template the answers were captured against.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.answers"
+    },
+    "status": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Project status carried through for Guide-mode context.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "totalQuestions": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Total number of questions in the active template.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.question_template"
+    },
+    "answeredCount": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Count of template items that have an answer.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.answers"
+    },
+    "answeredItems": {
+      "type": "array",
+      "description": "Template items that have been answered.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.answers",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "itemOid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "question": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "answer": {
+            "type": [
+              "string",
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "visibleUnanswered": {
+      "type": "array",
+      "description": "Template items still visible and unanswered.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.question_template",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "itemOid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "question": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "type": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "required": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "nextRequiredItem": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "First visible unanswered required item, falling back to the first visible unanswered item. Null when everything is answered.",
+      "additionalProperties": false,
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.question_template",
+      "properties": {
+        "itemOid": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "question": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "type": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "required": {
+          "type": "boolean"
+        }
+      }
+    },
+    "isDeleted": {
+      "type": "boolean",
+      "description": "Soft-delete tombstone \u2014 true when the source silver.project row is soft-deleted. On recompute the Gold doc is marked deleted (never physically removed/orphaned).",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "deletedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "UTC time the source row was soft-deleted (silver _s_deleted_at); null when live.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "_silverWatermarks": {
+      "type": "object",
+      "description": "Per-source-table high-water _s_silver_ts timestamps at the time this document was last written.",
+      "additionalProperties": false,
+      "x-rbac-roles": [
+        "all"
+      ],
+      "properties": {
+        "project": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "x-source-table": "silver.project"
+        },
+        "answers": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "x-source-table": "silver.answers"
+        },
+        "question_template": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "x-source-table": "silver.question_template"
+        }
+      }
+    },
+    "lafieldcraft": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Milliseconds between the loader run and the oldest contributing Silver watermark.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "sourceEnv": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Silver _s_env \u2014 logical source environment (si_dev, datamart, ...).",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_env": {
+      "type": "string",
+      "enum": [
+        "dev",
+        "qa",
+        "stg",
+        "sbx",
+        "prd"
+      ]
+    }
+  },
+  "x-upsert-key": [
+    "tenantId",
+    "projectId",
+    "sourceEnv"
+  ]
+}

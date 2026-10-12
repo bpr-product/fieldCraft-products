@@ -1,0 +1,615 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "gold.bpe_estimate_summary",
+  "version": "3.0.0",
+  "description": "Ball Park Estimate Gold document v2 \u2014 merged schema combining our Silver-to-Gold ETL pipeline with the other team's XGBoost ML output. One document per (tenantId, projectId). Includes cost breakdown, per-service split, cost range with confidence bands, and QA context. Vector embeddings are NOT stored here \u2014 they live in the dedicated vector DB; only the embeddingModel/embeddingVersion/vectorSyncedAt linkage is kept.",
+  "x-collection": "estimate_summary",
+  "x-database": "gold_bpe",
+  "x-grain": "bpe_estimate_summary",
+  "x-schema-version": 2,
+  "type": "object",
+  "required": [
+    "tenantId",
+    "projectId",
+    "_grain",
+    "_schemaVersion",
+    "isDeleted",
+    "goldUpdatedAt",
+    "_env"
+  ],
+  "properties": {
+    "pipelineRunId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "goldCreatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "goldUpdatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "projectId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "_grain": {
+      "type": "string",
+      "const": "bpe_estimate_summary"
+    },
+    "_schemaVersion": {
+      "type": "integer",
+      "const": 2
+    },
+    "dataAsOf": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "isDeleted": {
+      "type": "boolean"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "project": {
+      "type": "object",
+      "properties": {
+        "projectId": {
+          "type": "string"
+        },
+        "projectUid": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "orderNo": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "customerUid": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "assetUid": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "trade": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "tradeOid": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "tradeType": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "projectType": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "residential",
+            "commercial",
+            "industrial",
+            "institutional",
+            null
+          ]
+        },
+        "status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "location": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "zipcode": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "sqFt": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "x-source": "their sq_ft field"
+        },
+        "createdBy": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "createdAt": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "updatedAt": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "referenceProjectId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "estimate": {
+      "type": "object",
+      "properties": {
+        "estimateId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "estimation": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "materialCost": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "x-unit": "USD"
+        },
+        "workerCost": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "x-unit": "USD"
+        },
+        "toolCost": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "x-unit": "USD"
+        },
+        "overheadCost": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "x-unit": "USD"
+        },
+        "margin": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "x-unit": "USD"
+        },
+        "totalCost": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "x-unit": "USD"
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "costRange": {
+      "type": "object",
+      "description": "\u00b115% confidence bands from XGBoost model \u2014 from their implementation",
+      "x-source": "their estimate_low / estimate_mid / estimate_high",
+      "properties": {
+        "estimateLow": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "x-unit": "USD"
+        },
+        "estimateMid": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "x-unit": "USD"
+        },
+        "estimateHigh": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "x-unit": "USD"
+        },
+        "confidence": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "services": {
+      "type": "array",
+      "description": "Per-service cost breakdown \u2014 from their services[] array",
+      "x-source": "their services[] with materialCost / workerCost / toolCost per service",
+      "items": {
+        "type": "object",
+        "properties": {
+          "serviceName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "materialCost": {
+            "type": "number",
+            "minimum": 0,
+            "x-unit": "USD"
+          },
+          "workerCost": {
+            "type": "number",
+            "minimum": 0,
+            "x-unit": "USD"
+          },
+          "toolCost": {
+            "type": "number",
+            "minimum": 0,
+            "x-unit": "USD"
+          },
+          "overheadCost": {
+            "type": "number",
+            "minimum": 0,
+            "x-unit": "USD"
+          },
+          "totalCost": {
+            "type": "number",
+            "minimum": 0,
+            "x-unit": "USD"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "paymentConfig": {
+      "type": "object",
+      "properties": {
+        "marginMaterialPct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "marginResourcePct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "marginToolPct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "overheadMaterialPct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "overheadResourcePct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "overheadToolPct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "taxPct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "costSummary": {
+      "type": "object",
+      "properties": {
+        "bomLineCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "bomTotalCost": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "x-unit": "USD"
+        },
+        "resourceLineCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "resourceTotalCost": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "x-unit": "USD"
+        },
+        "toolLineCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "toolTotalCost": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "x-unit": "USD"
+        }
+      },
+      "additionalProperties": false
+    },
+    "qaContext": {
+      "type": "object",
+      "description": "Q&A answer tracking \u2014 merged from their answered_oids[] and confidence",
+      "x-source": "their answeredOids[], answeredCount, dataQuality, confidence",
+      "properties": {
+        "answeredCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "totalQuestions": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "answeredOids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "answeredPct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "dataQuality": {
+          "type": "string",
+          "enum": [
+            "full",
+            "material_split",
+            "estimate_fallback"
+          ]
+        },
+        "questionTemplateVersion": {
+          "type": [
+            "integer",
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "mlMeta": {
+      "type": "object",
+      "description": "ML model provenance \u2014 populated by XGBoost/Triton inference layer",
+      "x-source": "their model_version, model_type from Triton",
+      "properties": {
+        "modelVersion": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "modelType": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "inferenceDevice": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "qaMultiplier": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "tier": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "good",
+        "better",
+        "best",
+        null
+      ],
+      "description": "Good/Better/Best classification from tier_criteria_lookup"
+    },
+    "embeddingModel": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Model the vector-DB side embeds this project with. Vector lives in the dedicated vector DB, not here."
+    },
+    "embeddingVersion": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Embedding model version, for re-embedding lineage on model bumps."
+    },
+    "vectorSyncedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "When this project's vector was last published to the vector DB. Null until the vector-DB push stamps it; lets us detect Mongo/vector-DB drift."
+    },
+    "_silverWatermarks": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "projectEstimate": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "bom": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "resourceEstimate": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "projectTool": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "answers": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "paymentExpense": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    },
+    "_env": {
+      "type": "string",
+      "enum": [
+        "dev",
+        "qa",
+        "stg",
+        "sbx",
+        "prd"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "x-upsert-key": [
+    "tenantId",
+    "projectId",
+    "sourceEnv"
+  ]
+}

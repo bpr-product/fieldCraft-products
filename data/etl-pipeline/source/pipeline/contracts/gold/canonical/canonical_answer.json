@@ -1,0 +1,83 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "gold_canonical.answer",
+  "version": "1.1.0",
+  "description": "Canonical Gold — lean passthrough of silver.answers. One document per answer, with a precomputed templateId FK into gold_canonical.question (resolved by joining tradeOid + questionTemplateVersion against silver.fieldcraft_provider_question_template). Distinct from gold_qa_recommendation.qa_answer, which additionally embeds BOM lines — a qa_recommendation-feature-specific enrichment that does not belong in cross-feature canonical data.",
+  "x-database": "gold_canonical",
+  "x-collection": "answer",
+  "x-grain": "answer",
+  "x-etl-trigger": "batch only (15-min cron) — no streaming job",
+  "x-upsert-guard": "_silverLsn",
+  "type": "object",
+  "required": [
+    "tenantId",
+    "answerId",
+    "_grain",
+    "_schemaVersion",
+    "_silverLsn",
+    "goldUpdatedAt",
+    "_env"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "pipelineRunId": { "type": ["string", "null"] },
+    "goldCreatedAt": { "type": ["string", "null"], "format": "date-time" },
+    "goldUpdatedAt": { "type": ["string", "null"], "format": "date-time" },
+    "sourceUpdatedAt": { "type": ["string", "null"], "format": "date-time" },
+    "dataOrigin": { "type": ["string", "null"] },
+    "sourceEnv": {
+      "type": ["string", "null"],
+      "description": "Silver _s_env — part of the upsert key.",
+      "x-rbac-roles": ["all"]
+    },
+    "_env": {
+      "type": ["string", "null"],
+      "description": "Deployment tier that wrote this doc (PIPELINE_ENV) — different axis from sourceEnv.",
+      "x-rbac-roles": ["all"]
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1,
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.answers"
+    },
+    "answerId": {
+      "type": "integer",
+      "description": "silver.answers.id. Grain key.",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.answers"
+    },
+    "projectId": { "type": ["integer", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.answers" },
+    "tradeOid": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.answers" },
+    "questionTemplateVersion": { "type": ["integer", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.answers" },
+    "templateId": {
+      "type": ["integer", "null"],
+      "description": "FK into gold_canonical.question.templateId, resolved by joining (tradeOid, questionTemplateVersion) against silver.fieldcraft_provider_question_template. Null when no matching template row was found.",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.fieldcraft_provider_question_template"
+    },
+    "answersData": { "type": ["object", "array", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.answers" },
+    "status": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.answers" },
+    "schemaVersion": {
+      "type": ["integer", "null"],
+      "description": "silver.answers.schema_version — the SOURCE row's own schema version, distinct from this contract's _schemaVersion.",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.answers"
+    },
+    "createdBy": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.answers" },
+    "createdDate": { "type": ["string", "null"], "format": "date-time", "x-rbac-roles": ["all"], "x-source-table": "silver.answers" },
+    "updatedDate": { "type": ["string", "null"], "format": "date-time", "x-rbac-roles": ["all"], "x-source-table": "silver.answers" },
+    "invalid": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.answers" },
+    "_grain": { "type": "string", "const": "canonical_answer", "x-rbac-roles": ["all"] },
+    "_schemaVersion": { "type": "integer", "const": 1, "x-rbac-roles": ["all"] },
+    "_silverLsn": { "type": "integer", "minimum": 0, "x-rbac-roles": ["all"], "x-source-table": "silver.answers" },
+    "isDeleted": {
+      "type": "boolean",
+      "description": "Soft-delete tombstone. Silver never physically deletes; a delete is an op=u that sets _s_is_deleted=TRUE.",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.answers"
+    },
+    "deletedAt": { "type": ["string", "null"], "format": "date-time", "x-rbac-roles": ["all"], "x-source-table": "silver.answers" }
+  },
+  "x-upsert-key": ["tenantId", "sourceEnv", "answerId"]
+}

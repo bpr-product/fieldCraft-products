@@ -1,0 +1,77 @@
+plugins {
+    id 'java'
+}
+
+description = 'FieldCraft Tenant-Customer Services'
+
+group = project.rootProject.group
+version = project.rootProject.version
+
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
+
+dependencies {
+    //spring 
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.json:json:20231013'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+    // NOT A NEW REPO DEPENDENCY — the same pinned version already declared by
+    // fieldcraft-tenant-api, fieldcraft-tenant-services and fieldcraft-common:fieldcraft-shared. Needed in
+    // THIS module because CustomerCommunicationService.sanitisedBody() cleans the composer's rich
+    // text (Jsoup + a Safelist) before it is stored as additional_info.notes. Sanitising lives at
+    // the point of persistence rather than in the controller: the notes are authored in a
+    // contentEditable and rendered back into the portal, so storing them unsanitised is a
+    // stored-XSS path, and a guard that sits at one of two call sites is one the other forgets.
+    implementation 'org.jsoup:jsoup:1.17.2'
+
+    // Use JUnit Jupiter for testing.
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.mockito:mockito-core:5.2.0'
+    implementation platform('org.mockito:mockito-bom:5.4.0')
+    testImplementation 'org.hamcrest:hamcrest:2.2'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'com.h2database:h2:2.2.224'
+    // Real PostgreSQL for TemplateUsageRefreshSchedulerIT (Comms PR-09f) — proves the orchestration
+    // against the real Provider-DB schema (V1_5_0_0_13/V1_5_0_0_86), not a mocked repository. Same
+    // versions as fieldcraft-tenantprovider-services'/fieldcraft-provider-services' existing embedded-
+    // postgres ITs.
+    testImplementation 'io.zonky.test:embedded-postgres:2.0.7'
+    testImplementation enforcedPlatform('io.zonky.test.postgres:embedded-postgres-binaries-bom:16.2.0')
+    testImplementation 'org.flywaydb:flyway-core'
+    testImplementation 'org.flywaydb:flyway-database-postgresql'
+    testRuntimeOnly 'org.postgresql:postgresql'
+
+    //Local projects
+    implementation project(':tenant:fieldcraft-tenant-dal')
+    implementation project(path: ':shared:fieldcraft-common:fieldcraft-utils')
+    implementation project(':tenant:fieldcraft-tenantprovider-services')
+    implementation project(':tenant:fieldcraft-tenantexternal-services')
+    implementation project(path: ':shared:fieldcraft-common-services')
+    // EnumCategoryRepository/EnumValueRepository (enum_category/enum_values, tenant DB) — needed by
+    // SalesStageService's turned-down-vocabulary guard. fieldcraft-common-services already depends on
+    // this module, but as `implementation` (not `api`), so its types are not on this module's
+    // compile classpath transitively; declared directly here instead of promoting the sibling
+    // dependency to `api`, which would be a wider-reaching change for one call site.
+    implementation project(path: ':shared:fieldcraft-common-dal')
+    implementation project(path: ':shared:fieldcraft-common:fieldcraft-shared')
+    implementation project(path: ':shared:fieldcraft-shared-data:fieldcraft-core-data')
+    implementation project(path: ':shared:fieldcraft-shared-data:fieldcraft-tenant-data')
+    implementation project(path: ':shared:fieldcraft-shared-data:fieldcraft-customer-data')
+    implementation project(path: ':shared:fieldcraft-shared-data:fieldcraft-provider-data')
+    implementation project(path: ':shared:fieldcraft-saas:fieldcraft-infra-core')
+    implementation project(path: ':shared:fieldcraft-saas:fieldcraft-saas-service')
+    // MessageTemplateUsageSnapshotRepository/AutomationPlanMasterStepRepository (Provider DB) —
+    // needed by TemplateUsageRefreshScheduler (Comms PR-09f). fieldcraft-tenantprovider-services
+    // already depends on fieldcraft-provider-services, but as `implementation` (not `api`), so
+    // fieldcraft-provider-dal's repository types are not on THIS module's compile classpath
+    // transitively through it — same reasoning as fieldcraft-common-dal above; declared directly
+    // here rather than widening an existing dependency to `api`.
+    implementation project(path: ':provider:fieldcraft-provider-dal')
+}

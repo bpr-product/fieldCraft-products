@@ -1,0 +1,19 @@
+psycopg2-binary==2.9.9
+pymongo==4.7.2
+azure-keyvault-secrets==4.8.0
+azure-identity==1.16.0
+jsonschema>=4.17.0
+pyyaml>=6.0
+requests>=2.31.0
+pydantic>=2.6.0
+structlog>=24.1.0
+# BPE → Azure Blob Storage Parquet export (offline ML feature store). pandas+pyarrow
+# write Parquet; adlfs (pulls fsspec) is the az:// backend (blob endpoint).
+pandas>=2.1
+pyarrow>=11
+adlfs>=2024.4.1
+# Optional — Claude-backed NL interpreter for the prompt-to-dashboard UI
+# (gold/tools/nl_interpreter.py). Only needed to enable free-form prompts;
+# the dashboard app falls back to its deterministic keyword router without it.
+# Requires ANTHROPIC_API_KEY in the environment.
+anthropic>=0.49.0

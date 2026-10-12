@@ -1,0 +1,73 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "gold_canonical.lead",
+  "version": "1.0.0",
+  "description": "Canonical Gold — pre-conversion CRM lead record. One document per (tenantId, leadUid, sourceEnv), passthrough from silver.fieldcraft_customer_lead (sourced from the `lead` table in the shared, cross-tenant Customer DB). Excludes the raw `data` JSON payload and automation-engine bookkeeping columns — see docs/crm/eden_crm_gold_requirements.md G2.",
+  "x-database": "gold_canonical",
+  "x-collection": "lead",
+  "x-grain": "lead",
+  "x-etl-trigger": "realtime (Flink, gold-canonical-stream) + batch (--rebuild only)",
+  "x-upsert-guard": "_silverLsn",
+  "type": "object",
+  "required": [
+    "tenantId",
+    "leadUid",
+    "sourceEnv",
+    "_grain",
+    "_schemaVersion",
+    "_silverLsn",
+    "goldUpdatedAt",
+    "_env"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "pipelineRunId": { "type": ["string", "null"] },
+    "goldCreatedAt": { "type": ["string", "null"], "format": "date-time" },
+    "goldUpdatedAt": { "type": ["string", "null"], "format": "date-time" },
+    "sourceUpdatedAt": { "type": ["string", "null"], "format": "date-time" },
+    "dataOrigin": { "type": ["string", "null"] },
+    "sourceEnv": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Silver _s_env — always stamped by Bronze on every row, never null. Part of the upsert key.",
+      "x-rbac-roles": ["all"]
+    },
+    "_env": {
+      "type": ["string", "null"],
+      "description": "Deployment tier that wrote this doc (PIPELINE_ENV) — different axis from sourceEnv.",
+      "x-rbac-roles": ["all"]
+    },
+    "tenantId": { "type": "string", "minLength": 1, "x-rbac-roles": ["all"], "x-source-table": "silver.fieldcraft_customer_lead" },
+    "leadUid": { "type": "string", "minLength": 1, "description": "Grain key.", "x-rbac-roles": ["all"], "x-source-table": "silver.fieldcraft_customer_lead" },
+    "serviceName": { "type": ["string", "null"], "description": "Resolved display name, via LEFT JOIN of lead.service_id on silver.external_service_service_master. The raw service_id FK is deliberately not surfaced as its own field — serviceName alone is sufficient, per explicit direction 2026-09-25. Null if the join doesn't resolve.", "x-rbac-roles": ["all"], "x-source-table": "silver.fieldcraft_customer_lead,silver.external_service_service_master" },
+    "externalDealId": { "type": ["string", "null"], "description": "External-system cross-reference, audit/debug only.", "x-rbac-roles": ["internal"], "x-source-table": "silver.fieldcraft_customer_lead" },
+    "externalContactId": { "type": ["string", "null"], "description": "External-system cross-reference, audit/debug only.", "x-rbac-roles": ["internal"], "x-source-table": "silver.fieldcraft_customer_lead" },
+    "firstName": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.fieldcraft_customer_lead" },
+    "lastName": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.fieldcraft_customer_lead" },
+    "email": { "type": ["string", "null"], "description": "PII — same redaction discipline as other free-text answer/contact fields.", "x-rbac-roles": ["all"], "x-source-table": "silver.fieldcraft_customer_lead" },
+    "phone": { "type": ["string", "null"], "description": "PII — same redaction discipline as other free-text answer/contact fields.", "x-rbac-roles": ["all"], "x-source-table": "silver.fieldcraft_customer_lead" },
+    "status": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.fieldcraft_customer_lead" },
+    "salesStage": { "type": ["string", "null"], "description": "Shares vocabulary with gold_canonical.customer.salesStage by design.", "x-rbac-roles": ["all"], "x-source-table": "silver.fieldcraft_customer_lead" },
+    "salesStageEnteredAt": { "type": ["string", "null"], "format": "date-time", "x-rbac-roles": ["all"], "x-source-table": "silver.fieldcraft_customer_lead" },
+    "customerId": { "type": ["string", "null"], "description": "FK to gold_canonical.customer once converted — numeric in the source, stringified by the loader. Not a shard/tenant-scoping field on its own — always filter by tenantId first.", "x-rbac-roles": ["all"], "x-source-table": "silver.fieldcraft_customer_lead" },
+    "convertedAt": { "type": ["string", "null"], "format": "date-time", "x-rbac-roles": ["all"], "x-source-table": "silver.fieldcraft_customer_lead" },
+    "projectUid": { "type": ["string", "null"], "x-rbac-roles": ["all"], "x-source-table": "silver.fieldcraft_customer_lead" },
+    "projectId": { "type": ["string", "null"], "description": "Numeric in the source, stringified by the loader to match gold_canonical.project.projectId.", "x-rbac-roles": ["all"], "x-source-table": "silver.fieldcraft_customer_lead" },
+    "createdAt": { "type": ["string", "null"], "format": "date-time", "x-rbac-roles": ["all"], "x-source-table": "silver.fieldcraft_customer_lead" },
+    "_grain": { "type": "string", "const": "canonical_lead", "x-rbac-roles": ["all"] },
+    "_schemaVersion": { "type": "integer", "const": 1, "x-rbac-roles": ["all"] },
+    "_silverLsn": { "type": "integer", "minimum": 0, "x-rbac-roles": ["all"] },
+    "dataAsOf": { "type": "string", "format": "date-time", "x-rbac-roles": ["all"] },
+    "isDeleted": { "type": "boolean", "x-rbac-roles": ["all"] },
+    "_silverWatermarks": {
+      "type": "object",
+      "additionalProperties": false,
+      "x-rbac-roles": ["all"],
+      "properties": {
+        "lead": { "type": ["string", "null"], "format": "date-time", "x-source-table": "silver.fieldcraft_customer_lead" }
+      }
+    },
+    "lafieldcraft": { "type": "integer", "minimum": 0, "x-rbac-roles": ["all"] }
+  },
+  "x-upsert-key": ["tenantId", "leadUid", "sourceEnv"]
+}

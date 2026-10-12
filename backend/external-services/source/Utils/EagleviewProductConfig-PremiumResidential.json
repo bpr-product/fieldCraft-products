@@ -1,0 +1,34 @@
+{
+    "productID": 31,
+    "name": "Premium - Residential",
+    "description": "A comprehensive roof measurement report derived from aerial imagery, including pitch and linear measurement diagrams plus a summarized report view for estimating/material ordering.",
+    "productGroup": "Total roof area, Pitch diagram, Length diagram (ridges/hips/valleys/rakes/eaves/flashings/step flashing/parapets), # of facets, Report summary with waste calculation/suggested waste factor, Aerial imagery views",
+    "isTemporarilyUnavailable": false,
+    "priceMin": 0.0,
+    "priceMax": 0.0,
+    "deliveryProducts": [
+        {
+        "productID": 8,
+        "name": "RegularDelivery",
+        "description": "If ordered during business hours (6AM - 6PM PST most days of the year) the guaranteed date is 2 business days, by close of day. If the report is ordered after close of business, it will not be processed until the next business day. Note: Premium reports are delivered within 6hrs.",
+        "isTemporarilyUnavailable": false,
+        "priceMin": 5.0,
+        "priceMax": 6.0
+        }
+    ],
+    "addOnProducts": [
+        {
+            "productID": 88,
+            "name": "Walls",
+            "description": "Exterior walls add-on (if enabled on your account).",
+            "isTemporarilyUnavailable": false,
+            "priceMin": 0.0,
+            "priceMax": 0.0
+        }
+    ],
+    "measurementInstructionTypes": [1, 2],
+    "TypeOfStructure": 1,
+    "IsRoofProduct": true,
+    "SortOrder": 1,
+    "AllowsUserSubmittedPhotos": true
+}

@@ -1,0 +1,291 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "gold_eden.recommendation",
+  "version": "2.0.0",
+  "description": "Eden recommendation / decision-support output — one document per (tenantId, recommendationId). Written at AGENT RUNTIME. Turns the read-model context collections (project_health, invoice_summary, …) into structured, explainable, feedback-able outputs: each recommendation carries a rationale, the supporting facts it was derived from (with back-pointers to the source Gold docs for explainability), a confidence, a severity, and a status that captures the user feedback loop.",
+  "x-database": "gold_eden",
+  "x-collection": "recommendation",
+  "x-grain": "eden_recommendation",
+  "x-written-by": "agent-runtime",
+  "x-upsert-key": [
+    "tenantId",
+    "recommendationId"
+  ],
+  "type": "object",
+  "required": [
+    "tenantId",
+    "recommendationId",
+    "agentId",
+    "recommendationType",
+    "title",
+    "status",
+    "_grain",
+    "_schemaVersion",
+    "goldUpdatedAt",
+    "_env"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "pipelineRunId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "goldCreatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "goldUpdatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "sourceUpdatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "dataOrigin": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Tenant identifier. First half of the compound key.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "recommendationId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique recommendation id (uuid4). Second half of the compound key.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_grain": {
+      "type": "string",
+      "const": "eden_recommendation",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_schemaVersion": {
+      "type": "integer",
+      "const": 1,
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "agentId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Agent that produced the recommendation.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "sessionId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Session it was produced in, if interactive.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "projectId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Project the recommendation is about, if project-scoped.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "recommendationType": {
+      "type": "string",
+      "description": "Domain of the recommendation, e.g. schedule_risk, cost_overrun, procurement_gap, invoice_followup, next_action.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Short actionable headline shown to the user.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "detail": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Full recommendation text.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "rationale": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Why the agent is recommending this — the explainability narrative.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "supportingFacts": {
+      "type": "array",
+      "description": "Back-pointers to the Gold facts this recommendation was derived from — the citation trail for explainability and audit.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "collection": {
+            "type": "string",
+            "description": "Source Gold collection, e.g. project_health."
+          },
+          "docKey": {
+            "type": "object",
+            "description": "Upsert key of the source document, e.g. {tenantId, projectId}."
+          },
+          "field": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Field within the source doc, e.g. slipDays."
+          },
+          "value": {
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ],
+            "description": "Value at the time of recommendation."
+          }
+        }
+      }
+    },
+    "confidence": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Agent confidence in the recommendation (0-1).",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "severity": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "info",
+        "low",
+        "medium",
+        "high",
+        "critical",
+        null
+      ],
+      "description": "Urgency/impact of the recommendation.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "proposed",
+        "accepted",
+        "dismissed",
+        "actioned",
+        "expired"
+      ],
+      "description": "Lifecycle + feedback loop state. accepted/dismissed/actioned capture user feedback for learning.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "userFeedback": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Structured feedback from the user (e.g. {rating, comment, by, at}) — closes the recommendation feedback loop.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "expiresAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "When the recommendation goes stale. Null = no expiry.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "createdAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "isDeleted": {
+      "type": "boolean",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "sourceEnv": {
+      "type": ["string", "null"],
+      "description": "Silver _s_env — logical source environment (si_dev, datamart, ...).",
+      "x-rbac-roles": ["all"]
+    },
+    "_env": {
+      "type": "string",
+      "enum": [
+        "dev",
+        "qa",
+        "stg",
+        "sbx",
+        "prd"
+      ]
+    }
+  }
+}

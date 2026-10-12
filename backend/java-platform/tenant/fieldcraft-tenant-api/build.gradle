@@ -1,0 +1,173 @@
+plugins {
+    id 'application'
+}
+
+description = 'FieldCraft Tenant Api [Server]'
+
+group = project.rootProject.group
+version = project.rootProject.version
+
+bootJar {
+    enabled = true
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    manifest {
+        attributes 'Start-Class': 'com.fieldcraft.tenant.FieldCraftApiServer'
+    }
+}
+
+//jar {
+//    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+//    enabled = false
+//}
+
+repositories {
+    // Use Maven Central for resolving dependencies.
+    mavenCentral()
+    maven { url "https://repo.spring.io/milestone" }
+}
+
+dependencies {
+    //spring
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    //implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+    implementation "org.springframework.boot:spring-boot-starter-jdbc"
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-graphql'
+    // https://mvnrepository.com/artifact/com.graphql-java/graphql-java-extended-scalars
+    implementation 'com.graphql-java:graphql-java-extended-scalars:24.0'
+
+    implementation 'org.modelmapper:modelmapper:2.3.5'
+    // BOM-managed; previously pinned to 4.11.1 which conflicts with Boot 3.5's transitive version.
+    implementation 'org.mongodb:mongodb-driver-sync'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+    implementation 'com.google.guava:guava:33.0.0-jre'
+    implementation 'org.flywaydb:flyway-core:10.18.2'          // core engine
+    implementation 'org.flywaydb:flyway-database-postgresql:10.18.2' // PostgreSQL support
+    runtimeOnly 'org.postgresql:postgresql:42.7.3'             // JDBC driver
+
+    // Firebase Admin SDK — FCM push notifications to FIELDCRAFT Navigator (mobile)
+    implementation 'com.google.firebase:firebase-admin:9.3.0'
+
+    //log4j
+    implementation 'org.springframework.boot:spring-boot-starter-log4j2'
+    //implementation 'org.apache.logging.log4j:log4j-api'
+    //runtimeOnly 'org.apache.logging.log4j:log4j-core'
+
+    // Image and PDF thumbnail generation
+    implementation 'net.coobird:thumbnailator:0.4.20'
+    implementation 'com.openhtmltopdf:openhtmltopdf-pdfbox:1.0.10'
+    implementation 'org.jsoup:jsoup:1.17.2'
+
+    //runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+    runtimeOnly ('org.postgresql:postgresql')
+
+    // azure graph
+    runtimeOnly ('com.microsoft.graph:microsoft-graph:5.+')
+    // Include Azure identity for authentication
+    runtimeOnly ('com.azure:azure-identity:1.+')
+    //azure blob
+    runtimeOnly platform('com.azure:azure-sdk-bom:1.2.18')
+    runtimeOnly ('com.azure:azure-storage-blob')
+    //azure open ai
+    runtimeOnly ('com.azure:azure-ai-openai:1.0.0-beta.5')
+    //azure weather
+    runtimeOnly 'com.azure:azure-maps-weather:1.0.0-beta.1'
+    //azure document analyser
+    runtimeOnly ('com.azure:azure-ai-formrecognizer:4.0.0')
+    //migrating form recognizer to Document intelligence
+    implementation('com.azure:azure-ai-documentintelligence:1.0.1')
+    runtimeOnly ('org.eclipse.angus:angus-mail:2.0.1')
+
+    // https://mvnrepository.com/artifact/com.azure/azure-messaging-webpubsub
+    runtimeOnly ('com.azure:azure-messaging-webpubsub:1.2.15')
+    runtimeOnly ('com.azure:azure-messaging-webpubsub-client:1.+')
+    runtimeOnly 'org.postgresql:postgresql'
+
+    //test
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+    testImplementation "org.springframework.security:spring-security-test"
+    testImplementation "org.junit.jupiter:junit-jupiter"
+    testImplementation 'org.springframework.graphql:spring-graphql-test'
+
+    // NEW DEPENDENCY (flag on the PR per CLAUDE.md). Test scope only.
+    // Runs a REAL PostgreSQL binary as a subprocess — no Docker daemon, no containers.
+    // Required because build-spec §12 mandates verifying migrations against MIGRATION DDL:
+    // Hibernate ddl-auto emits neither partial-index predicates nor CHECK constraints, so a
+    // test on generated DDL passes while proving nothing. Testcontainers is the spec's named
+    // tool but needs Docker, which is unavailable in this environment; this is the equivalent
+    // that is not. Acceptance criteria #1, #8, #10-#14 and #17-#18 all depend on it.
+    testImplementation 'io.zonky.test:embedded-postgres:2.0.7'
+    testImplementation enforcedPlatform('io.zonky.test.postgres:embedded-postgres-binaries-bom:16.2.0')
+    testRuntimeOnly 'org.postgresql:postgresql'
+
+    //Local projects
+    implementation project(path: ':shared:fieldcraft-shared-data:fieldcraft-core-data')
+    implementation project(path: ':shared:fieldcraft-shared-data:fieldcraft-tenant-data')
+    implementation project(path: ':shared:fieldcraft-shared-data:fieldcraft-customer-data')
+    implementation project(path: ':shared:fieldcraft-shared-data:fieldcraft-provider-data')
+
+    implementation project(path: ':shared:fieldcraft-saas:fieldcraft-infra-core')
+    implementation project(path: ':shared:fieldcraft-ase:fieldcraft-ase-data')
+    implementation project(path: ':shared:fieldcraft-saas:fieldcraft-subscription-service')
+
+    implementation project(path: ':shared:fieldcraft-common:fieldcraft-shared')
+    implementation project(path: ':shared:fieldcraft-saas:fieldcraft-saas-service')
+    implementation project(path: ':shared:fieldcraft-saas:fieldcraft-payment-service')
+    implementation project(path: ':shared:fieldcraft-saas:fieldcraft-resource-service')
+    implementation project(path: ':shared:fieldcraft-saas:fieldcraft-external-service')
+    implementation project(path: ':shared:fieldcraft-saas:fieldcraft-projecthub-service')
+    implementation project(path: ':shared:fieldcraft-saas:fieldcraft-azureutils')
+
+    implementation project(path: ':shared:fieldcraft-common:fieldcraft-utils')
+    implementation project(path: ':shared:fieldcraft-common:fieldcraft-utils-import')
+
+    implementation project(':shared:fieldcraft-common-services')
+    implementation project(':shared:fieldcraft-common-dal')
+
+    //implementation project(':fieldcraft-common:fieldcraft-shared')
+    //implementation project(':fieldcraft-common:fieldcraft-core-data')
+    //implementation project(':fieldcraft-common:fieldcraft-tenant-data')
+    //implementation project(':fieldcraft-common:fieldcraft-customer-data')
+
+    implementation project(':tenant:fieldcraft-tenant-dal')
+    implementation project(':tenant:fieldcraft-tenant-services')
+    implementation project(':tenant:fieldcraft-tenantcustomer-services')
+    implementation project(':tenant:fieldcraft-tenantprovider-services')
+    implementation project(':tenant:fieldcraft-tenantexternal-services')
+    implementation project(':tenant:fieldcraft-tenantprojecthub-services')
+    implementation project(':tenant:fieldcraft-tenantsubscription-services')
+
+}
+
+// Apply a specific Java toolchain to ease working on different environments.
+// java {
+//     toolchain {
+//         languageVersion = JavaLanguageVersion.of(17)
+//     }
+// }
+
+application {
+    // Define the main class for the application.
+    mainClass = 'com.fieldcraft.tenant.FieldCraftApiServer'
+}
+
+tasks.named('test') {
+    // Use JUnit Platform for unit tests.
+    useJUnitPlatform()
+}
+
+configurations {
+    configureEach {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    }
+}
+
+tasks.withType(Tar) {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.withType(Zip) {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}

@@ -1,0 +1,177 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "gold_canonical.user_permissions",
+  "version": "2.0.0",
+  "description": "Canonical Gold — resolved effective RBAC state per (tenant, user): active roles, flattened permissions, and active project membership. One document per (tenantId, user_uid). Cross-feature: consumed by Eden first, intended for any future feature needing RBAC instead of re-deriving the same Silver joins. Schema mirrors gold/src/canonical/load_user_permissions.py shape_doc() exactly. Source model verified in docs/canonical/user_access_management_model.md: source table is silver.roles (NOT silver.role); project access is mediated through silver.resource (project_member has no direct user_id) so users without a resource row cannot appear in project_ids.",
+  "x-database": "gold_canonical",
+  "x-collection": "user_permissions",
+  "x-grain": "user_permissions",
+  "x-etl-trigger": "batch rebuild via --rebuild; real-time CDC streaming recommended follow-up given RBAC revocation latency sensitivity (see docs/canonical/user_access_management_model.md)",
+  "x-upsert-guard": "_silverLsn",
+  "type": "object",
+  "required": [
+    "tenantId",
+    "user_uid",
+    "user_account_id",
+    "_grain",
+    "_schemaVersion",
+    "_silverLsn",
+    "goldUpdatedAt",
+    "_env"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "pipelineRunId": {
+      "type": ["string", "null"]
+    },
+    "_env": {
+      "type": ["string", "null"],
+      "description": "Deployment tier that wrote this doc (PIPELINE_ENV) — different axis from sourceEnv.",
+      "x-rbac-roles": ["all"]
+    },
+    "goldCreatedAt": {
+      "type": ["string", "null"],
+      "format": "date-time"
+    },
+    "goldUpdatedAt": {
+      "type": ["string", "null"],
+      "format": "date-time"
+    },
+    "sourceUpdatedAt": {
+      "type": ["string", "null"],
+      "format": "date-time"
+    },
+    "dataOrigin": {
+      "type": ["string", "null"]
+    },
+    "sourceEnv": {
+      "type": ["string", "null"],
+      "description": "Silver _s_env — logical source environment (si_dev, datamart, ...).",
+      "x-rbac-roles": ["all"]
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Tenant identifier. Part of the compound upsert key.",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.user_account"
+    },
+    "user_uid": {
+      "type": "string",
+      "minLength": 1,
+      "description": "silver.user_account.object_id — the external IdP id, matches the JWT `oid` claim. Grain key. Rows with a NULL object_id are skipped by the loader (cannot be keyed).",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.user_account"
+    },
+    "user_account_id": {
+      "type": "integer",
+      "description": "silver.user_account.id — internal tenant-scoped FK used for joins.",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.user_account"
+    },
+    "displayName": {
+      "type": ["string", "null"],
+      "description": "Derived: trim(firstname + middlename + lastname).",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.user_account"
+    },
+    "email": {
+      "type": ["string", "null"],
+      "x-rbac-roles": ["tenant_admin"],
+      "x-source-table": "silver.user_account"
+    },
+    "isActive": {
+      "type": "boolean",
+      "description": "user_account.active AND NOT user_account.deleted. Does not fold in _s_is_deleted — that is surfaced separately as isDeleted per platform convention.",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.user_account"
+    },
+    "roles": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Distinct silver.roles.name for effective (temporally valid, active-role) user_role_map assignments. Source table is `roles`, not `role`.",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.roles"
+    },
+    "permissions": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Distinct silver.role_permission.permission codes ('RESOURCE.ACTION' form, e.g. DOC.MAN) flattened across effective roles. No permission master table exists source-side — codes are uncatalogued free text.",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.role_permission"
+    },
+    "project_ids": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "silver.project_member.project_id (cast to string) WHERE status='ACTIVE', resolved via the resource bridge (user_account -> resource -> project_member). Users with no silver.resource row will have an empty array even if they hold roles/permissions.",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.project_member"
+    },
+    "_grain": {
+      "type": "string",
+      "const": "user_permissions",
+      "x-rbac-roles": ["all"]
+    },
+    "_schemaVersion": {
+      "type": "integer",
+      "const": 1,
+      "x-rbac-roles": ["all"]
+    },
+    "_silverLsn": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Max PostgreSQL LSN across contributing rows at write time. Upsert guard.",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.user_account"
+    },
+    "dataAsOf": {
+      "type": "string",
+      "format": "date-time",
+      "x-rbac-roles": ["all"]
+    },
+    "isDeleted": {
+      "type": "boolean",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.user_account"
+    },
+    "deletedAt": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "x-rbac-roles": ["all"],
+      "x-source-table": "silver.user_account"
+    },
+    "_silverWatermarks": {
+      "type": "object",
+      "additionalProperties": false,
+      "x-rbac-roles": ["all"],
+      "properties": {
+        "user_account": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "x-source-table": "silver.user_account"
+        },
+        "user_role_map": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "x-source-table": "silver.user_role_map"
+        },
+        "role_permission": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "x-source-table": "silver.role_permission"
+        },
+        "project_member": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "x-source-table": "silver.project_member"
+        }
+      }
+    },
+    "lafieldcraft": {
+      "type": "integer",
+      "minimum": 0,
+      "x-rbac-roles": ["all"]
+    }
+  },
+  "x-upsert-key": ["tenantId", "user_uid"]
+}

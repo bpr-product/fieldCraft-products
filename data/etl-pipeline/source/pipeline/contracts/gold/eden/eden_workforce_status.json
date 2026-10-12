@@ -1,0 +1,382 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "gold_eden.workforce_status",
+  "version": "2.0.0",
+  "description": "Eden AI Assistant \u2014 per-project workforce status. One document per (tenantId, projectId). Summarises scheduled resources (silver.resource_schedule + silver.resource), employment mix (W2 vs 1099), assignment status counts, scheduled duration, actual hours logged (silver.timelog), and an approximate utilisation ratio. There is no silver.worker/crew/equipment table \u2014 'workforce' means scheduled resources, not equipment. Schema mirrors gold/src/eden/load_workforce_status.py shape_doc() exactly.",
+  "x-database": "gold_eden",
+  "x-collection": "workforce_status",
+  "x-grain": "eden_workforce_status",
+  "x-etl-trigger": "event-driven on writes to silver.resource_schedule, silver.task (project-keyed). timelog/resource changes are picked up on the next related trigger or batch --rebuild (no project key on those events).",
+  "x-upsert-guard": "_silverLsn",
+  "type": "object",
+  "required": [
+    "tenantId",
+    "projectId",
+    "_grain",
+    "_schemaVersion",
+    "_silverLsn",
+    "goldUpdatedAt",
+    "_env"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "pipelineRunId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "goldCreatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "goldUpdatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "sourceUpdatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "dataOrigin": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Tenant identifier. First half of the compound upsert key.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "projectId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Project identifier cast to string. Second half of the compound upsert key.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "_grain": {
+      "type": "string",
+      "const": "eden_workforce_status",
+      "description": "ETL grain identifier.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_schemaVersion": {
+      "type": "integer",
+      "const": 1,
+      "description": "Integer schema version.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_silverLsn": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "PostgreSQL LSN of the silver.project row at write time. Upsert guard against stale overwrites.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "dataAsOf": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC effective data snapshot time. Prompt-cache key component.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "headcount": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Distinct resources scheduled on the project (non-deleted schedules).",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.resource_schedule"
+    },
+    "w2Count": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Count of assigned resources with employment type W2 (over the assignedResources list).",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.resource"
+    },
+    "contractorCount": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Count of assigned resources with employment type 1099 (over the assignedResources list).",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.resource"
+    },
+    "scheduledAssignments": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Count of resource_schedule rows with status 'scheduled'.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.resource_schedule"
+    },
+    "activeAssignments": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Count of resource_schedule rows with status 'active'.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.resource_schedule"
+    },
+    "completedAssignments": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Count of resource_schedule rows with status 'completed'.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.resource_schedule"
+    },
+    "scheduledDurationTotal": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Sum of resource_schedule.duration across non-deleted assignments. Unit per source (unconfirmed alignment with timelog.time_spent).",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.resource_schedule"
+    },
+    "hoursLogged": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Sum of timelog.time_spent reached through the resource_schedule join for this project.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.timelog"
+    },
+    "utilizationPct": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Approximate utilisation = hoursLogged / scheduledDurationTotal * 100. Null when nothing scheduled. Approximate: duration and time_spent unit alignment is unconfirmed.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "activeTimelogCount": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Count of timelog rows with status 'active' (currently clocked-in) for this project.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.timelog"
+    },
+    "nextScheduledStart": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Earliest future start_time among 'scheduled' assignments; null when none upcoming.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.resource_schedule"
+    },
+    "assignedResources": {
+      "type": "array",
+      "description": "Up to 100 distinct resources scheduled on the project, ordered by name.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.resource",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "resourceId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "resourceUid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "employmentType": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "unit": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "skills": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "isDeleted": {
+      "type": "boolean",
+      "description": "Soft-delete tombstone \u2014 true when the source silver.project row is soft-deleted. On recompute the Gold doc is marked deleted (never physically removed/orphaned).",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "deletedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "UTC time the source row was soft-deleted (silver _s_deleted_at); null when live.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "_silverWatermarks": {
+      "type": "object",
+      "description": "Per-source-table high-water _s_silver_ts timestamps at the time this document was last written.",
+      "additionalProperties": false,
+      "x-rbac-roles": [
+        "all"
+      ],
+      "properties": {
+        "project": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "x-source-table": "silver.project"
+        },
+        "resource_schedule": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "x-source-table": "silver.resource_schedule"
+        },
+        "timelog": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "x-source-table": "silver.timelog"
+        }
+      }
+    },
+    "lafieldcraft": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Milliseconds between the loader run and the oldest contributing Silver watermark.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "sourceEnv": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Silver _s_env \u2014 logical source environment (si_dev, datamart, ...).",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_env": {
+      "type": "string",
+      "enum": [
+        "dev",
+        "qa",
+        "stg",
+        "sbx",
+        "prd"
+      ]
+    }
+  },
+  "x-upsert-key": [
+    "tenantId",
+    "projectId",
+    "sourceEnv"
+  ]
+}

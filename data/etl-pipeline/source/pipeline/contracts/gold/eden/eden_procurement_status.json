@@ -1,0 +1,335 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "gold_eden.procurement_status",
+  "version": "4.0.0",
+  "description": "Eden AI Assistant \u2014 per-project procurement and BOM status. One document per (tenantId, projectId). Pre-computes unordered BOM items, pending PO approvals, and spend coverage. Schema mirrors gold/src/eden/load_procurement_status.py shape_doc() exactly.",
+  "x-database": "gold_eden",
+  "x-collection": "procurement_status",
+  "x-grain": "eden_procurement_status",
+  "x-etl-trigger": "event-driven on writes to silver.project, silver.bom, silver.purchase_order, silver.purchase_order_items",
+  "x-upsert-guard": "_silverLsn",
+  "type": "object",
+  "required": [
+    "tenantId",
+    "projectId",
+    "_grain",
+    "_schemaVersion",
+    "_silverLsn",
+    "goldUpdatedAt",
+    "_env"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "pipelineRunId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "goldCreatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "goldUpdatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Tenant identifier. First half of the compound upsert key.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "projectId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Project identifier cast to string. Second half of the compound upsert key.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "_grain": {
+      "type": "string",
+      "const": "eden_procurement_status",
+      "description": "ETL grain identifier.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_schemaVersion": {
+      "type": "integer",
+      "const": 1,
+      "description": "Integer schema version.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_silverLsn": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "PostgreSQL LSN of the silver.project row at write time. Upsert guard against stale overwrites.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "dataAsOf": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC effective data snapshot time. Prompt-cache key component.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "orderNo": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Human-readable order number for this project.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "bomTotalValue": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Total value of all BOM line items for this project.",
+      "x-unit": "USD",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "project_manager",
+        "estimator",
+        "accountant"
+      ],
+      "x-source-table": "silver.bom"
+    },
+    "orderedValue": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Value of BOM items covered by purchase orders.",
+      "x-unit": "USD",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "project_manager",
+        "estimator",
+        "accountant"
+      ],
+      "x-source-table": "silver.purchase_order_items"
+    },
+    "unorderedValue": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Value of BOM items not yet covered by any purchase order.",
+      "x-unit": "USD",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "project_manager",
+        "estimator",
+        "accountant"
+      ],
+      "x-source-table": "silver.bom"
+    },
+    "unorderedItems": {
+      "type": "array",
+      "description": "BOM line items with no associated purchase order.",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "project_manager",
+        "estimator"
+      ],
+      "x-source-table": "silver.bom",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "materialName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "quantity": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "unit": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "unitCost": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "x-unit": "USD"
+          },
+          "totalCost": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "x-unit": "USD"
+          },
+          "vendorName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "pendingApprovals": {
+      "type": "array",
+      "description": "Purchase orders awaiting approval (status PENDING_APPROVAL).",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "project_manager"
+      ],
+      "x-source-table": "silver.purchase_order",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "poNumber": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "vendor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "total": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "x-unit": "USD"
+          },
+          "status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "isDeleted": {
+      "type": "boolean",
+      "description": "Soft-delete tombstone \u2014 true when the source silver.project row is soft-deleted. On recompute the Gold doc is marked deleted (never physically removed/orphaned).",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "deletedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "UTC time the source row was soft-deleted (silver _s_deleted_at); null when live.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "_silverWatermarks": {
+      "type": "object",
+      "description": "Per-source-table high-water _s_silver_ts timestamps at the time this document was last written.",
+      "additionalProperties": false,
+      "x-rbac-roles": [
+        "all"
+      ],
+      "properties": {
+        "project": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "x-source-table": "silver.project"
+        },
+        "bom": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "x-source-table": "silver.bom"
+        },
+        "purchase_order": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "x-source-table": "silver.purchase_order"
+        }
+      }
+    },
+    "lafieldcraft": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Milliseconds between the loader run and the oldest contributing Silver watermark.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "sourceEnv": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Silver _s_env \u2014 logical source environment (si_dev, datamart, ...).",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_env": {
+      "type": "string",
+      "enum": [
+        "dev",
+        "qa",
+        "stg",
+        "sbx",
+        "prd"
+      ]
+    }
+  },
+  "x-upsert-key": [
+    "tenantId",
+    "projectId",
+    "sourceEnv"
+  ]
+}

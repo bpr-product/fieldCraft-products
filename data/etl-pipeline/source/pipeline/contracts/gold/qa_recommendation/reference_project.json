@@ -1,0 +1,271 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "gold.gold_reference_project",
+  "version": "2.0.0",
+  "description": "Curated past projects used to pre-populate Q&A and task templates for new projects. One document per reference-eligible project.",
+  "type": "object",
+  "required": [
+    "tenantid",
+    "reference_project_id",
+    "project_type",
+    "is_approved_reference",
+    "embedding_model",
+    "embedding_version",
+    "created_ts",
+    "_gold_ts",
+    "goldUpdatedAt",
+    "_env"
+  ],
+  "properties": {
+    "pipelineRunId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "goldCreatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "goldUpdatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "tenantid": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reference_project_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_project_uid": {
+      "type": "string",
+      "description": "Silver project.id this reference was distilled from"
+    },
+    "project_type": {
+      "type": "string",
+      "enum": [
+        "residential",
+        "commercial",
+        "industrial",
+        "institutional"
+      ]
+    },
+    "tier": {
+      "type": "string",
+      "enum": [
+        "good",
+        "better",
+        "best"
+      ]
+    },
+    "trade_tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "region": {
+      "type": "string"
+    },
+    "state": {
+      "type": "string"
+    },
+    "is_approved_reference": {
+      "type": "boolean"
+    },
+    "approved_by": {
+      "type": "string"
+    },
+    "approved_ts": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "last_used_ts": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "use_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "qa_template": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "question",
+          "data_type"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "question": {
+            "type": "string"
+          },
+          "section": {
+            "type": "string"
+          },
+          "item_group": {
+            "type": "string"
+          },
+          "data_type": {
+            "type": "string"
+          },
+          "is_repeating": {
+            "type": "boolean"
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": [
+                    "string",
+                    "number",
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "label": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "task_template": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "task_id",
+          "name"
+        ],
+        "properties": {
+          "task_id": {
+            "type": "string"
+          },
+          "parent_task_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "wbs_code": {
+            "type": "string"
+          },
+          "duration_hours": {
+            "type": "number",
+            "minimum": 0
+          },
+          "trade": {
+            "type": "string"
+          },
+          "predecessors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "bom_template": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "qty",
+          "unit"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "qty": {
+            "type": "number",
+            "minimum": 0
+          },
+          "unit": {
+            "type": "string"
+          },
+          "unit_cost": {
+            "type": "number",
+            "minimum": 0
+          },
+          "total": {
+            "type": "number",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "scope_summary": {
+      "type": "string",
+      "description": "Human-readable scope description; the basis for the scope vector held in the dedicated vector DB."
+    },
+    "embedding_model": {
+      "type": "string",
+      "description": "Model the vector-DB side embeds scope_summary with. Vector lives in the dedicated vector DB, not here."
+    },
+    "embedding_version": {
+      "type": "string",
+      "description": "Embedding model version, for re-embedding lineage on model bumps."
+    },
+    "vector_synced_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "When this reference project's scope vector was last published to the vector DB. Null until the vector-DB push stamps it; lets us detect Mongo/vector-DB drift."
+    },
+    "created_ts": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_ts": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "_silver_lsn": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "_gold_ts": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "_env": {
+      "type": "string",
+      "enum": [
+        "dev",
+        "qa",
+        "stg",
+        "sbx",
+        "prd"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,27 @@
+.env
+.env.*
+!.env.template
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+.git/
+.gitignore
+tests/
+scripts/tests/
+
+# Runtime bind-mount data for the sibling services in docker/datapipeline/*.yml
+# (kafka, silver-postgres, mongo, pgadmin, zookeeper, flink checkpoints/ha).
+# Files inside are written by containers running as their own internal UIDs
+# (e.g. mongo's uid 999), so a permission the deploy user can't read breaks
+# the whole build -- see "error from sender: ... admin-mongodb-data/.mongodb:
+# permission denied" on the prod build.
+data/
+data/**

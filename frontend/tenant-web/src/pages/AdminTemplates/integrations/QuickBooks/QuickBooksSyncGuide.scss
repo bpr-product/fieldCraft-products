@@ -1,0 +1,633 @@
+/*
+ * Copyright (C) FIELDCRAFT Inc - All Rights Reserved
+ * This file is part of FieldCraft. - Proprietary and confidential
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ *
+ * QuickBooks "How it works" guidance — styled entirely from the connected workspace's
+ * `--qbw-*` tokens (QuickBooksWorkspace.scss), so the panel is the same material as
+ * the rail, the module header and the table rather than a palette of its own. No
+ * per-module colours: one accent carries "this is what it attaches to", and the
+ * workspace's ok/warn tones carry record state on the module status pill.
+ *
+ * Three scopes:
+ *   .qbsg-paper / .qbsg-root  the on-demand "How it works" panel — portalled to
+ *                             <body> by MUI's Dialog, so these rules sit at the top
+ *                             level. Compound selectors (`.MuiDialog-paper.qbsg-paper`)
+ *                             out-specify MUI's single-class defaults without
+ *                             !important.
+ *   .qbw-root .qbsg-pin       the module status pill, which lives inside the workspace
+ *                             card in the module header's toolbar row.
+ *   .qbsg-pop-paper / .qbsg-pop
+ *                             the pill's detail popover — portalled too, so also top
+ *                             level.
+ */
+
+/* ── Panel shell ───────────────────────────────────────────────────────────── */
+.MuiDialog-paper.qbsg-paper {
+  background: var(--qbw-card);
+  border: 0.5px solid var(--qbw-hair-strong);
+  border-radius: 16px;
+  box-shadow: 0 28px 80px -28px rgba(20, 24, 40, 0.44), 0 1px 3px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.qbsg-root {
+  font-family: var(--qbw-font);
+  color: var(--qbw-ink);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+
+  *, *::before, *::after { box-sizing: border-box; }
+  svg { display: block; }
+}
+
+/* ── Panel header ──────────────────────────────────────────────────────────── */
+.qbsg-root .qbsg-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  padding: 20px 22px 16px;
+  border-bottom: 0.5px solid var(--qbw-hair);
+}
+.qbsg-root .qbsg-head-mark {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(150deg, #2ca01c, #108000);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+.qbsg-root .qbsg-head-mark span {
+  color: #fff;
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: -0.5px;
+}
+.qbsg-root .qbsg-head-txt {
+  flex: 1;
+  min-width: 0;
+  display: block;
+}
+.qbsg-root .qbsg-head-title {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.25px;
+  margin: 0;
+}
+.qbsg-root .qbsg-head-sub {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--qbw-muted);
+  margin: 3px 0 0;
+  max-width: 64ch;
+}
+.qbsg-root .qbsg-close {
+  flex-shrink: 0;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--qbw-faint);
+  padding: 5px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: background 0.13s ease, color 0.13s ease;
+}
+.qbsg-root .qbsg-close svg { width: 19px; height: 19px; }
+.qbsg-root .qbsg-close:hover { background: var(--qbw-card-2); color: var(--qbw-ink); }
+
+/* ── Phases ────────────────────────────────────────────────────────────────
+      Two phases on a vertical spine: set up once, then sync as work comes in.
+      Vertical because it reads as a sequence at any width, and because the
+      previous horizontal tier strip implied a running order to repeat. */
+.qbsg-root .qbsg-phases {
+  list-style: none;
+  margin: 0;
+  padding: 18px 22px 6px;
+  overflow-y: auto;
+  max-height: min(58vh, 540px);
+}
+.qbsg-root .qbsg-phase {
+  display: flex;
+  gap: 14px;
+  min-width: 0;
+}
+.qbsg-root .qbsg-phase-spine {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 26px;
+}
+.qbsg-root .qbsg-phase-num {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  font-size: 11.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--qbw-muted);
+  background: var(--qbw-card-2);
+  border: 0.5px solid var(--qbw-hair);
+}
+.qbsg-root .qbsg-phase-line {
+  flex: 1;
+  width: 1.5px;
+  min-height: 20px;
+  margin: 5px 0;
+  border-radius: 2px;
+  background: var(--qbw-hair);
+}
+.qbsg-root .qbsg-phase-main {
+  flex: 1;
+  min-width: 0;
+  padding-bottom: 22px;
+}
+.qbsg-root .qbsg-phase-head { margin: 2px 0 12px; }
+.qbsg-root .qbsg-phase-label {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.15px;
+  color: var(--qbw-ink);
+  margin: 0;
+}
+.qbsg-root .qbsg-phase-desc {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--qbw-muted);
+  margin: 3px 0 0;
+  max-width: 62ch;
+}
+
+/* ── Group inside a phase ──────────────────────────────────────────────────── */
+.qbsg-root .qbsg-group + .qbsg-group { margin-top: 14px; }
+.qbsg-root .qbsg-group-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 3px 8px;
+  margin-bottom: 8px;
+}
+.qbsg-root .qbsg-group-label {
+  font-size: 10px;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--qbw-ink-2);
+}
+.qbsg-root .qbsg-group-desc {
+  font-size: 11.5px;
+  color: var(--qbw-faint);
+}
+.qbsg-root .qbsg-group-mods {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ── Module chip ───────────────────────────────────────────────────────────
+      Four reading states. `focal` is the module whose attachments are on show,
+      `chain` the records it attaches to, `dimmed` everything unrelated — all
+      built from the one accent, so nothing has to be learned as a colour code. */
+.qbsg-root .qbsg-chip {
+  position: relative;
+  appearance: none;
+  font: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  border-radius: 9px;
+  background: var(--qbw-card);
+  border: 0.5px solid var(--qbw-hair-strong);
+  color: var(--qbw-ink-2);
+  font-size: 12.5px;
+  font-weight: 550;
+  letter-spacing: -0.05px;
+  transition: background 0.15s var(--qbw-ease), border-color 0.15s var(--qbw-ease),
+    color 0.15s var(--qbw-ease), opacity 0.15s var(--qbw-ease), transform 0.15s var(--qbw-ease);
+}
+.qbsg-root .qbsg-chip-ico {
+  display: grid;
+  place-items: center;
+  color: var(--qbw-faint);
+  transition: color 0.15s var(--qbw-ease);
+}
+.qbsg-root .qbsg-chip-ico svg { width: 15px; height: 15px; }
+.qbsg-root .qbsg-chip-name { white-space: nowrap; }
+.qbsg-root .qbsg-chip:hover {
+  background: var(--qbw-card-2);
+  border-color: var(--qbw-hair-strong);
+}
+.qbsg-root .qbsg-chip:active { transform: scale(0.98); }
+
+/* "You are here" — the module the workspace is showing behind the panel. */
+.qbsg-root .qbsg-chip-here {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--qbw-accent);
+  flex-shrink: 0;
+}
+.qbsg-root .qbsg-chip--current { border-color: var(--qbw-accent); }
+
+.qbsg-root .qbsg-chip--focal {
+  background: var(--qbw-accent);
+  border-color: var(--qbw-accent);
+  color: var(--qbw-accent-ink);
+  font-weight: 650;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.14);
+}
+.qbsg-root .qbsg-chip--focal .qbsg-chip-ico { color: var(--qbw-accent-ink); }
+.qbsg-root .qbsg-chip--focal .qbsg-chip-here { background: var(--qbw-accent-ink); }
+.qbsg-root .qbsg-chip--focal:hover { background: var(--qbw-accent); filter: brightness(1.06); }
+
+.qbsg-root .qbsg-chip--chain {
+  background: var(--qbw-accent-soft);
+  border-color: var(--qbw-accent);
+  color: var(--qbw-accent);
+  font-weight: 650;
+}
+.qbsg-root .qbsg-chip--chain .qbsg-chip-ico { color: var(--qbw-accent); }
+.qbsg-root .qbsg-chip--chain:hover { background: var(--qbw-accent-soft); filter: brightness(0.98); }
+
+.qbsg-root .qbsg-chip--dimmed { opacity: 0.4; }
+.qbsg-root .qbsg-chip--dimmed:hover { opacity: 0.75; }
+
+/* ── Panel footer: what the selected module attaches to ────────────────────── */
+.qbsg-root .qbsg-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 13px 22px;
+  border-top: 0.5px solid var(--qbw-hair);
+  background: var(--qbw-card-2);
+  min-height: 58px;
+  justify-content: center;
+}
+.qbsg-root .qbsg-foot-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 12px;
+  color: var(--qbw-muted);
+}
+.qbsg-root .qbsg-foot-hint svg { width: 15px; height: 15px; color: var(--qbw-faint); }
+
+.qbsg-root .qbsg-foot-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+.qbsg-root .qbsg-attach {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+}
+.qbsg-root .qbsg-attach-label {
+  font-size: 10px;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--qbw-faint);
+  white-space: nowrap;
+}
+.qbsg-root .qbsg-attach-chips {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  min-width: 0;
+}
+.qbsg-root .qbsg-attach-chip {
+  appearance: none;
+  font: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border: 0.5px solid var(--qbw-hair-strong);
+  border-radius: 999px;
+  background: var(--qbw-card);
+  color: var(--qbw-ink-2);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: border-color 0.13s ease, color 0.13s ease, transform 0.13s ease;
+}
+.qbsg-root .qbsg-attach-chip-ico { display: grid; place-items: center; color: var(--qbw-faint); }
+.qbsg-root .qbsg-attach-chip-ico svg { width: 14px; height: 14px; }
+.qbsg-root .qbsg-attach-chip:hover { border-color: var(--qbw-accent); color: var(--qbw-accent); }
+.qbsg-root .qbsg-attach-chip:hover .qbsg-attach-chip-ico { color: var(--qbw-accent); }
+.qbsg-root .qbsg-attach-chip:active { transform: scale(0.97); }
+
+.qbsg-root .qbsg-foot-actions {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.qbsg-root .qbsg-foot-go,
+.qbsg-root .qbsg-foot-clear {
+  appearance: none;
+  font: inherit;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 6px 13px;
+  white-space: nowrap;
+  transition: background 0.13s ease, color 0.13s ease, filter 0.13s ease;
+}
+.qbsg-root .qbsg-foot-go {
+  background: var(--qbw-accent);
+  border: 0.5px solid var(--qbw-accent);
+  color: var(--qbw-accent-ink);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.14);
+}
+.qbsg-root .qbsg-foot-go:hover { filter: brightness(1.06); }
+.qbsg-root .qbsg-foot-clear {
+  background: transparent;
+  border: 0.5px solid var(--qbw-hair-strong);
+  color: var(--qbw-muted);
+}
+.qbsg-root .qbsg-foot-clear:hover { background: var(--qbw-card); color: var(--qbw-ink); }
+
+.qbsg-root .qbsg-foot-note {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--qbw-muted);
+  max-width: 76ch;
+}
+.qbsg-root .qbsg-foot-note strong { font-weight: 650; color: var(--qbw-ink-2); }
+
+/* ── Focus ─────────────────────────────────────────────────────────────────── */
+.qbsg-root .qbsg-chip:focus-visible,
+.qbsg-root .qbsg-close:focus-visible,
+.qbsg-root .qbsg-attach-chip:focus-visible,
+.qbsg-root .qbsg-foot-go:focus-visible,
+.qbsg-root .qbsg-foot-clear:focus-visible {
+  outline: 2px solid var(--qbw-accent);
+  outline-offset: 2px;
+}
+
+
+/* ── Module status pill ────────────────────────────────────────────────────
+      Lives on the module header's toolbar row, straight after the filter pills, so
+      it costs no row of its own. It shows the headline only — what it is, how many,
+      and the tone — and hands the detail to the popover below.
+
+      Its BOX METRICS are copied from `.qbw-fpill` exactly (same padding, font size,
+      border width, radius and inner gap) so it shares their height and baseline and
+      the row reads as one aligned set of controls.
+
+      Its FILL deliberately does not match: filter pills are solid `--qbw-card` and
+      toggle with `aria-pressed`, so a pill identical to them would read as one more
+      filter. This one is transparent until hovered — same shape, quieter surface. */
+.qbw-root .qbsg-pin {
+  appearance: none;
+  font: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 11px;
+  border-radius: 999px;
+  border: 0.5px solid var(--qbw-hair);
+  background: transparent;
+  color: var(--qbw-muted);
+  font-size: 12.5px;
+  font-weight: 550;
+  white-space: nowrap;
+  transition: background 0.13s ease, border-color 0.13s ease, color 0.13s ease, transform 0.13s ease;
+}
+/* Status dot — identical metrics to `.qbw-fpill-dot`, so the pill and the filter
+   pills beside it carry their state at exactly the same visual weight. */
+.qbw-root .qbsg-pin-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; background: var(--qbw-wait); }
+.qbw-root .qbsg-pin-dot--ok { background: var(--qbw-ok); }
+.qbw-root .qbsg-pin-dot--warn { background: var(--qbw-warn-dot); }
+/* Count badge — the same treatment `.qbw-fpill-n` gives the filter counts beside it. */
+.qbw-root .qbsg-pin-n { font-variant-numeric: tabular-nums; font-weight: 700; opacity: 0.85; }
+.qbw-root .qbsg-pin:hover { background: var(--qbw-card-2); border-color: var(--qbw-hair-strong); color: var(--qbw-ink-2); }
+.qbw-root .qbsg-pin:active { transform: scale(0.97); }
+.qbw-root .qbsg-pin[aria-expanded="true"] { background: var(--qbw-card-2); border-color: var(--qbw-hair-strong); color: var(--qbw-ink); }
+
+.qbw-root .qbsg-pin--ok { color: var(--qbw-ok); border-color: var(--qbw-ok-soft); background: var(--qbw-ok-soft); }
+.qbw-root .qbsg-pin--ok:hover { color: var(--qbw-ok); border-color: var(--qbw-ok); background: var(--qbw-ok-soft); }
+
+/* The only state that raises its voice — it is the one the user has to act on. */
+.qbw-root .qbsg-pin--warn {
+  color: var(--qbw-warn);
+  border-color: var(--qbw-warn-dot);
+  background: var(--qbw-warn-soft);
+  font-weight: 650;
+}
+.qbw-root .qbsg-pin--warn:hover { color: var(--qbw-warn); border-color: var(--qbw-warn); background: var(--qbw-warn-soft); }
+
+.qbw-root .qbsg-pin:focus-visible {
+  outline: 2px solid var(--qbw-accent);
+  outline-offset: 2px;
+}
+
+/* Off-screen but reachable by assistive tech — carries the problem announcement
+   that the removed alert row used to make. Not `display: none`, which would take
+   it out of the accessibility tree entirely. */
+.qbsg-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Detail popover ────────────────────────────────────────────────────────
+      Everything the row used to show, on demand: each attached record with its
+      state, one line explaining the one-time-setup model, and the way into the
+      full guide. Portalled by MUI, so these rules sit at the top level. */
+.MuiPopover-paper.qbsg-pop-paper {
+  margin-top: 6px;
+  background: var(--qbw-card);
+  border: 0.5px solid var(--qbw-hair-strong);
+  border-radius: 12px;
+  box-shadow: 0 18px 50px -20px rgba(20, 24, 40, 0.36), 0 1px 3px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.qbsg-pop {
+  font-family: var(--qbw-font);
+  color: var(--qbw-ink);
+  -webkit-font-smoothing: antialiased;
+  width: 320px;
+  max-width: calc(100vw - 32px);
+  /* No bottom padding: the footer band is full-bleed and supplies its own, so it can
+     run to the paper's edge and pick up its rounded corners. */
+  padding: 12px 12px 0;
+
+  *, *::before, *::after { box-sizing: border-box; }
+  svg { display: block; }
+}
+
+.qbsg-pop-title {
+  margin: 0 0 8px;
+  padding: 0 4px;
+  font-size: 10px;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--qbw-faint);
+}
+
+.qbsg-pop-list { list-style: none; margin: 0; padding: 0; }
+.qbsg-pop-item {
+  appearance: none;
+  font: inherit;
+  cursor: pointer;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--qbw-ink);
+  text-align: left;
+  font-size: 12.5px;
+  transition: background 0.13s ease;
+}
+.qbsg-pop-item:hover { background: var(--qbw-card-2); }
+.qbsg-pop-item-ico { display: grid; place-items: center; flex-shrink: 0; color: var(--qbw-faint); }
+.qbsg-pop-item-ico svg { width: 15px; height: 15px; }
+.qbsg-pop-item-name { flex: 1; min-width: 0; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.qbsg-pop-item-state { flex-shrink: 0; font-size: 11px; font-weight: 600; }
+.qbsg-pop-item-state--ok { color: var(--qbw-ok); }
+.qbsg-pop-item-state--warn { color: var(--qbw-warn); }
+.qbsg-pop-item-go { width: 15px; height: 15px; flex-shrink: 0; color: var(--qbw-faint); }
+.qbsg-pop-item:hover .qbsg-pop-item-go { color: var(--qbw-ink-2); }
+
+/* ── Footer band ────────────────────────────────────────────────────────────
+      The closing advice plus the way into the full guide, read as one block. It is
+      full-bleed — negative side margins cancel the panel's padding — so the hairline
+      spans the whole width and the tint reads as a footer rather than a boxed-in
+      card floating inside one. The paper's `overflow: hidden` rounds its corners. */
+.qbsg-pop-foot {
+  display: flex;
+  flex-direction: column;
+  /* The chip takes its own width, not the row's — see `align-self` on it for the side
+     it takes. Flex-start is the default the note wants; the chip overrides it. */
+  align-items: flex-start;
+  gap: 9px;
+  margin: 10px -12px 0;
+  padding: 10px 12px 11px;
+  border-top: 0.5px solid var(--qbw-hair);
+  background: var(--qbw-card-2);
+}
+
+.qbsg-pop-note {
+  margin: 0;
+  padding: 0 2px;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--qbw-muted);
+}
+.qbsg-pop-note strong { font-weight: 650; color: var(--qbw-ink-2); }
+
+/* A chip, not a row: it carries a border and the panel's own card colour so it stands
+   off the tinted band as something you press, and it stops at the end of its label
+   instead of running the panel's full width. Text only — the label is the whole control,
+   word for word the rail's own "How it works ?". */
+.qbsg-pop-more {
+  appearance: none;
+  font: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  /* Trailing edge of the band, under the note rather than beside it: where a panel's
+     one action is expected, and clear of the left rail that every record row and the
+     note itself start from — a chip on that line was one more thing beginning where
+     the list begins.
+     Flush against the band's content edge, with NO inset: the chip's 8px right padding
+     is the record rows' own `padding-right`, so flush is what puts its border on the
+     rows' box edge AND the end of its label on the column the rows' trailing chevrons
+     end on. Insetting it so the border meets those chevrons looks like the tidier move
+     and is not — it breaks the second alignment to fake the first (both measured in a
+     headless render, 2026-08-19). */
+  align-self: flex-end;
+  /* padding-right stays 8px — it is the alignment invariant described above. The left
+     side gets more, because text needs the room a leading glyph did not. */
+  padding: 5px 8px 5px 10px;
+  border: 0.5px solid var(--qbw-hair-strong);
+  border-radius: 8px;
+  background: var(--qbw-card);
+  color: var(--qbw-accent);
+  font-size: 11.5px;
+  font-weight: 650;
+  line-height: 1.3;
+  white-space: nowrap;
+  box-shadow: 0 1px 1px rgba(20, 24, 40, 0.04);
+  transition: background 0.13s ease, border-color 0.13s ease;
+}
+.qbsg-pop-more:hover {
+  background: var(--qbw-accent-soft);
+  border-color: var(--qbw-accent);
+}
+.qbsg-pop-more:active { transform: translateY(0.5px); }
+
+.qbsg-pop-item:focus-visible {
+  outline: 2px solid var(--qbw-accent);
+  outline-offset: -2px;
+}
+/* Sits outside the box rather than inset: the link's hover box is only a few pixels
+   wider than its text, so an inset ring would land on the letters. */
+.qbsg-pop-more:focus-visible {
+  outline: 2px solid var(--qbw-accent);
+  outline-offset: 1px;
+}
+
+/* ── Narrow widths ─────────────────────────────────────────────────────────── */
+@media (max-width: 700px) {
+  .qbsg-root .qbsg-head { padding: 16px 16px 13px; }
+  .qbsg-root .qbsg-phases { padding: 14px 16px 4px; }
+  .qbsg-root .qbsg-foot { padding: 12px 16px; }
+  .qbsg-root .qbsg-foot-row { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .qbsg-root .qbsg-foot-actions { align-self: stretch; }
+  .qbsg-root .qbsg-foot-go { flex: 1; justify-content: center; }
+  /* Once the toolbar wraps, the pill starts a line of its own — a divider hanging at
+     the start of that line would read as a stray mark, so it goes. */
+  .qbw-root .qbw-toolbar-ctx::before { display: none; }
+}
+
+/* ── Reduced motion ────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .qbsg-root *,
+  .qbsg-pop *,
+  .qbw-root .qbsg-pin {
+    animation: none !important;
+    transition: none !important;
+  }
+  .qbsg-root .qbsg-chip:active,
+  .qbsg-root .qbsg-attach-chip:active,
+  .qbsg-pop-more:active,
+  .qbw-root .qbsg-pin:active { transform: none; }
+}

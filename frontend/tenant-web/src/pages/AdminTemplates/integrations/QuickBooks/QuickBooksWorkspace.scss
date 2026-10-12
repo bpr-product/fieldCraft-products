@@ -1,0 +1,679 @@
+/*
+ * Copyright (C) FIELDCRAFT Inc - All Rights Reserved
+ * This file is part of FieldCraft. - Proprietary and confidential
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ *
+ * QuickBooksWorkspace — calm macOS-flavoured connected sync/table workspace.
+ * Tokens namespaced --qbw-*; component styles scoped under .qbw-root.
+ * Header and body cells share horizontal padding and per-column align classes,
+ * so column headers and values are always perfectly aligned.
+ */
+
+:root {
+  --qbw-card:      #ffffff;
+  --qbw-rail-bg:   #f4f4f7;
+  --qbw-card-2:    #f5f6f8;
+  --qbw-hair:      rgba(0, 0, 0, 0.08);
+  --qbw-hair-2:    rgba(0, 0, 0, 0.06);
+  --qbw-hair-strong: rgba(0, 0, 0, 0.13);
+  --qbw-ink:       #1d1d1f;
+  --qbw-ink-2:     #3a3a3c;
+  --qbw-muted:     #6e6e73;
+  --qbw-faint:     #8e8e93;
+  --qbw-accent:    #007aff;
+  --qbw-accent-soft: rgba(0, 122, 255, 0.10);
+  --qbw-accent-ink: #ffffff;
+  --qbw-ease: cubic-bezier(0.2, 0.8, 0.3, 1);   /* shared calm easing for all motion */
+  /* Calm, restrained semantic status scale — replaces the old rainbow. */
+  --qbw-ok:   #0a84ff; --qbw-ok-soft:   rgba(10, 132, 255, 0.12);   /* synced (blue, matches "connected") */
+  --qbw-wait: #8a8f98; --qbw-wait-soft: rgba(138, 143, 152, 0.14);  /* pending (neutral) */
+  --qbw-warn: #c77700; --qbw-warn-dot: #ff9f0a; --qbw-warn-soft: rgba(255, 159, 10, 0.14); /* needs attention (amber) */
+  --qbw-bad:  #d1503f; --qbw-bad-soft:  rgba(209, 80, 63, 0.12);    /* failed (muted red) */
+  --qbw-green: #2ca01c; /* QuickBooks brand — logo mark only */
+  --qbw-font: -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  --qbw-mono: "SF Mono", ui-monospace, "Cascadia Code", "Segoe UI Mono", Menlo, monospace;
+}
+
+.qbw-root {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  font-family: var(--qbw-font);
+  color: var(--qbw-ink);
+  background: var(--qbw-card);
+  -webkit-font-smoothing: antialiased;
+  font-size: 14px;
+
+  *, *::before, *::after { box-sizing: border-box; }
+  svg { display: block; }
+
+  /* ── Rail ── */
+  .qbw-rail {
+    width: 248px; flex-shrink: 0; background: var(--qbw-rail-bg);
+    border-right: 0.5px solid var(--qbw-hair);
+    display: flex; flex-direction: column; padding: 14px 10px; overflow-y: auto;
+    transition: width .22s cubic-bezier(0.2, 0.8, 0.3, 1);
+  }
+  .qbw-rail-head { display: flex; align-items: center; gap: 10px; padding: 6px 8px 12px;
+    width: 100%; border: 0; background: transparent; color: inherit; font: inherit; cursor: pointer;
+    text-align: left; border-radius: 10px; margin-bottom: 2px; transition: background .13s ease; }
+  .qbw-rail-head:hover { background: var(--qbw-card-2); }
+  .qbw-rail-head-txt { min-width: 0; flex: 1; }
+  .qbw-rail-chev { width: 18px; height: 18px; color: var(--qbw-faint); flex-shrink: 0; }
+  .qbw-mark { width: 34px; height: 34px; border-radius: 8px; flex-shrink: 0; display: grid; place-items: center;
+    background: linear-gradient(150deg, #2ca01c, #108000); box-shadow: inset 0 1px 0 rgba(255,255,255,0.25); }
+  .qbw-mark span { color: #fff; font-weight: 800; font-size: 16px; letter-spacing: -0.5px; }
+  .qbw-rail-head-t { font-size: 14px; font-weight: 650; letter-spacing: -0.1px; }
+  .qbw-rail-head-s { font-size: 11px; color: var(--qbw-muted); display: flex; align-items: center; gap: 5px; }
+  .qbw-live { width: 6px; height: 6px; border-radius: 50%; background: var(--qbw-ok); box-shadow: 0 0 0 3px var(--qbw-ok-soft); }
+
+  .qbw-rail-group { font-size: 10px; font-weight: 650; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--qbw-faint); padding: 12px 8px 4px; }
+  .qbw-mod { position: relative; display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
+    padding: 7px 8px; border: 0; background: transparent; color: inherit; font: inherit;
+    border-radius: 8px; cursor: pointer; transition: background .13s ease; }
+  .qbw-mod:hover { background: var(--qbw-card-2); }
+  .qbw-mod--sel { background: var(--qbw-accent-soft); }
+  .qbw-mod-ico { width: 24px; height: 24px; border-radius: 6px; display: grid; place-items: center;
+    color: var(--qbw-muted); flex-shrink: 0; }
+  .qbw-mod--sel .qbw-mod-ico { color: var(--qbw-accent); }
+  .qbw-mod-ico svg { width: 16px; height: 16px; }
+  .qbw-mod-name { flex: 1; font-size: 13px; font-weight: 550; letter-spacing: -0.1px; }
+  .qbw-mod--sel .qbw-mod-name { font-weight: 650; }
+  .qbw-mod-badge { font-size: 10.5px; font-weight: 700; font-variant-numeric: tabular-nums;
+    padding: 1px 7px; border-radius: 999px; background: var(--qbw-warn-soft); color: var(--qbw-warn); }
+  .qbw-mod-count { font-size: 11px; color: var(--qbw-faint); font-variant-numeric: tabular-nums; }
+
+  .qbw-rail-foot { margin-top: auto; padding: 10px 4px 2px; display: flex; flex-direction: column; gap: 2px; border-top: 0.5px solid var(--qbw-hair); }
+  .qbw-rail-link { display: block; width: 100%; text-align: left; border: 0; background: transparent; font: inherit;
+    font-size: 12px; font-weight: 550; color: var(--qbw-muted); padding: 7px 8px; border-radius: 7px; cursor: pointer; transition: background .13s ease, color .13s ease; }
+  .qbw-rail-link:hover { background: var(--qbw-card-2); color: var(--qbw-ink); }
+  .qbw-rail-link:disabled { opacity: 0.5; cursor: default; }
+  /* Icon variant — the leading glyph marks the link that opens a surface rather
+     than acting in place, so Settings reads apart from the plain text links. */
+  .qbw-rail-link--icon { display: flex; align-items: center; gap: 8px; }
+  .qbw-rail-link--icon svg { width: 16px; height: 16px; flex-shrink: 0; }
+  .qbw-rail-link--danger { color: var(--qbw-bad); }
+  .qbw-rail-link--danger:hover { background: var(--qbw-bad-soft); color: var(--qbw-bad); }
+
+  /* Attention marker for the collapsed (icon-only) rail. */
+  .qbw-mod-dot { display: none; position: absolute; top: 6px; right: 9px; width: 7px; height: 7px;
+    border-radius: 50%; background: var(--qbw-warn); box-shadow: 0 0 0 2px var(--qbw-rail-bg); }
+
+  /* ── Collapsed rail: click the QuickBooks mark to show module icons only; the
+        work area (flex: 1) expands to fill the freed width. ── */
+  .qbw-rail--collapsed { width: 64px; padding: 14px 8px; }
+  .qbw-rail--collapsed .qbw-rail-head { justify-content: center; gap: 0; padding: 6px; }
+  .qbw-rail--collapsed .qbw-rail-head-txt,
+  .qbw-rail--collapsed .qbw-rail-chev,
+  .qbw-rail--collapsed .qbw-mod-name,
+  .qbw-rail--collapsed .qbw-mod-count,
+  .qbw-rail--collapsed .qbw-mod-badge { display: none; }
+  .qbw-rail--collapsed .qbw-mod { justify-content: center; gap: 0; padding: 9px 8px; }
+  .qbw-rail--collapsed .qbw-mod-dot { display: block; }
+  .qbw-rail--collapsed .qbw-rail-group { height: 0; padding: 0; margin: 8px 12px; font-size: 0;
+    color: transparent; border-top: 0.5px solid var(--qbw-hair); }
+  .qbw-rail--collapsed .qbw-rail-foot { display: none; }
+
+  /* ── Workspace column ── */
+  /* Base is a plain block so it can host existing module content during the
+     staged migration; the migrated per-module pane opts into a flex column. */
+  .qbw-work { flex: 1; min-width: 0; background: var(--qbw-card); display: flex; flex-direction: column; min-height: 0; }
+  .qbw-work--pane { display: flex; flex-direction: column; }
+
+  /* ── Sync-in-progress banner (calm; replaces the old per-module colored boxes) ── */
+  .qbw-syncbar {
+    position: relative; overflow: hidden; flex-shrink: 0;
+    display: flex; align-items: center; gap: 13px;
+    margin: 16px 28px 0; padding: 12px 16px 13px;
+    background: var(--qbw-accent-soft); border: 0.5px solid var(--qbw-hair-strong);
+    border-radius: 12px; animation: qbw-fade-up 0.3s ease both;
+  }
+  .qbw-syncbar-spin {
+    width: 16px; height: 16px; flex-shrink: 0; border-radius: 50%;
+    border: 2px solid var(--qbw-card); border-top-color: var(--qbw-accent);
+    animation: qbw-spin 0.7s linear infinite;
+  }
+  .qbw-syncbar-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+  .qbw-syncbar-title { font-size: 13.5px; font-weight: 650; letter-spacing: -0.1px; color: var(--qbw-ink); }
+  .qbw-syncbar-detail { font-size: 12px; color: var(--qbw-muted); }
+  .qbw-syncbar-state {
+    flex-shrink: 0; font-size: 11px; font-weight: 650; letter-spacing: 0.01em; color: var(--qbw-accent);
+    background: var(--qbw-card); border: 0.5px solid var(--qbw-hair); padding: 3px 10px; border-radius: 999px;
+  }
+  .qbw-syncbar-track { position: absolute; left: 0; right: 0; bottom: 0; height: 2.5px; overflow: hidden; }
+  .qbw-syncbar-fill {
+    position: absolute; top: 0; height: 100%; width: 34%; border-radius: 3px;
+    background: var(--qbw-accent); animation: qbw-indeterminate 1.4s ease-in-out infinite;
+  }
+
+  /* Setup note — a calm "configure first" prompt shown above a module table when an
+     action is required before syncing can run (e.g. employee sync settings). */
+  .qbw-setup-note {
+    flex-shrink: 0; display: flex; align-items: center; gap: 13px;
+    margin: 16px 28px 0; padding: 12px 16px;
+    background: var(--qbw-warn-soft); border: 0.5px solid var(--qbw-hair-strong);
+    border-radius: 12px; animation: qbw-fade-up 0.3s ease both;
+  }
+  .qbw-setup-note-ico { flex-shrink: 0; display: grid; place-items: center; color: var(--qbw-warn); }
+  .qbw-setup-note-ico svg { width: 18px; height: 18px; }
+  .qbw-setup-note-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+  .qbw-setup-note-title { font-size: 13.5px; font-weight: 650; letter-spacing: -0.1px; color: var(--qbw-ink); }
+  .qbw-setup-note-detail { font-size: 12px; color: var(--qbw-muted); }
+
+  /* Title hint — a quiet info affordance beside a module title that opens a short
+     explanation on click. Nothing is wrong, so it stays an icon until asked for
+     rather than occupying a permanent strip above the table. */
+  /* Centred on the title. The row's `align-items: center` plus the title's explicit
+     line-height put the glyph on the exact vertical middle of the heading — no optical
+     nudge, so it stays centred if the title's size or line-height ever changes. */
+  .qbw-hint-wrap { position: relative; display: inline-flex; flex-shrink: 0; }
+  .qbw-hint-btn {
+    display: grid; place-items: center; padding: 2px; border: 0; border-radius: 50%;
+    background: transparent; color: var(--qbw-faint); cursor: pointer;
+    transition: background .13s ease, color .13s ease;
+  }
+  .qbw-hint-btn:hover { background: var(--qbw-card-2); color: var(--qbw-muted); }
+  .qbw-hint-btn[aria-expanded="true"] { background: var(--qbw-accent-soft); color: var(--qbw-accent); }
+  .qbw-hint-btn svg { width: 16px; height: 16px; }
+  .qbw-hintpop {
+    position: absolute; top: calc(100% + 7px); left: 0; width: 264px;
+    display: flex; flex-direction: column; gap: 2px;
+    background: var(--qbw-card); border: 0.5px solid var(--qbw-hair-strong);
+    border-radius: 12px; box-shadow: 0 10px 40px -10px rgba(20, 24, 40, 0.28);
+    padding: 11px 13px; z-index: 30;
+  }
+  .qbw-hintpop-title { font-size: 13px; font-weight: 650; letter-spacing: -0.1px; color: var(--qbw-ink); }
+  .qbw-hintpop-detail { font-size: 12px; font-weight: 400; line-height: 1.45; color: var(--qbw-muted); }
+
+  .qbw-sticky { position: sticky; top: 0; z-index: 5; background: var(--qbw-card); border-bottom: 0.5px solid var(--qbw-hair); }
+  .qbw-whead { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 22px 28px 0; }
+  .qbw-whead-l { min-width: 0; display: flex; align-items: center; gap: 13px; }
+  .qbw-title-ico { width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0; display: grid; place-items: center;
+    background: var(--qbw-accent-soft); color: var(--qbw-accent); }
+  .qbw-title-ico svg { width: 20px; height: 20px; }
+  .qbw-wtitle-row { display: flex; align-items: center; gap: 7px; min-width: 0; }
+  /* Explicit line-height so the hint icon beside it has a deterministic box to
+     align against, rather than the browser's font-dependent `normal`. */
+  .qbw-wtitle { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; line-height: 1.2; margin: 0; }
+  .qbw-wdesc { font-size: 12.5px; color: var(--qbw-muted); margin: 2px 0 0; max-width: 70ch; }
+
+  .qbw-sync-cluster { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+  /* Split Sync button — grouped sync config + action (the mode lives in the menu) */
+  .qbw-sync-wrap { position: relative; }
+  .qbw-splitbtn { display: inline-flex; align-items: stretch; border-radius: 9px; box-shadow: 0 1px 2px rgba(0,0,0,0.14); }
+  .qbw-splitbtn--busy { pointer-events: none; opacity: 0.9; }
+  .qbw-split-main, .qbw-split-caret { border: 0; background: var(--qbw-accent); color: #fff; font: inherit; font-weight: 600;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: filter .13s ease; }
+  .qbw-split-main { font-size: 13px; padding: 9px 16px; border-radius: 9px 0 0 9px; }
+  .qbw-split-main:only-child { border-radius: 9px; }
+  .qbw-split-caret { padding: 0 9px; border-radius: 0 9px 9px 0; border-left: 1px solid rgba(255,255,255,0.28); }
+  .qbw-split-main:not(:disabled):hover, .qbw-split-caret:not(:disabled):hover { filter: brightness(1.07); }
+  .qbw-split-main:disabled, .qbw-split-caret:disabled { cursor: not-allowed; }
+  /* Dim the button when it's blocked (disabled but not actively syncing), so it clearly
+     reads as unavailable; the syncing module keeps its busy look + spinner. */
+  .qbw-splitbtn:not(.qbw-splitbtn--busy) .qbw-split-main:disabled,
+  .qbw-splitbtn:not(.qbw-splitbtn--busy) .qbw-split-caret:disabled { opacity: 0.5; }
+  .qbw-split-main svg, .qbw-split-caret svg { width: 15px; height: 15px; }
+  .qbw-sync-menu { position: absolute; top: calc(100% + 7px); right: 0; width: 272px; background: var(--qbw-card);
+    border: 0.5px solid var(--qbw-hair-strong); border-radius: 12px; box-shadow: 0 10px 40px -10px rgba(20,24,40,0.28);
+    padding: 7px; z-index: 30; }
+  .qbw-sync-menu-label { font-size: 10.5px; font-weight: 650; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--qbw-faint); padding: 6px 9px 5px; }
+  .qbw-sync-opt { display: flex; gap: 10px; align-items: flex-start; width: 100%; text-align: left; padding: 9px;
+    border: 0; background: transparent; color: inherit; font: inherit; border-radius: 8px; cursor: pointer; }
+  .qbw-sync-opt:hover { background: var(--qbw-card-2); }
+  .qbw-sync-opt-check { width: 16px; height: 16px; margin-top: 1px; color: var(--qbw-accent); flex-shrink: 0; visibility: hidden; }
+  .qbw-sync-opt--on .qbw-sync-opt-check { visibility: visible; }
+  .qbw-sync-opt-t { display: block; font-size: 13px; font-weight: 600; }
+  .qbw-sync-opt-d { display: block; font-size: 11.5px; color: var(--qbw-muted); margin-top: 1px; line-height: 1.4; }
+
+  .qbw-toolbar { display: flex; align-items: center; gap: 14px; padding: 16px 28px; flex-wrap: wrap; }
+  .qbw-search { display: flex; align-items: center; gap: 8px; background: var(--qbw-card-2); border: 0.5px solid var(--qbw-hair);
+    border-radius: 8px; padding: 7px 11px; min-width: 220px; flex: 0 1 300px; }
+  .qbw-search svg { width: 15px; height: 15px; color: var(--qbw-faint); flex-shrink: 0; }
+  .qbw-search input { border: 0; background: transparent; font: inherit; font-size: 13px; color: var(--qbw-ink); width: 100%; outline: none; }
+  .qbw-search input::placeholder { color: var(--qbw-faint); }
+
+  .qbw-fgroup { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .qbw-fgroup-label { font-size: 10.5px; font-weight: 650; text-transform: uppercase; letter-spacing: 0.05em; color: var(--qbw-faint); }
+  .qbw-fpills { display: flex; gap: 6px; flex-wrap: wrap; }
+  .qbw-fpill { display: inline-flex; align-items: center; gap: 7px; border: 0.5px solid var(--qbw-hair);
+    background: var(--qbw-card); color: var(--qbw-ink-2); font: inherit; font-size: 12.5px; font-weight: 550;
+    padding: 6px 11px; border-radius: 999px; cursor: pointer; transition: all .13s ease; }
+  .qbw-fpill:hover { background: var(--qbw-card-2); }
+  .qbw-fpill[aria-pressed="true"] { border-color: transparent; background: var(--qbw-ink); color: var(--qbw-card); }
+  .qbw-fpill-dot { width: 7px; height: 7px; border-radius: 50%; }
+  .qbw-fpill-dot--ok { background: var(--qbw-ok); }
+  .qbw-fpill-dot--wait { background: var(--qbw-wait); }
+  .qbw-fpill-dot--warn { background: var(--qbw-warn-dot); }
+  .qbw-fpill-dot--bad { background: var(--qbw-bad); }
+  .qbw-fpill-n { font-variant-numeric: tabular-nums; font-weight: 700; opacity: 0.85; }
+
+  /* Module context on the toolbar row. It flows straight on from the filter pills
+     rather than being pushed to the far edge — right-aligning it left a gap wide
+     enough that it read as a stray control instead of part of this row. A hairline
+     keeps it legible as a different KIND of control (it is not a filter) while it
+     stays on the same line and baseline as its neighbours. */
+  .qbw-toolbar-ctx { flex-shrink: 0; display: flex; align-items: center; }
+  .qbw-toolbar-ctx::before {
+    content: ""; width: 1px; height: 18px; margin-right: 14px; flex-shrink: 0;
+    background: var(--qbw-hair-strong);
+  }
+
+  /* ── Table ── */
+  .qbw-table-region { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .qbw-tscroll { flex: 1; min-height: 0; overflow: auto; padding: 0 20px; }
+  .qbw-table { width: 100%; border-collapse: collapse; }
+  /* Header and body share horizontal padding → columns always line up. */
+  .qbw-table th, .qbw-table td { padding: 12px 14px; }
+  .qbw-table thead th {
+    position: sticky; top: 0; background: var(--qbw-card); z-index: 2; text-align: left;
+    font-size: 10.5px; font-weight: 650; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--qbw-faint); border-bottom: 0.5px solid var(--qbw-hair); white-space: nowrap;
+  }
+  /* Applied to BOTH th and td for a column → header + values align. */
+  .qbw-table th.qbw-num, .qbw-table td.qbw-num { text-align: right; font-variant-numeric: tabular-nums; }
+  .qbw-table tbody tr { border-bottom: 0.5px solid var(--qbw-hair-2); }
+  .qbw-table td { font-size: 13px; vertical-align: middle; color: var(--qbw-ink-2); }
+  .qbw-row--click { cursor: pointer; transition: background .1s ease; }
+  .qbw-row--click:hover { background: var(--qbw-card-2); }
+  .qbw-empty-row td { padding: 48px 14px; text-align: center; color: var(--qbw-faint); font-size: 13px; }
+
+  /* ── Reusable cell helpers ── */
+  .qbw-cell-main { display: flex; align-items: center; gap: 11px; }
+  .qbw-src { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; flex-shrink: 0;
+    border: 0.5px solid var(--qbw-hair); }
+  .qbw-src svg { width: 15px; height: 15px; }
+  .qbw-src--fieldcraft { background: var(--qbw-card-2); color: var(--qbw-muted); }
+  .qbw-src--qbo { background: rgba(44,160,28,0.10); color: var(--qbw-green); }
+  .qbw-src--qbo span { font-weight: 800; font-size: 12px; letter-spacing: -0.5px; }
+  .qbw-cell-name { font-weight: 600; letter-spacing: -0.1px; color: var(--qbw-ink); }
+  .qbw-cell-sub { font-size: 11.5px; color: var(--qbw-muted); margin-top: 1px; display: flex; align-items: center; gap: 6px; }
+  .qbw-src-tag { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; color: var(--qbw-faint); }
+  .qbw-amount { font-weight: 650; letter-spacing: -0.2px; color: var(--qbw-ink); }
+  .qbw-proj { color: var(--qbw-ink-2); }
+  .qbw-proj--none { color: var(--qbw-warn); font-size: 12px; display: inline-flex; align-items: center; gap: 5px; }
+  .qbw-proj--none svg { width: 13px; height: 13px; }
+  /* Stock bills have no project by design — informational, not a warning */
+  .qbw-proj--stock { color: var(--qbw-muted); font-size: 12px; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+  .qbw-proj--stock svg { width: 13px; height: 13px; color: var(--qbw-faint); }
+  .qbw-qbid { font-family: var(--qbw-mono); font-size: 12px; color: var(--qbw-ink-2); display: inline-flex; align-items: center; gap: 6px; }
+  .qbw-qbid svg { width: 13px; height: 13px; color: var(--qbw-ok); }
+  .qbw-qbid--none { font-family: var(--qbw-font); color: var(--qbw-faint); }
+  .qbw-last { color: var(--qbw-muted); font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .qbw-fieldcraft-status { display: inline-flex; align-items: center; font-size: 11.5px; font-weight: 600;
+    padding: 3px 9px; border-radius: 6px; background: var(--qbw-card-2); color: var(--qbw-ink-2); border: 0.5px solid var(--qbw-hair); }
+
+  /* Identity cell — leading mark + name + source pill + email.
+     Shape carries the meaning: a circle is somebody, a rounded square is something.
+     Both marks are 38px so row height and the name's left edge never shift between
+     modules. */
+  .qbw-idc { display: flex; align-items: center; gap: 12px; }
+  .qbw-avatar { width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0; display: grid; place-items: center;
+    font-weight: 700; font-size: 13px; letter-spacing: 0.2px; }
+  /* Record tile — a bill, project, account, service or time entry. Deliberately quiet
+     and uniform rather than tinted per row: the glyph says which kind of record this is,
+     so colour here would only compete with the status column. */
+  .qbw-rectile {
+    width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0; display: grid; place-items: center;
+    background: var(--qbw-card-2); color: var(--qbw-muted);
+    border: 0.5px solid var(--qbw-hair); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  }
+  .qbw-rectile svg { width: 18px; height: 18px; }
+  .qbw-idc-txt { min-width: 0; }
+  .qbw-idc-line1 { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .qbw-idc-name { font-weight: 650; letter-spacing: -0.1px; color: var(--qbw-ink);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    min-width: 0; max-width: 200px; }
+  /* Opt-in: show the full name across up to two lines, with more room (e.g. projects). */
+  .qbw-idc-name--wrap { white-space: normal; text-overflow: clip; max-width: 340px;
+    line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+
+  /* Wrapping name + source pill = ONE inline run.
+     As flex siblings the name box always claimed its full 340px max-width once the text was
+     long enough to wrap, so the pill was pushed to that fixed edge and a name whose last
+     line ended early left a gap as wide as the rest of that line. Flowing them inline puts
+     the pill immediately after the last word instead. The clamp moves up to this container
+     so name + pill are limited together. */
+  .qbw-idc-line1--wrap {
+    display: block;
+    max-width: 340px;
+    line-height: 1.35;
+    /* Exactly three line boxes at the line-height above — an exact multiple, so a longer
+       name is cut cleanly between lines rather than leaving a half-height sliver.
+       Three, not two: the name still wraps to two lines as before, and the third exists so
+       that when a last line ends nearly full the pill can wrap under it instead of being
+       clipped out of existence by the `overflow` below. */
+    max-height: 4.05em;
+    overflow: hidden;
+  }
+  /* Back into the text flow — this also drops the line clamp the name carried as a flex
+     item, which the container now owns. */
+  .qbw-idc-line1--wrap .qbw-idc-name--wrap { display: inline; }
+  /* The flex `gap` no longer applies once the row is inline, so restate it as a margin.
+     `line-height: 1` matters: `.qbw-idc-badge` / `.qbw-mini-chip` are inline-FLEX, so unlike
+     the plain-inline pill their box height does feed into the line box — left at 1.35 a
+     badge could push line two past the clamp above and get its bottom edge shaved. */
+  .qbw-idc-line1--wrap .qbw-src-pill,
+  .qbw-idc-line1--wrap .qbw-idc-badge,
+  .qbw-idc-line1--wrap .qbw-mini-chip,
+  .qbw-idc-line1--wrap .qbw-stock { margin-left: 8px; vertical-align: middle; line-height: 1; }
+  .qbw-src-pill { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em;
+    padding: 2px 7px; border-radius: 5px; white-space: nowrap; flex-shrink: 0; }
+  .qbw-src-pill--fieldcraft { background: var(--qbw-card-2); color: var(--qbw-muted); border: 0.5px solid var(--qbw-hair); }
+  .qbw-src-pill--qbo { background: rgba(44,160,28,0.12); color: var(--qbw-green); }
+  .qbw-idc-email { display: flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--qbw-muted); margin-top: 2px; max-width: 240px; }
+  .qbw-idc-email svg { width: 12px; height: 12px; opacity: 0.7; flex-shrink: 0; }
+  .qbw-idc-sub { font-size: 11.5px; color: var(--qbw-muted); margin-top: 2px; max-width: 240px; }
+  .qbw-idc-linetxt { display: block; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* A start/end window in a sub line: label column, value column, one row each. The
+     values share a column so they read as a pair you can compare vertically, and each
+     line is short enough to clear `.qbw-idc-sub`'s 240px cap — which the old single-line
+     "Start: … • End: …" run was not, losing the end time to the ellipsis above. */
+  .qbw-timewin { display: grid; grid-template-columns: auto auto; justify-content: start; gap: 1px 6px; }
+  .qbw-timewin-lbl { color: var(--qbw-faint); }
+
+  /* FIELDCRAFT status pill (Active / Inactive / Not in FIELDCRAFT) */
+  .qbw-fieldcraft-pill { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 600;
+    padding: 3px 10px; border-radius: 999px; background: var(--qbw-card-2); color: var(--qbw-ink-2); border: 0.5px solid var(--qbw-hair); }
+  .qbw-fieldcraft-pill-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--qbw-ok); }
+  .qbw-fieldcraft-pill--inactive { color: var(--qbw-muted); }
+  .qbw-fieldcraft-pill--inactive .qbw-fieldcraft-pill-dot { background: var(--qbw-faint); }
+
+  /* Soft sync-status pill.
+     `white-space: nowrap` is load-bearing, not cosmetic. The label is a bare text node, so
+     it becomes an ANONYMOUS flex item with the default `flex-shrink: 1`. In a tight column
+     (Time Activity is the narrowest — it carries the most columns) that item shrank below
+     its max-content width and a two-word label like "Not ready" broke across two lines. The
+     item kept its shrunken width while the second line was shorter, so the trailing info
+     icon was laid out past the unused remainder and read as detached from the label.
+     Refusing to wrap makes min-content equal max-content, and a flex item's automatic
+     minimum size then stops it shrinking below the full label. */
+  .qbw-spill { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 600;
+    padding: 5px 11px; border-radius: 999px; white-space: nowrap; }
+  .qbw-spill-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .qbw-spill--ok   { background: var(--qbw-ok-soft);   color: var(--qbw-ok); }    .qbw-spill--ok .qbw-spill-dot   { background: var(--qbw-ok); }
+  .qbw-spill--wait { background: var(--qbw-wait-soft); color: var(--qbw-muted); } .qbw-spill--wait .qbw-spill-dot { background: var(--qbw-wait); }
+  .qbw-spill--warn { background: var(--qbw-warn-soft); color: var(--qbw-warn); }  .qbw-spill--warn .qbw-spill-dot { background: var(--qbw-warn-dot); }
+  .qbw-spill--bad  { background: var(--qbw-bad-soft);  color: var(--qbw-bad); }   .qbw-spill--bad .qbw-spill-dot  { background: var(--qbw-bad); }
+  .qbw-spill-reason { display: block; font-size: 11px; color: var(--qbw-faint); margin-top: 4px; }
+  /* `flex-shrink: 0` for the same reason as the dot: the glyph is a fixed 13px affordance and
+     must never be squeezed to a sliver when the column is tight. */
+  .qbw-spill-info { display: inline-flex; align-items: center; cursor: help; opacity: 0.6; flex-shrink: 0; }
+  .qbw-spill-info svg { width: 13px; height: 13px; }
+  .qbw-spill-info:hover, .qbw-spill-info:focus-visible { opacity: 1; }
+  .qbw-spill-info:focus-visible { outline: 2px solid var(--qbw-accent); outline-offset: 1px; border-radius: 3px; }
+
+  /* Small pills / chips (worker type, stock, "not synced", etc.) */
+  .qbw-idc-badge, .qbw-mini-chip {
+    display: inline-flex; align-items: center; gap: 4px; font-size: 9.5px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.03em; padding: 2px 6px; border-radius: 5px;
+    background: var(--qbw-card-2); color: var(--qbw-muted); border: 0.5px solid var(--qbw-hair); white-space: nowrap;
+  }
+  .qbw-mini-chip--w2   { color: var(--qbw-accent); background: var(--qbw-accent-soft); border-color: transparent; }
+  .qbw-mini-chip--1099 { color: #8158d6; background: rgba(124, 92, 196, 0.12); border-color: transparent; }
+  .qbw-mini-chip--warn { color: var(--qbw-warn); background: var(--qbw-warn-soft); border-color: transparent; }
+  .qbw-bill-payment-sync-needed { cursor: help; }
+  .qbw-bill-payment-sync-needed svg { width: 11px; height: 11px; }
+
+  .qbw-cell-lines { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  /* Stacked value + sub-line in a right-aligned column (e.g. an invoice amount over its
+     tax line). The column's `qbw-num` right-aligns text, but these are flex items in a
+     column, so they also need their cross-axis pinned to the end — otherwise a short
+     sub-line sits away from the value it belongs to. */
+  .qbw-cell-lines--right { align-items: flex-end; text-align: right; }
+  .qbw-cell-meta { font-size: 11px; color: var(--qbw-muted); }
+  .qbw-cell-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin-top: 2px; }
+  .qbw-duration { font-weight: 650; color: var(--qbw-ink); font-variant-numeric: tabular-nums; }
+
+  .qbw-check-col { width: 44px; }
+  .qbw-check-col .MuiCheckbox-root { padding: 4px; }
+  .qbw-stock { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em;
+    color: var(--qbw-muted); background: var(--qbw-card-2); border: 0.5px solid var(--qbw-hair); padding: 1px 6px; border-radius: 5px;
+    white-space: nowrap; flex-shrink: 0; }
+
+  /* ── Status cell ── */
+  .qbw-status-wrap { display: inline-flex; flex-direction: column; gap: 0; }
+  .qbw-status { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 600; }
+  .qbw-status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .qbw-status--ok   { color: var(--qbw-ok); }   .qbw-status--ok   .qbw-status-dot { background: var(--qbw-ok);  box-shadow: 0 0 0 3px var(--qbw-ok-soft); }
+  .qbw-status--wait { color: var(--qbw-muted); } .qbw-status--wait .qbw-status-dot { background: var(--qbw-wait); box-shadow: 0 0 0 3px var(--qbw-wait-soft); }
+  .qbw-status--warn { color: var(--qbw-warn); } .qbw-status--warn .qbw-status-dot { background: var(--qbw-warn-dot); box-shadow: 0 0 0 3px var(--qbw-warn-soft); }
+  .qbw-status--bad  { color: var(--qbw-bad); }  .qbw-status--bad  .qbw-status-dot { background: var(--qbw-bad);  box-shadow: 0 0 0 3px var(--qbw-bad-soft); }
+  .qbw-status-reason { font-size: 11px; font-weight: 400; color: var(--qbw-faint); margin-top: 2px; }
+
+  /* ── Buttons ── */
+  .qbw-btn { appearance: none; border: 0.5px solid transparent; font: inherit; font-size: 13px; font-weight: 600;
+    padding: 8px 16px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 7px;
+    transition: filter .13s ease, background .13s ease; white-space: nowrap; }
+  .qbw-btn svg { width: 15px; height: 15px; }
+  .qbw-btn:disabled { opacity: 0.55; cursor: default; }
+  .qbw-btn-primary { background: var(--qbw-accent); color: var(--qbw-accent-ink); box-shadow: 0 1px 2px rgba(0,0,0,0.14); }
+  .qbw-btn-primary:not(:disabled):hover { filter: brightness(1.06); }
+  .qbw-btn-ghost { background: var(--qbw-card); color: var(--qbw-ink-2); border-color: var(--qbw-hair-strong); }
+  .qbw-btn-ghost:not(:disabled):hover { background: var(--qbw-card-2); }
+  .qbw-spin { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff;
+    border-radius: 50%; animation: qbw-spin 0.7s linear infinite; }
+  @keyframes qbw-spin { to { transform: rotate(360deg); } }
+
+  /* ── Pager ── */
+  .qbw-pager { display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    padding: 14px 28px; border-top: 0.5px solid var(--qbw-hair); background: var(--qbw-card); flex-wrap: wrap; flex-shrink: 0; }
+  .qbw-pager-l { font-size: 12px; color: var(--qbw-muted); display: flex; align-items: center; gap: 10px; }
+  .qbw-pager-l select { font: inherit; font-size: 12px; padding: 4px 8px; border-radius: 7px;
+    border: 0.5px solid var(--qbw-hair-strong); background: var(--qbw-card); color: var(--qbw-ink); }
+  .qbw-pager-r { display: flex; align-items: center; gap: 4px; }
+  .qbw-pgrange { font-size: 12px; color: var(--qbw-muted); font-variant-numeric: tabular-nums; padding: 0 8px; }
+  .qbw-pgbtn { width: 30px; height: 30px; border: 0.5px solid var(--qbw-hair-strong); background: var(--qbw-card);
+    border-radius: 7px; color: var(--qbw-ink-2); cursor: pointer; display: grid; place-items: center; }
+  .qbw-pgbtn:not(:disabled):hover { background: var(--qbw-card-2); }
+  .qbw-pgbtn:disabled { opacity: 0.4; cursor: default; }
+  .qbw-pgbtn svg { width: 17px; height: 17px; }
+}
+
+/* Embedded inside the existing connected shell: ONE unified card that holds the
+   rail + module content together, split only by the rail's divider line — so
+   they read as a single panel, not two separate blocks. */
+.qbw-root.qbw-embedded {
+  min-height: 520px;
+  border: 0.5px solid var(--qbw-hair-strong);
+  border-radius: 14px;
+  box-shadow: 0 4px 22px -12px rgba(20, 24, 40, 0.16), 0 1px 3px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  animation: qbw-fade-up 0.36s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+/* While a banner/hero still sits above, don't stick the header to the viewport. */
+.qbw-root.qbw-embedded .qbw-sticky { position: static; }
+
+/* ── Calm the existing QuickBooks module dialogs (bill detail, assign account,
+      assign COA, employee/project config, etc.). These are portalled to <body>,
+      so the rules live at the top level. We retire the loud per-module rainbow
+      accent bar for a single quiet accent, and give the paper a soft edge. ── */
+.qb-dialog-paper {
+  border: 0.5px solid var(--qbw-hair-strong) !important;
+  box-shadow: 0 24px 70px -24px rgba(20, 24, 40, 0.42) !important;
+}
+.qb-dialog-accent-bills,
+.qb-dialog-accent-bill-payments,
+.qb-dialog-accent-employees,
+.qb-dialog-accent-services {
+  height: 3px !important;
+  background: var(--qbw-accent) !important;
+}
+
+@media (max-width: 860px) {
+  .qbw-root .qbw-rail { display: none; }
+  .qbw-root .qbw-whead { flex-direction: column; align-items: flex-start; gap: 12px; }
+}
+
+/* ── Motion — calm, purposeful (no shimmer/glow/pulse) ── */
+@keyframes qbw-fade-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes qbw-row-in  { from { opacity: 0; transform: translateY(5px);  } to { opacity: 1; transform: none; } }
+@keyframes qbw-indeterminate { 0% { left: -40%; } 100% { left: 100%; } }
+@keyframes qbw-pop     { from { opacity: 0; transform: translateY(-6px) scale(0.985); } to { opacity: 1; transform: none; } }
+
+/* Rows reveal in a gentle stagger on load / filter / page change. */
+.qbw-root .qbw-table tbody tr { animation: qbw-row-in 0.30s ease both; }
+.qbw-root .qbw-table tbody tr:nth-child(1)  { animation-delay: 0.02s; }
+.qbw-root .qbw-table tbody tr:nth-child(2)  { animation-delay: 0.05s; }
+.qbw-root .qbw-table tbody tr:nth-child(3)  { animation-delay: 0.08s; }
+.qbw-root .qbw-table tbody tr:nth-child(4)  { animation-delay: 0.11s; }
+.qbw-root .qbw-table tbody tr:nth-child(5)  { animation-delay: 0.14s; }
+.qbw-root .qbw-table tbody tr:nth-child(6)  { animation-delay: 0.17s; }
+.qbw-root .qbw-table tbody tr:nth-child(7)  { animation-delay: 0.20s; }
+.qbw-root .qbw-table tbody tr:nth-child(8)  { animation-delay: 0.23s; }
+.qbw-root .qbw-table tbody tr:nth-child(9)  { animation-delay: 0.26s; }
+.qbw-root .qbw-table tbody tr:nth-child(10) { animation-delay: 0.29s; }
+.qbw-root .qbw-table tbody tr:nth-child(n+11) { animation-delay: 0.31s; }
+
+/* Per-module content settles in on every rail switch — the header rises while the
+   rows stagger below it (the sticky region remounts each time the module changes). */
+.qbw-root .qbw-sticky { animation: qbw-fade-up 0.32s var(--qbw-ease, ease) both; }
+
+/* Menus & interactive polish — calm transitions + a subtle press, no bounce. */
+.qbw-root .qbw-sync-menu { animation: qbw-pop 0.14s ease; }
+.qbw-root .qbw-hintpop { animation: qbw-pop 0.14s ease; }
+.qbw-root .qbw-mod { transition: background 0.13s ease, color 0.13s ease; }
+.qbw-root .qbw-fpill { transition: background 0.13s ease, color 0.13s ease, border-color 0.13s ease; }
+.qbw-root .qbw-fpill:active { transform: scale(0.97); }
+.qbw-root .qbw-split-main,
+.qbw-root .qbw-split-caret { transition: filter 0.13s ease, background 0.13s ease, transform 0.13s ease; }
+.qbw-root .qbw-split-main:active:not(:disabled),
+.qbw-root .qbw-split-caret:active:not(:disabled) { transform: scale(0.98); }
+.qbw-root .qbw-pgbtn { transition: background 0.13s ease, color 0.13s ease, opacity 0.13s ease; }
+.qbw-root .qbw-avatar { transition: transform 0.15s var(--qbw-ease, ease); }
+.qbw-root .qbw-table tbody tr:hover .qbw-avatar { transform: scale(1.05); }
+/* A square doesn't bounce well, so the record tile warms to the accent on row hover
+   instead — same "this row is live" cue, matching the selected rail module's glyph. */
+.qbw-root .qbw-rectile {
+  transition: background 0.15s var(--qbw-ease, ease), color 0.15s var(--qbw-ease, ease),
+    border-color 0.15s var(--qbw-ease, ease);
+}
+.qbw-root .qbw-table tbody tr:hover .qbw-rectile {
+  background: var(--qbw-accent-soft); color: var(--qbw-accent); border-color: transparent;
+}
+
+/* Toast / inline alerts sit above the card (outside .qbw-root) — slide down + fade in. */
+@keyframes qbw-slide-in { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+.qbw-toast { animation: qbw-slide-in 0.24s var(--qbw-ease, ease) both; }
+
+/* ── Refetch feedback ────────────────────────────────────────────────────────
+      A page/filter/search change (or a post-sync reload) re-queries a table that
+      already has rows. Blanking those rows back to skeletons would read as a
+      regression, so the rows stay put and slightly recede while a quiet
+      indeterminate line runs across the top of the table region. The line is
+      absolutely positioned so appearing and disappearing never shifts layout. */
+.qbw-root .qbw-table-region { position: relative; }
+.qbw-root .qbw-refreshbar {
+  position: absolute; top: 0; left: 0; right: 0; height: 2px; z-index: 3;
+  overflow: hidden; background: var(--qbw-hair-2); pointer-events: none;
+}
+.qbw-root .qbw-refreshbar-fill {
+  position: absolute; top: 0; height: 100%; width: 34%; border-radius: 3px;
+  background: var(--qbw-accent); animation: qbw-indeterminate 1.4s ease-in-out infinite;
+}
+/* Recede the data only — column headers and the pager stay fully legible, so the user
+   can still read what is being fetched and which page they are on. Interaction stays
+   live throughout; nothing is blocked while the refetch is in flight. */
+.qbw-root .qbw-table tbody { transition: opacity 0.16s var(--qbw-ease, ease); }
+.qbw-root .qbw-table-region--refreshing .qbw-table tbody { opacity: 0.62; }
+
+/* ── Busy Sync button ────────────────────────────────────────────────────────
+      A slow sheen crosses the fill while a sync is starting or running, so a
+      long job keeps showing life. Transform-only, so it stays off the layout and
+      paint paths; the button's size and text never move. */
+@keyframes qbw-sheen { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+.qbw-root .qbw-splitbtn--busy .qbw-split-main { position: relative; overflow: hidden; }
+.qbw-root .qbw-splitbtn--busy .qbw-split-main::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(100deg, transparent 18%, rgba(255, 255, 255, 0.22) 50%, transparent 82%);
+  animation: qbw-sheen 1.8s var(--qbw-ease, ease) infinite;
+}
+
+/* ── Interaction states ──────────────────────────────────────────────────────
+      One consistent vocabulary for every control in the workspace: a hover tint
+      (already defined per-control above), a small press, and a single visible
+      focus ring for keyboard users. Ring uses :focus-visible so pointer clicks
+      stay clean. */
+.qbw-root {
+  .qbw-split-main:focus-visible,
+  .qbw-split-caret:focus-visible,
+  .qbw-sync-opt:focus-visible,
+  .qbw-hint-btn:focus-visible,
+  .qbw-fpill:focus-visible,
+  .qbw-pgbtn:focus-visible,
+  .qbw-btn:focus-visible,
+  .qbw-mod:focus-visible,
+  .qbw-rail-head:focus-visible,
+  .qbw-rail-link:focus-visible,
+  .qbw-pager-l select:focus-visible {
+    outline: 2px solid var(--qbw-accent);
+    outline-offset: 2px;
+  }
+  /* The split button's halves sit flush against each other — inset the ring so it
+     traces the pressed half instead of overlapping its neighbour. */
+  .qbw-split-main:focus-visible,
+  .qbw-split-caret:focus-visible { outline-offset: -2px; }
+
+  /* Search field: the wrapper carries the border, so it carries the focus state. */
+  .qbw-search { transition: border-color 0.13s ease, background 0.13s ease, box-shadow 0.13s ease; }
+  .qbw-search:focus-within {
+    background: var(--qbw-card);
+    border-color: var(--qbw-accent);
+    box-shadow: 0 0 0 3px var(--qbw-accent-soft);
+  }
+  .qbw-search:focus-within svg { color: var(--qbw-accent); }
+
+  /* Press feedback — subtle and fast; disabled controls never move. */
+  .qbw-btn { transition: filter 0.13s ease, background 0.13s ease, transform 0.13s var(--qbw-ease, ease); }
+  .qbw-btn:active:not(:disabled) { transform: scale(0.98); }
+  .qbw-pgbtn:active:not(:disabled) { transform: scale(0.94); }
+  .qbw-mod:active { background: var(--qbw-accent-soft); }
+  .qbw-rail-link:active:not(:disabled) { transform: scale(0.99); }
+  .qbw-rail-link { transition: background 0.13s ease, color 0.13s ease, transform 0.13s var(--qbw-ease, ease); }
+
+  /* Status pills settle rather than snap when a row's status changes after a sync. */
+  .qbw-spill, .qbw-status-dot, .qbw-mod-badge, .qbw-mod-count {
+    transition: background 0.18s var(--qbw-ease, ease), color 0.18s var(--qbw-ease, ease);
+  }
+}
+
+/* ── Loading skeleton — a calm placeholder of the workspace + in-table rows. It
+      reuses the real .qbw-rail / .qbw-work / .qbw-table-region layout so the UI reads
+      as materializing in place instead of flashing a spinner. MUI Skeleton is tinted
+      to the quiet palette; its pulse (and the row stagger) are already covered by the
+      reduced-motion block below, since everything here lives inside .qbw-root. ── */
+.qbw-root .MuiSkeleton-root { background-color: rgba(0, 0, 0, 0.07); border-radius: 6px; }
+.qbw-root.qbw-skeleton { pointer-events: none; }
+.qbw-skel-lines { display: flex; flex-direction: column; gap: 5px; min-width: 0; flex: 1; }
+.qbw-skel-railhead { display: flex; align-items: center; gap: 11px; padding: 6px 8px 16px; }
+.qbw-skel-mod { display: flex; align-items: center; gap: 12px; padding: 9px 10px; }
+.qbw-skel-whead { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 22px 28px; }
+.qbw-skel-whead-title { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.qbw-skel-toolbar { display: flex; align-items: center; gap: 16px; padding: 16px 28px; border-top: 0.5px solid var(--qbw-hair-2); }
+.qbw-skel-pills { display: flex; align-items: center; gap: 8px; }
+.qbw-skel-table { display: flex; flex-direction: column; }
+.qbw-root.qbw-skeleton .qbw-skel-row {
+  display: flex; align-items: center; gap: 24px;
+  padding: 14px 28px; border-top: 0.5px solid var(--qbw-hair-2);
+  animation: qbw-row-in 0.30s var(--qbw-ease, ease) both;
+}
+.qbw-skel-idc { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+.qbw-skel-col { flex: 0 0 auto; }
+
+@media (prefers-reduced-motion: reduce) {
+  .qbw-root .qbw-spin { animation: none; }
+  .qbw-root *, .qbw-root.qbw-embedded { animation: none !important; }
+  .qbw-root * { transition: none !important; }
+  .qbw-toast { animation: none !important; }
+  /* The blanket rule above stops the travelling fills, which would otherwise leave a
+     stalled 34% stub reading as "stuck". Present them as static full-width bars so the
+     busy state is still legible without motion. */
+  .qbw-root .qbw-refreshbar-fill,
+  .qbw-root .qbw-syncbar-fill { left: 0; width: 100%; opacity: 0.55; }
+  /* No sheen to sweep — drop it entirely rather than leaving a bright static band. */
+  .qbw-root .qbw-splitbtn--busy .qbw-split-main::after { display: none; }
+}

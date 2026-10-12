@@ -1,0 +1,304 @@
+# Gold Pipeline — Unified Configuration
+#
+# Single source of truth for all Gold features.
+# Each feature has two concerns in one place:
+#
+#   enabled       → WHETHER the feature runs (ops control)
+#   type/weight   → HOW the feature runs (developer classification)
+#
+# Ops team: only touch "enabled: true/false"
+# Developers: update classification fields when adding/changing a loader
+#
+# Override config path: GOLD_CONFIG_PATH env var
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# Field reference:
+#
+#   enabled       true | false — skip entire feature if false
+#   type          batch | realtime
+#                   batch    → runs via cron every 15 min (run_pipeline.py)
+#                   realtime → runs as systemd service (always on)
+#   weight        heavy | medium | light
+#                   heavy    → 3+ table joins OR external API per record
+#                   medium   → 2-3 table joins, no external API
+#                   light    → simple aggregation or single table query
+#   table_joins   number of Silver tables joined in the SQL query
+#   external_api  true if the loader calls an external API per record
+#                   (e.g. Azure OpenAI for embeddings)
+#   freshness_sla seconds — maximum acceptable data age before alert fires
+#   service       systemd service name (realtime features only)
+#   collections   Cosmos DB collections this feature writes to
+#   reason        why this classification was chosen
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── SLA / timeout thresholds (configurable — no hardcoded values in code) ─────
+# Resolution precedence (highest first):
+#   projects."<tenant>:<project>" > tenants."<tenant>" > environments."<GOLD_ENV>"
+#   > feature/loader freshness_sla > sla.defaults
+# Tenant/project/environment entries are SPARSE — add only where an override is
+# needed; everything else falls through to sla.defaults. Selected env = GOLD_ENV.
+# Metrics: freshness_sla (s, max Gold data age) · tenant_timeout_s (s, 0 = none)
+#          · project_timeout_s (s, 0 = none).
+sla:
+  defaults:
+    freshness_sla: 900
+    tenant_timeout_s: 300
+    project_timeout_s: 0
+  environments:
+    prod: {}
+    dev:
+      freshness_sla: 3600       # looser freshness in dev
+  tenants: {}                   # e.g. tn78010693: { tenant_timeout_s: 600 }
+  projects: {}                  # e.g. "tn78010693:1006": { project_timeout_s: 120 }
+
+# ── Phase 1 release (2026-07-17) ─────────────────────────────────────────────
+# gold_eden and gold_canonical are enabled for Phase 1 (canonical added 2026-07-29,
+# ops decision — user_permissions RBAC needed alongside eden). bpe / qa_recommendation
+# stay disabled end-to-end (setup, batch loaders, and their streaming jobs all gate
+# on `enabled` below) until a future release phase re-enables them — no code removed,
+# just toggled off.
+# Within eden, `enabled_collections` is the actual gate (read by
+# setup_gold_eden.py, step_registry.py, and gold_eden_stream.py); `collections`
+# remains the full inventory for documentation/reference.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── Batch features (cron every 15 min) ───────────────────────────────────────
+
+bpe:
+  enabled: false  # Phase 1: disabled — re-enable in a future release phase
+  type: realtime
+  weight: heavy
+  table_joins: 7
+  external_api: false
+  freshness_sla: 5
+  host: shared
+  service: gold-bpe
+  source: event_hub_consolidated
+  kafka_topic: local.silver.cdc.events
+  consumer_group: gold-bpe-v1
+  collections:
+    - feature_store
+  reason: "feature_store migrated from 15-min batch to CDC-triggered streaming (gold_bpe_stream): consumes local.silver.cdc.events (dedicated Silver CDC hub, consumer group gold-bpe-v1) and, on a change to project/project_estimate/bom/resource_estimate/payment_expense/answers/task, recomputes that (tenant,project)'s feature_store doc via load_estimate_snapshot.build_documents and upserts by (tenantId, project_id). prediction_store (model OUTPUT) is NOT written by this pipeline. setup_gold_feat_bpe still runs in batch so collections/indexes exist; a one-time batch run() backfills existing projects."
+
+eden:
+  enabled: true
+  type: realtime
+  weight: medium
+  table_joins: 4
+  external_api: false
+  freshness_sla: 2
+  host: shared
+  service: gold-eden
+  source: event_hub_consolidated
+  kafka_topic: local.silver.cdc.events
+  consumer_group: gold-eden-v1
+  collections:
+    - project_health
+    - invoice_summary
+    - task_intelligence
+    - procurement_status
+    - bom_stock_gap
+    - estimate_price_evidence
+    - schedule_move_evidence
+    - weather_schedule_cross
+    - bid_context
+    - tenant_dashboard
+    - knowledge_chunk
+  enabled_collections:  # Phase 1: only these are set up / populated / streamed
+    - project_health
+    - invoice_summary
+    - task_intelligence
+    - procurement_status
+    - bom_stock_gap
+    - agent_audit
+    - agent_memory
+    - agent_plan
+    # estimate_price_evidence (Q1) / schedule_move_evidence (Q2) reasoning
+    # evidence collections NOT added here yet — code is built (loader +
+    # contract + setup + step_registry for each) but neither has gone
+    # through Phase 1 release review. Add either name to this allowlist
+    # to turn it on.
+  reason: "CDC-triggered re-aggregation: reads local.silver.cdc.events (dedicated Silver CDC hub, consumer group gold-eden-v1). On a relevant Silver change it re-runs the affected loader's tested SQL for just that (tenant, project) and upserts the affected collections. Replaced the */1 batch cron — freshness drops from 60s to ~2s while preserving multi-table join correctness. Initial population is now Debezium-based too, not a separate direct-Silver-SQL batch run: fieldcraft-silver-cdc-connector.template.json's snapshot.mode is 'initial', so a fresh connector/replication-slot registration snapshots every current Silver row through the same topic gold_eden_stream.py already consumes — step_registry.py's --rebuild (force_batch) is a no-op for eden as of this change (see its own comment there for how to recover a genuine streaming gap instead)."
+
+qa_recommendation:
+  enabled: false  # Phase 1: disabled — re-enable in a future release phase
+  type: realtime
+  weight: medium
+  table_joins: 3
+  external_api: false
+  freshness_sla: 5
+  host: shared
+  service: gold-qa-recommendation
+  source: event_hub_consolidated
+  kafka_topic: local.silver.cdc.events
+  consumer_group: gold-qa-recommendation-v1
+  collections:
+    - qa_answer
+  reason: "qa_answer migrated from 15-min batch to CDC-triggered streaming (gold_qa_recommendation_stream): consumes local.silver.cdc.events and, on a change to answers/project/bom, recomputes that (tenant,project)'s qa_answer docs via load_qa_recommendation.build_documents and upserts by (tenantId, answerId). 3-table join (answers + project + bom) with EventData JSONB transform and embedded BOM lines; grain = one doc per Q&A answer."
+
+canonical:
+  enabled: true  # Enabled 2026-07-29 alongside eden for Phase 1 (ops decision)
+  type: realtime
+  weight: medium
+  table_joins: 5
+  external_api: false
+  freshness_sla: 30
+  host: shared
+  service: gold-canonical
+  source: event_hub_consolidated
+  kafka_topic: local.silver.cdc.events
+  consumer_group: gold-canonical-v1
+  collections:
+    - user_permissions
+    - tenant
+    - project
+    - customer
+    - asset
+    - lead
+    - communication_log
+  reason: "Canonical Gold — cross-feature reference data, not owned by one feature. user_permissions resolves effective roles/permissions/project membership per user (user_account + user_role_map + roles + role_permission + resource + project_member). tenant/project/customer/asset migrated from 15-min batch to the same CDC-triggered stream — tenant (2026-08-24) recomputes on a change to silver.tenant (tenant-grain, upserts by (tenantId, sourceEnv)); project (2026-08-24) recomputes on a change to silver.project (own id) or silver.customer_asset (project_id column, asset-linkage refresh) (project-grain, upserts by (tenantId, projectId, sourceEnv)); customer/asset (2026-08-24, second pass) recompute on a change to silver.customer_asset (customer_uid/asset_uid columns) or, for customer, silver.fieldcraft_customer_customer (customer_uuid column) — both loaders gained an optional customer_uid/asset_uid scope filter (load_customer.py/load_asset.py) so a single-entity recompute doesn't rescan every customer_asset row for the tenant. lead/communication_log (added for the CRM work, see docs/crm/eden_crm_gold_requirements.md G2/G5) were added realtime-only from the start — no batch cutover history — recomputing on a change to silver.fieldcraft_customer_lead (own lead_uid; tenant from its tenant_id column, since _s_tenantid is 'fieldcraft_customer') / silver.communication_log (own id) respectively; both loaders (load_lead.py/load_communication_log.py) take an optional scope filter (lead_uid/communication_log_id) mirroring project's own-id pattern. load_lead.py additionally LEFT JOINs silver.external_service_service_master directly (no separate service_lookup collection) to resolve service_id to a display name (serviceName only — the raw serviceId FK is not surfaced), and load_communication_log.py LEFT JOINs silver.project to resolve project_id to its order_no — neither join has its own CDC trigger table (both source tables are small/rarely-changing; see each loader's own comment). All seven collections share one Flink job (gold_user_permissions_stream.py, job name gold-canonical-stream — kept as-is; only its internal routing/reaggregation grew a grain per collection) and one Kafka consumer group (gold-canonical-v1) so they don't fragment CDC consumption. question/answer remain batch-only (see step_registry.py) — global/rarely-changing reference data where the 15-min cadence is sufficient. Direct-key trigger tables (user_account, user_role_map, resource) recompute a single user; roles/role_permission/project_member have no user key in the CDC payload and recompute the whole tenant instead (see gold_user_permissions_stream.py docstring). freshness_sla tightened to 30s — RBAC/permission-revocation staleness is a security-sensitive latency. Batch loaders (load_user_permissions/load_tenant/load_project/load_customer/load_asset/load_lead/load_communication_log) still run as the one-time seed/backfill under `run_pipeline.py --rebuild` (step_registry.is_realtime gate), per docs/gold-layer/initial_load_cutover_runbook.md — start the stream first, then --rebuild."
+
+# ── Individual loader profiles (used by monitoring + timeout decisions) ────────
+# These are read by step_registry.py for per-loader classification.
+# Ops: do not edit these — edit feature-level enabled above.
+
+loaders:
+  load_estimate_snapshot:
+    weight: light
+    table_joins: 7
+    external_api: false
+    freshness_sla: 900
+    reason: "Silver project + BOM join; per-project feature_store document"
+
+  load_project_health:
+    weight: medium
+    table_joins: 4
+    external_api: false
+    freshness_sla: 900
+    reason: "4-table join, high record count per tenant"
+
+  load_invoice_summary:
+    weight: light
+    table_joins: 2
+    external_api: false
+    freshness_sla: 900
+    reason: "2-table join, straightforward aggregation"
+
+  load_task_intelligence:
+    weight: medium
+    table_joins: 3
+    external_api: false
+    freshness_sla: 900
+    reason: "3-table join, high task count per project"
+
+  load_procurement_status:
+    weight: medium
+    table_joins: 4
+    external_api: false
+    freshness_sla: 900
+    reason: "4-table join across procurement entities"
+
+  load_bid_context:
+    weight: light
+    table_joins: 2
+    external_api: false
+    freshness_sla: 900
+    reason: "2-table join, SDM form state only"
+
+  load_bom_stock_gap:
+    weight: heavy
+    table_joins: 5
+    external_api: false
+    freshness_sla: 900
+    reason: "Procurement agent — bom (line items) + project + stock_item + vendor_material_map + material_cost + vendor; grain one doc per (project, material). Corrected source model: no bom_item; price via material_cost (vendor_material_map has no price)."
+
+  load_estimate_price_evidence:
+    weight: heavy
+    table_joins: 4
+    external_api: false
+    freshness_sla: 900
+    reason: "Finance agent (Q1 reasoning evidence) — silver.project_estimate (windowed LAG per version) + silver.bom (reconciliation SUM) + silver.vendor_material_map + silver.material_cost (price-at-estimate-date resolution); grain one doc per (project, estimate version). Batch-only — not yet wired into gold_eden_stream.py's CDC trigger table, so it always runs regardless of eden's realtime classification (see step_registry.py comment)."
+
+  load_schedule_move_evidence:
+    weight: heavy
+    table_joins: 4
+    external_api: false
+    freshness_sla: 900
+    reason: "Schedule agent (Q2 reasoning evidence) — silver.project_schedule (windowed LAG per version, date-move detection) + silver.resource_schedule (completed-assignment correlation) + silver.audit_log (reschedule events via project.project_uid) + silver.rule_solve_snapshot (GoPAL solve-engine record); grain one doc per (project, schedule version). No proven causation — corroborating evidence only. Batch-only — not yet wired into gold_eden_stream.py's CDC trigger table, so it always runs regardless of eden's realtime classification (see step_registry.py comment)."
+
+  load_weather_schedule_cross:
+    weight: medium
+    table_joins: 3
+    external_api: false
+    freshness_sla: 900
+    reason: "Schedule agent — task + project + site_weather (weather_data JSON parse); nightly batch after weather refresh; grain one doc per (project, task, scheduled day)."
+
+  load_tenant_dashboard:
+    weight: medium
+    table_joins: 3
+    external_api: false
+    freshness_sla: 900
+    reason: "cross-project aggregation per tenant"
+
+  load_qa_recommendation:
+    weight: medium
+    table_joins: 3
+    external_api: false
+    freshness_sla: 900
+    reason: "3-table join (silver.answers + silver.project + silver.bom); BOM lines bulk-fetched per batch and embedded; EventData JSONB transform; incremental watermark"
+
+  load_knowledge_chunk:
+    weight: heavy
+    table_joins: 0
+    external_api: true
+    freshness_sla: 900
+    reason: "AI Assistant RAG knowledge base (migrated from ai_assistant); reads a JSON source file (SOURCE_PATH) and embeds each chunk via the embedding provider; file-driven batch loader, only runs when a source is configured"
+
+  load_user_permissions:
+    weight: medium
+    table_joins: 5
+    external_api: false
+    freshness_sla: 300
+    reason: "user_account + user_role_map + roles + role_permission + resource + project_member; grain one doc per (tenant, user). Tighter freshness_sla than other batch loaders — RBAC revocation staleness is a security latency, not a display one."
+
+  load_tenant:
+    weight: light
+    table_joins: 1
+    external_api: false
+    freshness_sla: 30
+    reason: "silver.tenant only; grain one doc per (tenantId, sourceEnv). CDC-triggered realtime (2026-08-24) — freshness_sla matches the canonical stream's tightened 30s SLA."
+
+  load_project:
+    weight: light
+    table_joins: 2
+    external_api: false
+    freshness_sla: 30
+    reason: "silver.project + silver.customer_asset (asset-linkage refresh); grain one doc per (tenantId, projectId, sourceEnv). CDC-triggered realtime (2026-08-24)."
+
+  load_customer:
+    weight: light
+    table_joins: 2
+    external_api: false
+    freshness_sla: 30
+    reason: "silver.customer_asset + silver.fieldcraft_customer_customer (LEFT JOIN); grain one doc per (tenantId, customerUid, sourceEnv). CDC-triggered realtime (2026-08-24, second pass); optional customer_uid scope filter for single-entity recompute."
+
+  load_asset:
+    weight: light
+    table_joins: 1
+    external_api: false
+    freshness_sla: 30
+    reason: "silver.customer_asset only; grain one doc per (tenantId, assetUid, sourceEnv). CDC-triggered realtime (2026-08-24, second pass); optional asset_uid scope filter for single-entity recompute."
+
+  load_lead:
+    weight: light
+    table_joins: 2
+    external_api: false
+    freshness_sla: 30
+    reason: "silver.fieldcraft_customer_lead + silver.external_service_service_master (LEFT JOIN, serviceName resolution only); grain one doc per (tenantId, leadUid, sourceEnv). CRM work (docs/crm/eden_crm_gold_requirements.md G2); realtime-only from the start, optional lead_uid scope filter mirrors project's own-id pattern."
+
+  load_communication_log:
+    weight: light
+    table_joins: 2
+    external_api: false
+    freshness_sla: 30
+    reason: "silver.communication_log + silver.project (LEFT JOIN, resolves project_id to order_no); grain one doc per (tenantId, communicationLogId, sourceEnv). CRM work (docs/crm/eden_crm_gold_requirements.md G5); realtime-only from the start, optional communication_log_id scope filter mirrors project's own-id pattern."

@@ -1,0 +1,45 @@
+{
+  "name": "fieldcraft-customer-connector",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "database.hostname": "${POSTGRES_HOST}",
+    "database.port": "${POSTGRES_PORT}",
+    "database.user": "${DEBEZIUM_DB_USER}",
+    "database.password": "${POSTGRES_PASSWORD}",
+    "database.dbname": "${CUSTOMER_DBNAME}",
+    "database.server.name": "${CUSTOMER_SERVER_NAME}",
+    "plugin.name": "pgoutput",
+    "publication.name": "${CUSTOMER_PUBLICATION_NAME}",
+    "publication.autocreate.mode": "all_tables",
+    "slot.name": "${CUSTOMER_REPLICATION_SLOT}",
+
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter.schemas.enable": "false",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable": "false",
+
+    "table.exclude.list": "public.flyway_customer_schema_history",
+
+    "transforms": "unwrap,route",
+    "transforms.unwrap.type": "io.debezium.transforms.ExtractNewRecordState",
+    "transforms.unwrap.add.fields": "op,source.lsn:lsn,source.ts_ms:ts_ms,source.table:source_table,source.db:source_db",
+    "transforms.unwrap.add.fields.prefix": "",
+    "transforms.unwrap.delete.handling.mode": "rewrite",
+    "transforms.unwrap.drop.tombstones": "true",
+    "transforms.route.type": "org.apache.kafka.connect.transforms.RegexRouter",
+    "transforms.route.regex": "(.*)\\.public\\.(.*)",
+    "transforms.route.replacement": "${ETL_ENV}.cdc.events",
+
+    "topic.prefix": "${ETL_ENV}",
+    "decimal.handling.mode": "string",
+    "time.precision.mode": "connect",
+    "snapshot.mode": "initial",
+    "heartbeat.interval.ms": "0",
+    "database.sslmode": "${POSTGRES_SSL_MODE}",
+    "tasks.max": "1",
+    "producer.override.max.request.size": "1000000",
+    "producer.override.batch.size": "131072",
+    "producer.override.linger.ms": "10",
+    "column.exclude.list": "public.tenant_configuration.data"
+  }
+}

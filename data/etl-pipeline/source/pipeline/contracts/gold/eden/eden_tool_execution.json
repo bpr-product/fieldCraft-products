@@ -1,0 +1,261 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "gold_eden.tool_execution",
+  "version": "2.0.0",
+  "description": "Eden tool-execution log — one document per (tenantId, executionId) recording a single tool/API invocation by an agent. Written at AGENT RUNTIME. Provides tool-result storage, tool-execution auditability, and action traceability (SOC 2 / ISO 27001) — every autonomous action an agent takes is recorded with inputs, output, status, and latency. Append-mostly (status/output updated once the call returns).",
+  "x-database": "gold_eden",
+  "x-collection": "tool_execution",
+  "x-grain": "eden_tool_execution",
+  "x-written-by": "agent-runtime",
+  "x-upsert-key": [
+    "tenantId",
+    "executionId"
+  ],
+  "type": "object",
+  "required": [
+    "tenantId",
+    "executionId",
+    "agentId",
+    "toolName",
+    "status",
+    "_grain",
+    "_schemaVersion",
+    "goldUpdatedAt",
+    "_env"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "pipelineRunId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "goldCreatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "goldUpdatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "sourceUpdatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "dataOrigin": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Tenant identifier. First half of the compound key.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "executionId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique invocation id (uuid4). Second half of the compound key.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_grain": {
+      "type": "string",
+      "const": "eden_tool_execution",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_schemaVersion": {
+      "type": "integer",
+      "const": 1,
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "agentId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Agent that invoked the tool.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "sessionId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Conversation/session of the invocation.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "userId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "End user on whose behalf the tool ran. Needed for access auditing.",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "audit_reader"
+      ]
+    },
+    "planId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Plan this invocation belongs to, if any. Joins to agent_plan.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "stepId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Plan step that triggered the invocation.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "toolName": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Name of the tool / MCP tool / API invoked.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "toolKind": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "mcp",
+        "api",
+        "function",
+        "retrieval",
+        null
+      ],
+      "description": "Integration class of the tool.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "inputArgs": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Arguments the tool was called with. Mask/redact secrets before writing.",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "audit_reader"
+      ]
+    },
+    "output": {
+      "type": [
+        "object",
+        "array",
+        "string",
+        "number",
+        "boolean",
+        "null"
+      ],
+      "description": "Tool result. Cacheable / replayable.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "success",
+        "error",
+        "timeout",
+        "denied"
+      ],
+      "description": "Outcome of the invocation. 'denied' = blocked by policy/RBAC before running.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "errorMessage": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Error detail when status=error/timeout.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "latencyMs": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Wall-clock duration of the tool call.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "startedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "finishedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "sourceEnv": {
+      "type": ["string", "null"],
+      "description": "Silver _s_env — logical source environment (si_dev, datamart, ...).",
+      "x-rbac-roles": ["all"]
+    },
+    "_env": {
+      "type": "string",
+      "enum": [
+        "dev",
+        "qa",
+        "stg",
+        "sbx",
+        "prd"
+      ]
+    }
+  }
+}

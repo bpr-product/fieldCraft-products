@@ -1,0 +1,904 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "gold_eden.invoice_summary",
+  "version": "4.0.0",
+  "description": "Eden AI Assistant \u2014 per-project invoice and payment rollup. One document per (tenantId, projectId). Schema mirrors gold/src/eden/load_invoice_summary.py shape_doc() exactly.",
+  "x-database": "gold_eden",
+  "x-collection": "invoice_summary",
+  "x-grain": "eden_invoice_summary",
+  "x-etl-trigger": "event-driven on writes to silver.project, silver.invoice, silver.payment_receives",
+  "x-upsert-guard": "_silverLsn",
+  "type": "object",
+  "required": [
+    "tenantId",
+    "projectId",
+    "_grain",
+    "_schemaVersion",
+    "_silverLsn",
+    "goldUpdatedAt",
+    "_env"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "pipelineRunId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "goldCreatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "goldUpdatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Tenant identifier. First half of the compound upsert key.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "projectId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Project identifier cast to string. Second half of the compound upsert key.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "orderNo": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Order number for the project, passed through from silver.project.order_no.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "_grain": {
+      "type": "string",
+      "const": "eden_invoice_summary",
+      "description": "ETL grain identifier.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_schemaVersion": {
+      "type": "integer",
+      "const": 1,
+      "description": "Integer schema version.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_silverLsn": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "PostgreSQL LSN of the silver.project row at write time. Upsert guard against stale overwrites.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "dataAsOf": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC effective data snapshot time. Prompt-cache key component.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "totalBilled": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Sum of invoiced_amount across all non-invalid invoices for this project.",
+      "x-unit": "USD",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "project_manager",
+        "accountant"
+      ],
+      "x-source-table": "silver.invoice"
+    },
+    "totalReceived": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Sum of payment_receives amounts for this project's invoices.",
+      "x-unit": "USD",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "project_manager",
+        "accountant"
+      ],
+      "x-source-table": "silver.payment_receives"
+    },
+    "totalOutstanding": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Sum of invoiced_amount for invoices not in PAID status.",
+      "x-unit": "USD",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "project_manager",
+        "accountant"
+      ],
+      "x-source-table": "silver.invoice"
+    },
+    "overdueInvoices": {
+      "type": "array",
+      "description": "Unpaid invoices past their due date, ordered by due date ascending.",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "project_manager",
+        "accountant"
+      ],
+      "x-source-table": "silver.invoice",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "invoiceNo": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "invoicedAmount": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "x-unit": "USD"
+          },
+          "dueDate": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "daysOverdue": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "upcomingInvoices": {
+      "type": "array",
+      "description": "Unpaid, non-void invoices with a due date in the future, ordered by due date ascending.",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "project_manager",
+        "accountant"
+      ],
+      "x-source-table": "silver.invoice",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "invoiceNo": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "invoicedAmount": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "x-unit": "USD"
+          },
+          "dueDate": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "lastPayment": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Most recent payment received against this project's invoices. Null when no payments exist.",
+      "additionalProperties": false,
+      "x-rbac-roles": [
+        "tenant_admin",
+        "project_manager",
+        "accountant"
+      ],
+      "x-source-table": "silver.payment_receives",
+      "properties": {
+        "amount": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "x-unit": "USD"
+        },
+        "receivedDate": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "payMethod": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "isDeleted": {
+      "type": "boolean",
+      "description": "Soft-delete tombstone \u2014 true when the source silver.project row is soft-deleted. On recompute the Gold doc is marked deleted (never physically removed/orphaned).",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "deletedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "UTC time the source row was soft-deleted (silver _s_deleted_at); null when live.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "_silverWatermarks": {
+      "type": "object",
+      "description": "Per-source-table high-water _s_silver_ts timestamps at the time this document was last written.",
+      "additionalProperties": false,
+      "x-rbac-roles": [
+        "all"
+      ],
+      "properties": {
+        "project": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "x-source-table": "silver.project"
+        },
+        "invoice": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "x-source-table": "silver.invoice"
+        },
+        "payment_receives": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "x-source-table": "silver.payment_receives"
+        }
+      }
+    },
+    "lafieldcraft": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Milliseconds between the loader run and the oldest contributing Silver watermark.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "invoices": {
+      "type": "array",
+      "description": "Full-detail invoice event list for this project \u2014 one entry per silver.invoice row (invalid=FALSE), ordered by due date ascending. This IS the invoice history: silver.invoice is one-row-per-invoice with no retained state-timeline, so the chronological event list is the correct and complete historical representation (see docs/gold-layer/historical_data_strategy.md).",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "project_manager",
+        "accountant"
+      ],
+      "x-source-table": "silver.invoice",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "invoiceId": {
+            "type": "string"
+          },
+          "invoiceNo": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "type": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "totalAmount": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "x-unit": "USD"
+          },
+          "invoicedAmount": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "x-unit": "USD"
+          },
+          "taxAmount": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "x-unit": "USD"
+          },
+          "balance": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "x-unit": "USD"
+          },
+          "dueDate": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "issuedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "term": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "message": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "customerUid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "documentId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lineItems": {
+            "type": [
+              "object",
+              "array",
+              "string",
+              "null"
+            ]
+          },
+          "codes": {
+            "type": [
+              "object",
+              "array",
+              "string",
+              "null"
+            ]
+          },
+          "taxInfo": {
+            "type": [
+              "object",
+              "array",
+              "string",
+              "null"
+            ]
+          },
+          "additionalInfo": {
+            "type": [
+              "object",
+              "array",
+              "string",
+              "null"
+            ]
+          },
+          "reminder": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "status": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "count": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              }
+            }
+          },
+          "invalid": {
+            "type": "boolean"
+          },
+          "audit": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "createdAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "createdBy": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "version": {
+                "type": [
+                  "integer",
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "payments": {
+      "type": "array",
+      "description": "Full-detail payment event list for this project \u2014 one entry per silver.payment_receives_entries row joined to its parent payment_receives record, ordered by created_at descending.",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "project_manager",
+        "accountant"
+      ],
+      "x-source-table": "silver.payment_receives_entries",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "paymentId": {
+            "type": "string"
+          },
+          "entryId": {
+            "type": "string"
+          },
+          "invoiceNo": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "paymentAmount": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "x-unit": "USD"
+          },
+          "interestPaid": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "x-unit": "USD"
+          },
+          "lateFeePaid": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "x-unit": "USD"
+          },
+          "amount": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "x-unit": "USD"
+          },
+          "invoicedAmount": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "x-unit": "USD"
+          },
+          "suspenseAmount": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "x-unit": "USD"
+          },
+          "payMethod": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "receivedDate": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "customerUid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "chartOfAccountId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "currency": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "code": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "exchangeRate": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              }
+            }
+          },
+          "transaction": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "fieldcraftTransactionId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "paymentTransactionId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "paymentReceiptId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "paymentReferenceNo": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          },
+          "codes": {
+            "type": [
+              "object",
+              "array",
+              "string",
+              "null"
+            ]
+          },
+          "additionalInfo": {
+            "type": [
+              "object",
+              "array",
+              "string",
+              "null"
+            ]
+          },
+          "audit": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "createdAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              }
+            }
+          }
+        }
+      }
+    },
+    "expenses": {
+      "type": "array",
+      "description": "Full-detail expense event list for this project \u2014 one entry per silver.payment_expense row (money paid out: labor/salary, vendor bills), ordered by created_at descending.",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "project_manager",
+        "accountant"
+      ],
+      "x-source-table": "silver.payment_expense",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "expenseId": {
+            "type": "string"
+          },
+          "amount": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "x-unit": "USD"
+          },
+          "status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "billable": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "reference": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "referenceId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "referenceNo": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "referenceType": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          },
+          "payee": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "payeeId": {
+                "type": [
+                  "string",
+                  "integer",
+                  "null"
+                ]
+              },
+              "payeeAccountNo": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "userId": {
+                "type": [
+                  "string",
+                  "integer",
+                  "null"
+                ]
+              }
+            }
+          },
+          "chartOfAccountId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "chartOfAccountName": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Resolved via LEFT JOIN silver.chart_of_account on chart_of_account_id; null if the account was deleted/missing or the ID itself is null."
+          },
+          "currency": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "code": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "exchangeRate": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              }
+            }
+          },
+          "codes": {
+            "type": [
+              "object",
+              "array",
+              "string",
+              "null"
+            ]
+          },
+          "audit": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "createdAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              }
+            }
+          }
+        }
+      }
+    },
+    "sourceEnv": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Silver _s_env \u2014 logical source environment (si_dev, datamart, ...).",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_env": {
+      "type": "string",
+      "enum": [
+        "dev",
+        "qa",
+        "stg",
+        "sbx",
+        "prd"
+      ]
+    }
+  },
+  "x-upsert-key": [
+    "tenantId",
+    "projectId",
+    "sourceEnv"
+  ]
+}

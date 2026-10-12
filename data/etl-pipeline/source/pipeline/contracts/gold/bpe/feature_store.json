@@ -1,0 +1,234 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "gold.bpe.feature_store",
+  "version": "2.0.0",
+  "description": "One document per project (grain bpe_feature_store), keyed (tenantId, project_id). The BPE ML feature store: engineered features + cost fields + source_flags, recomputed from Silver. Written by the realtime BPE stream (sole writer when bpe.type=realtime); also the source for the BPE→Parquet lake export (offline training store).",
+  "type": "object",
+  "required": [
+    "tenantId",
+    "project_id",
+    "_grain",
+    "_schemaVersion",
+    "_env"
+  ],
+  "properties": {
+    "tenantId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "project_id": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "service": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "trade_oid": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "area": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "stories": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "asset_type": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "zipcode": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "city": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "state": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "services": {
+      "type": "array"
+    },
+    "n_services": {
+      "type": "integer"
+    },
+    "is_single_service": {
+      "type": "boolean"
+    },
+    "q_template_version": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "features": {
+      "type": "object",
+      "description": "flattened Q&A features dict"
+    },
+    "material_cost": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "worker_cost": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "tool_cost": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "overhead_cost": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "margin": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "total_cost": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "bom_items": {
+      "type": "array"
+    },
+    "actual_material_spend": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "actual_labor_spend": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "data_quality": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "source_flags": {
+      "type": "object"
+    },
+    "refreshed_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "isDeleted": {
+      "type": "boolean"
+    },
+    "deletedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "_grain": {
+      "const": "bpe_feature_store"
+    },
+    "_schemaVersion": {
+      "type": "integer"
+    },
+    "_silverLsn": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "_silverWatermarks": {
+      "type": "object"
+    },
+    "lafieldcraft": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "pipelineRunId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "goldUpdatedAt": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sourceUpdatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Silver _s_silver_ts"
+    },
+    "dataOrigin": {
+      "type": "string"
+    },
+    "createdAt": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "_pipelineRunId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "_env": {
+      "type": "string",
+      "enum": [
+        "dev",
+        "qa",
+        "stg",
+        "sbx",
+        "prd"
+      ]
+    }
+  },
+  "additionalProperties": true
+}

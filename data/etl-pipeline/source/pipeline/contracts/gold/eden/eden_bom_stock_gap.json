@@ -1,0 +1,542 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "gold_eden.bom_stock_gap",
+  "version": "2.0.0",
+  "description": "Eden Procurement agent \u2014 gap between BOM material requirements and current on-hand stock per project+material. One document per (tenantId, projectId, materialUid). Schema mirrors gold/src/eden/load_bom_stock_gap.py shape_doc() exactly. NOTE: corrected source model \u2014 silver.bom IS the line-item table (no silver.bom_item exists); join bom.material_uid -> stock_item.material_uid; preferred vendor/unit_price via vendor_material_map + material_cost (silver.vendor_material_map has no price column).",
+  "x-database": "gold_eden",
+  "x-collection": "bom_stock_gap",
+  "x-grain": "eden_bom_stock_gap",
+  "x-etl-trigger": "event-driven on writes to silver.bom and silver.stock_item; batch rebuild via --rebuild",
+  "x-upsert-guard": "_silverLsn",
+  "type": "object",
+  "required": [
+    "tenantId",
+    "projectId",
+    "materialUid",
+    "_grain",
+    "_schemaVersion",
+    "_silverLsn",
+    "goldUpdatedAt",
+    "_env"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "pipelineRunId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "goldCreatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "goldUpdatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "sourceUpdatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "dataOrigin": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Tenant identifier. Part of the compound upsert key.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.bom"
+    },
+    "projectId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Project identifier cast to string. Part of the compound upsert key.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.bom"
+    },
+    "projectName": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Denormalized project name (silver.project.customer).",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.project"
+    },
+    "materialUid": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Material UUID (silver.bom.material_uid = silver.stock_item.material_uid). Grain key.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.bom"
+    },
+    "materialId": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "description": "Integer material id (silver.material.id) when resolvable, else null.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.material"
+    },
+    "materialName": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Denormalized material name (silver.bom.material_name, fallback silver.material.name).",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.bom"
+    },
+    "unit": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Unit of measure for display (silver.bom.unit, fallback silver.material.unit).",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.bom"
+    },
+    "requiredQty": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Sum of BOM line quantities for this material on this project (WHERE invalid=false).",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.bom"
+    },
+    "stockQty": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Current on-hand stock for this material across stock_item rows.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.stock_item"
+    },
+    "gapQty": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Computed requiredQty - stockQty. Negative value = shortfall.",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "preferredVendorId": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "description": "Lowest-price vendor (silver.vendor_material_map.vendor_id, ranked by material_cost.cost).",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "project_manager",
+        "estimator"
+      ],
+      "x-source-table": "silver.vendor_material_map"
+    },
+    "preferredVendorName": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Denormalized preferred vendor name (silver.vendor.company_name \u2014 silver.vendor has no 'name' column).",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "project_manager",
+        "estimator"
+      ],
+      "x-source-table": "silver.vendor"
+    },
+    "unitPrice": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Preferred-vendor unit price for PO draft auto-fill (silver.material_cost.cost via vendor_material_map_id; fallback silver.bom.unit_cost). silver.vendor_material_map has no price column.",
+      "x-unit": "USD",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "project_manager",
+        "estimator"
+      ],
+      "x-source-table": "silver.material_cost"
+    },
+    "vendorOptions": {
+      "type": "array",
+      "description": "Every vendor_material_map + vendor + material_cost combination for this material (not just the auto-picked cheapest in preferredVendor*/unitPrice above). Each option embeds its own collapsed price-version history \u2014 silver.material_cost retains multiple effective-dated rows per vendor_material_map_id (verified live: 6 materials, 2-3 versions each). See docs/gold-layer/historical_data_strategy.md \u00a77.",
+      "x-rbac-roles": [
+        "tenant_admin",
+        "project_manager",
+        "estimator"
+      ],
+      "x-source-table": "silver.vendor_material_map",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "vendorMaterialMapId": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "vendorId": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "vendorName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "vendorDisplayName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "vendorStatus": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "vendorType": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "vendorEmail": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "vendorLeadTimeDays": {
+            "type": [
+              "number",
+              "integer",
+              "null"
+            ]
+          },
+          "inStock": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "cost": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "x-unit": "USD"
+          },
+          "costType": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "costUnit": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "costEffectiveStartdate": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "costEffectiveEnddate": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "priceHistory": {
+            "type": "array",
+            "description": "Collapsed price-change timeline for this vendor+material combination, oldest first. No-op versions (identical cost/costType) are dropped; the true current price is always the last entry. Capped at 25 entries (baseline + most recent 24).",
+            "x-source-table": "silver.material_cost",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "cost": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "x-unit": "USD"
+                },
+                "costType": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "unit": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "grade": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "effectiveFrom": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                },
+                "effectiveTo": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time",
+                  "description": "Null = open-ended (also true when source carries the material_cost sentinel end-year, e.g. 3026)."
+                },
+                "recordedAt": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                },
+                "delta": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "x-unit": "USD",
+                  "description": "Cost change vs the previous kept entry; null for the baseline."
+                },
+                "isCurrent": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "priceSummary": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "description": "Null when priceHistory is empty (no material_cost rows for this vendor option).",
+            "additionalProperties": false,
+            "properties": {
+              "currentCost": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "x-unit": "USD"
+              },
+              "baselineCost": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "x-unit": "USD"
+              },
+              "rawVersionCount": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "priceChangeCount": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "totalCostDelta": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "x-unit": "USD"
+              },
+              "firstEffectiveAt": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "lastChangedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "_grain": {
+      "type": "string",
+      "const": "eden_bom_stock_gap",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_schemaVersion": {
+      "type": "integer",
+      "const": 1,
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_silverLsn": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Max PostgreSQL LSN across contributing bom rows at write time. Upsert guard.",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.bom"
+    },
+    "dataAsOf": {
+      "type": "string",
+      "format": "date-time",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "isDeleted": {
+      "type": "boolean",
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.bom"
+    },
+    "deletedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "x-rbac-roles": [
+        "all"
+      ],
+      "x-source-table": "silver.bom"
+    },
+    "_silverWatermarks": {
+      "type": "object",
+      "additionalProperties": false,
+      "x-rbac-roles": [
+        "all"
+      ],
+      "properties": {
+        "project": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "x-source-table": "silver.project"
+        },
+        "bom": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "x-source-table": "silver.bom"
+        },
+        "stock_item": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "x-source-table": "silver.stock_item"
+        }
+      }
+    },
+    "lafieldcraft": {
+      "type": "integer",
+      "minimum": 0,
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "sourceEnv": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Silver _s_env \u2014 logical source environment (si_dev, datamart, ...).",
+      "x-rbac-roles": [
+        "all"
+      ]
+    },
+    "_env": {
+      "type": "string",
+      "enum": [
+        "dev",
+        "qa",
+        "stg",
+        "sbx",
+        "prd"
+      ]
+    }
+  },
+  "x-upsert-key": [
+    "tenantId",
+    "projectId",
+    "materialUid",
+    "sourceEnv"
+  ]
+}

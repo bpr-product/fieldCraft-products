@@ -1,0 +1,66 @@
+.assetSubHeader {
+  // color: #168316 !important;
+  font-size: 22px !important;
+  padding-left: 8px !important;
+}
+
+.assetSubName {
+  // color: #168316 !important;
+  font-size: 20px !important;
+  // padding-bottom: 8px !important;
+  font-weight: 500 !important;
+}
+.assetStreetName {
+  font-size: 16px !important;
+  // color: #035283 !important;
+}
+.assetZipCode {
+  font-size: 16px !important;
+  color: rgb(66, 66, 66) !important;
+  padding-bottom: 8px !important;
+}
+.assetImage {
+  width: 95% !important;
+  height: 200px !important;
+  border-radius: 7px !important;
+}
+
+.assetContent {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.assetImageUpload {
+  width: 100% !important;
+  height: 300px !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-direction: column !important;
+  background-color: rgb(255, 255, 255) !important;
+  transition: box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms !important;
+  border-radius: 6px !important;
+  box-shadow: rgba(47, 43, 61, 0.1) 0px 4px 18px 0px !important;
+  background-image: none !important;
+  overflow: hidden !important;
+}
+
+.tenantImageUpload {
+  width: 100% !important;
+  height: 250px !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-direction: column !important;
+  background-color: rgb(255, 255, 255) !important;
+  transition: box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms !important;
+  border-radius: 6px !important;
+  box-shadow: rgba(47, 43, 61, 0.1) 0px 4px 18px 0px !important;
+  background-image: none !important;
+  overflow: hidden !important;
+}
+.bill{
+  background-color: #85bb65;
+}

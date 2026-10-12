@@ -1,0 +1,159 @@
+# config/environments.nonprod.yaml
+#
+# Nonprod-tier variant of environments.yaml -- same schema, different
+# cdc_enabled selection. See docker-compose.nonprod.yml's
+# ENVIRONMENTS_CONFIG_PATH (all nonprod services point here, not the plain
+# environments.yaml used by dev/server).
+#
+# WHY A SEPARATE FILE (not one shared environments.yaml for every tier):
+# environments.yaml is git-tracked and gets baked into the Docker image at
+# build time for every service except env-config-watcher (which bind-mounts
+# it live). Both nonprod.yml and prod.yml used to point at the exact same
+# in-container path -- meaning whichever cdc_enabled flags happened to be
+# committed on whatever branch/commit each pipeline deployed applied
+# identically to BOTH tiers, with nothing structurally keeping them apart.
+# Splitting into per-tier files makes the separation explicit instead of
+# relying on branch/commit discipline.
+#
+# Credentials are still ${ENV_VAR} placeholders resolved from this tier's own
+# .env.nonprod at container start -- no secrets in this file.
+#
+# Full schema reference: docs/multi-env/configuration_reference.md
+
+tier: nonprod
+
+environments:
+
+  # ── DATAMART ──────────────────────────────────────────────────────────────
+  datamart:
+    cdc_enabled: false
+    snapshot_mode: never
+    source:
+      host:         ${DATAMART_PG_HOST}
+      port:         5432
+      user:         ${DATAMART_PG_USER}
+      password:     ${DATAMART_PG_PASSWORD}
+      provider_db:  ${DATAMART_PG_DBNAME}
+      ssl_mode:     require
+    tables:
+      columns:
+        trade:
+          drop: [trade_logo]
+        tenant_configuration:
+          drop: [data]
+
+  # ── DEV ───────────────────────────────────────────────────────────────────
+  dev:
+    cdc_enabled: false
+    snapshot_mode: initial
+    source:
+      host:         ${DEV_PG_HOST}
+      port:         5432
+      user:         ${DEV_PG_USER}
+      password:     ${DEV_PG_PASSWORD}
+      provider_db:  ${DEV_PG_DBNAME}
+      ssl_mode:     require
+    tables:
+      columns:
+        worker:
+          drop: [ssn, date_of_birth]
+
+  # ── SI DEV ───────────────────────────────────────────────────────────────
+  si_dev:
+    cdc_enabled: false
+    snapshot_mode: never
+    source:
+      host:         ${SI_DEV_PG_HOST}
+      port:         5432
+      user:         ${SI_DEV_PG_USER}
+      password:     ${SI_DEV_PG_PASSWORD}
+      provider_db:  ${SI_DEV_PG_DBNAME}
+      ssl_mode:     require
+    tables:
+      columns:
+        worker:
+          drop: [ssn, date_of_birth]
+
+  # ── QA ────────────────────────────────────────────────────────────────────
+  qa:
+    cdc_enabled: false
+    # See the STAGING block's comment below -- "when_needed" is rejected by
+    # this tier's actual debezium/connect:2.5 image. Use "initial".
+    snapshot_mode: initial
+    source:
+      host:         ${QA_PG_HOST}
+      port:         5432
+      user:         ${QA_PG_USER}
+      password:     ${QA_PG_PASSWORD}
+      provider_db:  ${QA_PG_DBNAME}
+      ssl_mode:     require
+    tables:
+      columns:
+        worker:
+          drop: [ssn, date_of_birth]
+
+  # ── STAGING ───────────────────────────────────────────────────────────────
+  staging:
+    cdc_enabled: true
+    # NOTE: "when_needed" is documented for some Debezium connectors but is
+    # NOT a valid enum value for io.debezium.connector.postgresql.PostgresConnector
+    # in the debezium/connect:2.5 image actually deployed here -- Kafka Connect's
+    # own config validation rejects it. Use "initial" (first-run snapshot).
+    snapshot_mode: initial
+    source:
+      host:         ${STAGING_PG_HOST}
+      port:         5432
+      user:         ${STAGING_PG_USER}
+      password:     ${STAGING_PG_PASSWORD}
+      provider_db:  ${STAGING_PG_DBNAME}
+      ssl_mode:     require
+    tables:
+      # old_task is a per-task VERSION-HISTORY table (every reschedule appends a
+      # new row rather than overwriting) -- confirmed live 2026-08-18: ~1.76M
+      # rows across 4 tenants, ~71% of this env's entire Silver footprint, and
+      # NOT read by any Gold loader/EDEN/BPE/Recommendation code (grepped the
+      # whole tree, only this table's own comment mentions it). Excluding it
+      # skips it during BOTH the initial Debezium snapshot and ongoing CDC --
+      # Debezium only snapshots/captures tables in its include/exclude-derived
+      # capture set. Existing already-replicated rows in Silver are NOT deleted
+      # by this alone; that needs a separate explicit DROP/TRUNCATE.
+      exclude: [old_task]
+      columns:
+        worker:
+          drop: [ssn, date_of_birth]
+
+  # ── SANDBOX ───────────────────────────────────────────────────────────────
+  sandbox:
+    cdc_enabled: false
+    # See the STAGING block's comment below -- "when_needed" is rejected by
+    # this tier's actual debezium/connect:2.5 image. Use "initial".
+    snapshot_mode: initial
+    source:
+      host:         ${SANDBOX_PG_HOST}
+      port:         5432
+      user:         ${SANDBOX_PG_USER}
+      password:     ${SANDBOX_PG_PASSWORD}
+      provider_db:  ${SANDBOX_PG_DBNAME}
+      ssl_mode:     require
+    tables:
+      columns: {}
+
+  # ── PROD ──────────────────────────────────────────────────────────────────
+  # Never enabled on the nonprod tier -- prod source data belongs only in
+  # environments.prod.yaml, deployed only to the prod stack.
+  prod:
+    cdc_enabled: false
+    # See the STAGING block's comment above -- "when_needed" is rejected by
+    # this tier's actual debezium/connect:2.5 image. Use "initial".
+    snapshot_mode: initial
+    source:
+      host:         ${PROD_PG_HOST}
+      port:         5432
+      user:         ${PROD_PG_USER}
+      password:     ${PROD_PG_PASSWORD}
+      provider_db:  ${PROD_PG_DBNAME}
+      ssl_mode:     require
+    tables:
+      columns:
+        worker:
+          drop: [ssn, date_of_birth]
